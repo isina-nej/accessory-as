@@ -5,7 +5,7 @@ import { useState } from "react";
 import { type ShopQuery } from "@/lib/products";
 import { withQuery } from "@/lib/shop-query";
 
-export function SearchBox({ q }: { q: ShopQuery }) {
+export function SearchBox({ q, base = "/shop" }: { q: ShopQuery; base?: string }) {
   const router = useRouter();
   const [v, setV] = useState(q.q);
   return (
@@ -13,7 +13,7 @@ export function SearchBox({ q }: { q: ShopQuery }) {
       className="flex gap-2"
       onSubmit={(e) => {
         e.preventDefault();
-        router.push(withQuery("/", q, { q: v.trim(), page: 1 }));
+        router.push(withQuery(base, q, { q: v.trim(), page: 1 }));
       }}
     >
       <input

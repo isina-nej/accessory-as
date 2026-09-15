@@ -4,7 +4,7 @@ import { toFa } from "@/lib/fa";
 import { SORTS, SORT_LABELS, type ShopQuery } from "@/lib/products";
 import { withQuery } from "@/lib/shop-query";
 
-export function SortBar({ q, total }: { q: ShopQuery; total: number }) {
+export function SortBar({ q, total, base = "/shop" }: { q: ShopQuery; total: number; base?: string }) {
   return (
     <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border bg-white px-4 py-2">
       <p className="text-sm text-(--color-muted-fg)">{toFa(total)} اکسسوری</p>
@@ -13,7 +13,7 @@ export function SortBar({ q, total }: { q: ShopQuery; total: number }) {
         {SORTS.map((s) => (
           <Link
             key={s}
-            href={withQuery("/", q, { sort: s, page: 1 })}
+            href={withQuery(base, q, { sort: s, page: 1 })}
             className={cn(
               "rounded-full px-3 py-1",
               q.sort === s ? "bg-(--color-brand) text-white" : "hover:bg-black/5",

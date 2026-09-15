@@ -6,7 +6,7 @@ import { cn } from "@/lib/cn";
 import { toFa } from "@/lib/fa";
 import { submitReview } from "@/lib/review-actions";
 
-export function ReviewForm({ slug }: { slug: string }) {
+export function ReviewForm({ slug, onDone }: { slug: string; onDone?: () => void }) {
   const [author, setAuthor] = useState("");
   const [rating, setRating] = useState(5);
   const [body, setBody] = useState("");
@@ -27,6 +27,7 @@ export function ReviewForm({ slug }: { slug: string }) {
           setBody("");
           setRating(5);
           setMsg("دیدگاهت ثبت شد، ممنون!");
+          onDone?.();
         } else {
           setMsg(r.error);
         }

@@ -15,6 +15,20 @@
       "when": 1789453292799,
       "tag": "0001_lively_lila_cheney",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1789456608869,
+      "tag": "0002_third_wolf_cub",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1789456840552,
+      "tag": "0003_robust_warbird",
+      "breakpoints": true
     }
   ]
 }

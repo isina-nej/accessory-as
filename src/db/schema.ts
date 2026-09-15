@@ -17,6 +17,8 @@ export const user = mysqlTable("user", {
   email: varchar("email", { length: 255 }).notNull().unique(),
   emailVerified: boolean("email_verified").notNull().default(false),
   image: text("image"),
+  phoneNumber: varchar("phone_number", { length: 20 }),
+  phoneNumberVerified: boolean("phone_number_verified"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow().onUpdateNow(),
 });
@@ -56,20 +58,16 @@ export const account = mysqlTable(
   (t) => [index("account_user_idx").on(t.userId)],
 );
 
-export const verification = mysqlTable(
-  "verification",
-  {
-    id: varchar("id", { length: 36 }).primaryKey(),
-    identifier: text("identifier").notNull(),
-    value: text("value").notNull(),
-    expiresAt: timestamp("expires_at").notNull(),
-    createdAt: timestamp("created_at").notNull().defaultNow(),
-    updatedAt: timestamp("updated_at").notNull().defaultNow().onUpdateNow(),
-  },
-  (t) => [index("verification_id_idx").on(t.identifier)],
-);
+export const verification = mysqlTable("verification", {
+  id: varchar("id", { length: 36 }).primaryKey(),
+  identifier: text("identifier").notNull(),
+  value: text("value").notNull(),
+  expiresAt: timestamp("expires_at").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow().onUpdateNow(),
+});
 
-// --- Shop (از فیگما 708:439) ---
+// --- Shop (از فیگما) ---
 export const categories = mysqlTable("categories", {
   id: varchar("id", { length: 36 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
   slug: varchar("slug", { length: 100 }).notNull().unique(),
@@ -88,6 +86,7 @@ export const products = mysqlTable(
     oldPriceToman: int("old_price_toman"),
     discountPct: int("discount_pct"),
     stock: int("stock").notNull().default(0),
+    soldCount: int("sold_count").notNull().default(0),
     status: varchar("status", { length: 20 }).notNull().default("active"),
     sku: varchar("sku", { length: 50 }),
     description: text("description"),
@@ -145,11 +144,17 @@ export const addresses = mysqlTable(
   {
     id: varchar("id", { length: 36 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
     userId: varchar("user_id", { length: 36 }).notNull(),
+    label: varchar("label", { length: 50 }),
+    recipient: varchar("recipient", { length: 100 }),
     province: varchar("province", { length: 50 }).notNull(),
     city: varchar("city", { length: 50 }).notNull(),
     detail: text("detail").notNull(),
     postal: varchar("postal", { length: 20 }),
     phone: varchar("phone", { length: 20 }).notNull(),
+    lat: varchar("lat", { length: 30 }),
+    lng: varchar("lng", { length: 30 }),
+    isDefault: boolean("is_default").notNull().default(false),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
   },
   (t) => [index("addresses_user_idx").on(t.userId)],
 );
@@ -159,10 +164,17 @@ export const orders = mysqlTable(
   {
     id: varchar("id", { length: 36 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
     userId: varchar("user_id", { length: 36 }),
+    // pending|paid|preparing|shipped|delivered|failed|cancelled|refunded
     status: varchar("status", { length: 20 }).notNull().default("pending"),
     totalToman: int("total_toman").notNull(),
+    discountToman: int("discount_toman").notNull().default(0),
+    shippingFeeToman: int("shipping_fee_toman").notNull().default(0),
+    shippingSlug: varchar("shipping_slug", { length: 50 }),
+    couponCode: varchar("coupon_code", { length: 50 }),
+    trackingCode: varchar("tracking_code", { length: 100 }),
     addressId: varchar("address_id", { length: 36 }),
     createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at").notNull().defaultNow().onUpdateNow(),
   },
   (t) => [index("orders_user_idx").on(t.userId)],
 );
@@ -179,6 +191,17 @@ export const orderItems = mysqlTable(
   (t) => [index("order_items_order_idx").on(t.orderId)],
 );
 
+export const orderEvents = mysqlTable(
+  "order_events",
+  {
+    id: varchar("id", { length: 36 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
+    orderId: varchar("order_id", { length: 36 }).notNull(),
+    status: varchar("status", { length: 20 }).notNull(),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+  },
+  (t) => [index("order_events_order_idx").on(t.orderId)],
+);
+
 export const payments = mysqlTable("payments", {
   id: varchar("id", { length: 36 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
   orderId: varchar("order_id", { length: 36 }).notNull().unique(),
@@ -190,3 +213,43 @@ export const payments = mysqlTable("payments", {
   raw: json("raw"),
   verifiedAt: timestamp("verified_at"),
 });
+
+export const favorites = mysqlTable(
+  "favorites",
+  {
+    userId: varchar("user_id", { length: 36 }).notNull(),
+    productId: varchar("product_id", { length: 36 }).notNull(),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.productId] })],
+);
+
+export const coupons = mysqlTable("coupons", {
+  id: varchar("id", { length: 36 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
+  code: varchar("code", { length: 50 }).notNull().unique(),
+  pct: int("pct").notNull(),
+  maxToman: int("max_toman"),
+  minToman: int("min_toman"),
+  active: boolean("active").notNull().default(true),
+  expiresAt: timestamp("expires_at"),
+});
+
+export const shippingMethods = mysqlTable("shipping_methods", {
+  id: varchar("id", { length: 36 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
+  slug: varchar("slug", { length: 50 }).notNull().unique(),
+  title: varchar("title", { length: 100 }).notNull(),
+  feeToman: int("fee_toman").notNull().default(0),
+  freeOverToman: int("free_over_toman"),
+});
+
+export const walletRefunds = mysqlTable(
+  "wallet_refunds",
+  {
+    id: varchar("id", { length: 36 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
+    userId: varchar("user_id", { length: 36 }).notNull(),
+    iban: varchar("iban", { length: 40 }).notNull(),
+    status: varchar("status", { length: 20 }).notNull().default("pending"),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+  },
+  (t) => [index("wallet_refunds_user_idx").on(t.userId)],
+);

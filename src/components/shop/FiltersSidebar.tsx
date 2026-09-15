@@ -10,8 +10,8 @@ type Meta = {
   sizes: { value: string }[];
 };
 
-export function FiltersSidebar({ q, meta }: { q: ShopQuery; meta: Meta }) {
-  const clearHref = "/?sort=" + q.sort;
+export function FiltersSidebar({ q, meta, base = "/shop" }: { q: ShopQuery; meta: Meta; base?: string }) {
+  const clearHref = `${base}?sort=${q.sort}`;
   return (
     <aside className="space-y-4 rounded-2xl border bg-white p-4">
       <div className="flex items-center justify-between">
@@ -22,7 +22,7 @@ export function FiltersSidebar({ q, meta }: { q: ShopQuery; meta: Meta }) {
       </div>
 
       <Link
-        href={withQuery("/", q, { inStock: !q.inStock, page: 1 })}
+        href={withQuery(base, q, { inStock: !q.inStock, page: 1 })}
         className="flex items-center gap-2 text-sm"
       >
         <span
@@ -43,13 +43,13 @@ export function FiltersSidebar({ q, meta }: { q: ShopQuery; meta: Meta }) {
         </p>
         <div className="mt-2 flex gap-2">
           <Link
-            href={withQuery("/", q, { min: 250000, max: 5000000, page: 1 })}
+            href={withQuery(base, q, { min: 250000, max: 5000000, page: 1 })}
             className="rounded-full border px-3 py-1 text-xs"
           >
             تا ۵ میلیون
           </Link>
           <Link
-            href={withQuery("/", q, { min: 5000000, max: 25050000, page: 1 })}
+            href={withQuery(base, q, { min: 5000000, max: 25050000, page: 1 })}
             className="rounded-full border px-3 py-1 text-xs"
           >
             بالای ۵ میلیون
@@ -63,7 +63,7 @@ export function FiltersSidebar({ q, meta }: { q: ShopQuery; meta: Meta }) {
           {meta.cats.map((c) => (
             <Link
               key={c.slug}
-              href={withQuery("/", q, { cat: q.cat === c.slug ? "" : c.slug, page: 1 })}
+              href={withQuery(base, q, { cat: q.cat === c.slug ? "" : c.slug, page: 1 })}
               className={cn(
                 "rounded-full border px-3 py-1 text-xs",
                 q.cat === c.slug && "bg-(--color-brand) text-white",
@@ -81,7 +81,7 @@ export function FiltersSidebar({ q, meta }: { q: ShopQuery; meta: Meta }) {
           {meta.colors.map((c) => (
             <Link
               key={c.label}
-              href={withQuery("/", q, { color: q.color === c.label ? "" : c.label, page: 1 })}
+              href={withQuery(base, q, { color: q.color === c.label ? "" : c.label, page: 1 })}
               className={cn(
                 "rounded-full border px-3 py-1 text-xs",
                 q.color === c.label && "bg-(--color-brand) text-white",
@@ -99,7 +99,7 @@ export function FiltersSidebar({ q, meta }: { q: ShopQuery; meta: Meta }) {
           {meta.sizes.map((s) => (
             <Link
               key={s.value}
-              href={withQuery("/", q, { size: q.size === s.value ? "" : s.value, page: 1 })}
+              href={withQuery(base, q, { size: q.size === s.value ? "" : s.value, page: 1 })}
               className={cn(
                 "rounded-full border px-3 py-1 text-xs",
                 q.size === s.value && "bg-(--color-brand) text-white",
@@ -112,7 +112,7 @@ export function FiltersSidebar({ q, meta }: { q: ShopQuery; meta: Meta }) {
       </div>
 
       <Link
-        href={withQuery("/", q, { inStock: !q.inStock, page: 1 })}
+        href={withQuery(base, q, { inStock: !q.inStock, page: 1 })}
         className="block rounded-lg border px-3 py-2 text-center text-sm"
       >
         {q.inStock ? "نمایش ناموجودها هم" : "فقط کالاهای موجود"}

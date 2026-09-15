@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import { eq } from "drizzle-orm";
 import { db } from "./index";
-import { attributes, categories, productAttributes, productImages, products, reviews } from "./schema";
+import { attributes, categories, coupons, productAttributes, productImages, products, reviews, shippingMethods } from "./schema";
 
 // tsx برخلاف Next خودش .env را لود نمی‌کند
 try {
@@ -136,6 +136,24 @@ async function main() {
     if (existing.length > 0) continue;
     await db.insert(reviews).values(list.map((r) => ({ productId: row.id, ...r, verified: true })));
   }
+
+  // روش‌های ارسال فیگما: پست + تیپاکس، رایگان بالای ۵۰۰هزار
+  for (const m of [
+    { slug: "post", title: "پست پیشتاز", feeToman: 150000, freeOverToman: 500000 },
+    { slug: "tipax", title: "تیپاکس", feeToman: 220000, freeOverToman: 500000 },
+  ]) {
+    await db.insert(shippingMethods).values(m).onDuplicateKeyUpdate({
+      set: { title: m.title, feeToman: m.feeToman, freeOverToman: m.freeOverToman },
+    });
+  }
+
+  // کوپن نمونه فیگما
+  await db
+    .insert(coupons)
+    .values({ code: "GH632LO", pct: 20, maxToman: 2000000, minToman: 1000000, active: true })
+    .onDuplicateKeyUpdate({
+      set: { pct: 20, maxToman: 2000000, minToman: 1000000, active: true },
+    });
 
   const allP = await db.select().from(products);
   const allR = await db.select().from(reviews);

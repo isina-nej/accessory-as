@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Diamond, RefreshCcw, Truck, Zap } from "lucide-react";
 
 const FEATURES = [
@@ -7,18 +8,30 @@ const FEATURES = [
   { icon: Diamond, title: "کیفیت پرمیوم", sub: "متریال و کیفیت ساخت بی‌نقص" },
 ];
 
-const LINK_GROUPS = [
+const LINK_GROUPS: { title: string; links: { label: string; href: string }[] }[] = [
   {
     title: "راهنمای خرید از اکسسوری آس",
-    links: ["نحوه ثبت سفارش", "رویه ارسال سفارش", "شیوه‌های پرداخت"],
+    links: [
+      { label: "نحوه ثبت سفارش", href: "/faq" },
+      { label: "رویه ارسال سفارش", href: "/faq" },
+      { label: "شیوه‌های پرداخت", href: "/faq" },
+    ],
   },
   {
     title: "خدمات مشتریان",
-    links: ["پاسخ به پرسش‌های متداول", "شرایط استفاده", "حریم خصوصی"],
+    links: [
+      { label: "پاسخ به پرسش‌های متداول", href: "/faq" },
+      { label: "شرایط استفاده", href: "/about" },
+      { label: "حریم خصوصی", href: "/about" },
+    ],
   },
   {
     title: "با اکسسوری آس",
-    links: ["فروشگاه اکسسوری آس", "تماس با اکسسوری آس", "درباره اکسسوری آس"],
+    links: [
+      { label: "فروشگاه اکسسوری آس", href: "/shop" },
+      { label: "تماس با اکسسوری آس", href: "/contact" },
+      { label: "درباره اکسسوری آس", href: "/about" },
+    ],
   },
 ];
 
@@ -52,7 +65,9 @@ export function Footer() {
               <p className="font-bold">{g.title}</p>
               <ul className="mt-2 space-y-1 text-sm text-(--color-muted-fg)">
                 {g.links.map((l) => (
-                  <li key={l}>{l}</li>
+                  <li key={l.label}>
+                    <Link href={l.href} className="hover:text-(--color-brand)">{l.label}</Link>
+                  </li>
                 ))}
               </ul>
             </div>

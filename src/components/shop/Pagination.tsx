@@ -3,7 +3,7 @@ import { toFa } from "@/lib/fa";
 import { PAGE_SIZE, type ShopQuery } from "@/lib/products";
 import { withQuery } from "@/lib/shop-query";
 
-export function Pagination({ q, total }: { q: ShopQuery; total: number }) {
+export function Pagination({ q, total, base = "/shop" }: { q: ShopQuery; total: number; base?: string }) {
   const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
   if (pages <= 1) return null;
   return (
@@ -11,7 +11,7 @@ export function Pagination({ q, total }: { q: ShopQuery; total: number }) {
       {Array.from({ length: pages }, (_, i) => i + 1).map((p) => (
         <Link
           key={p}
-          href={withQuery("/", q, { page: p })}
+          href={withQuery(base, q, { page: p })}
           className={
             p === q.page
               ? "rounded-lg bg-(--color-brand) px-3 py-1 text-sm text-white"

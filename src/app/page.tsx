@@ -1,73 +1,66 @@
-import { Suspense } from "react";
+import Link from "next/link";
 import { Breadcrumb } from "@/components/shop/Breadcrumb";
-import { CardSkeleton, GridSkeleton } from "@/components/shop/CardSkeleton";
-import { FiltersSidebar } from "@/components/shop/FiltersSidebar";
+import { formatToman } from "@/lib/fa";
 import { Footer } from "@/components/shop/Footer";
 import { Header } from "@/components/shop/Header";
-import { OffersCarousel } from "@/components/shop/OffersCarousel";
-import { Pagination } from "@/components/shop/Pagination";
-import { ProductGrid } from "@/components/shop/ProductGrid";
-import { SearchBox } from "@/components/shop/SearchBox";
-import { SortBar } from "@/components/shop/SortBar";
-import { getFilterMeta, getOffers, getProducts } from "@/lib/get-products";
-import { shopQuerySchema } from "@/lib/products";
+import { getMegaMenu } from "@/lib/menu";
 
-export const revalidate = 60;
-
-export default async function Home({
-  searchParams,
-}: {
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
-}) {
-  const sp = await searchParams;
-  const flat = Object.fromEntries(
-    Object.entries(sp).map(([k, v]) => [k, Array.isArray(v) ? v[0] : v]),
-  );
-  const parsed = shopQuerySchema.safeParse(flat);
-  const q = parsed.success
-    ? parsed.data
-    : { sort: "all" as const, q: "", cat: "", color: "", size: "", inStock: false, min: 250000, max: 25050000, page: 1 };
-
-  let items: Awaited<ReturnType<typeof getProducts>>["items"] = [];
-  let total = 0;
-  let offers: Awaited<ReturnType<typeof getOffers>> = [];
-  let meta = { cats: [], colors: [], sizes: [] } as Awaited<ReturnType<typeof getFilterMeta>>;
-  let dbError = false;
-  try {
-    [{ items, total }, offers, meta] = await Promise.all([
-      getProducts(q),
-      getOffers(),
-      getFilterMeta(),
-    ]);
-  } catch {
-    dbError = true;
-  }
-
+export default async function LandingPage() {
+  const menu = await getMegaMenu().catch((): Awaited<ReturnType<typeof getMegaMenu>> => ({ cats: [], byCat: {} }));
   return (
     <div className="flex min-h-full flex-1 flex-col bg-(--color-mist)">
-      <Header />
-      <main className="mx-auto w-full max-w-7xl flex-1 space-y-4 px-4 py-6">
-        <Breadcrumb trail={[{ href: "/", label: "اکسسوری آس" }, { label: "فروشگاه" }]} />
-        <Suspense fallback={<CardSkeleton />}>
-          <OffersCarousel items={offers} />
-        </Suspense>
-        <SearchBox q={q} />
-        <div className="grid gap-4 lg:grid-cols-[330px_1fr]">
-          <FiltersSidebar q={q} meta={meta} />
-          <div className="space-y-4">
-            <SortBar q={q} total={total} />
-            {dbError ? (
-              <div className="rounded-2xl border bg-white p-10 text-center">
-                دیتابیس وصل نیست. MySQL داکر (keydo-mysql پورت 3307) را چک کن و migrate/seed بزن.
-              </div>
-            ) : (
-              <Suspense fallback={<GridSkeleton />}>
-                <ProductGrid items={items} />
-              </Suspense>
-            )}
-            <Pagination q={q} total={total} />
+      <Header menu={menu} />
+      <main className="mx-auto w-full max-w-7xl flex-1 space-y-8 px-4 py-8">
+        <Breadcrumb trail={[{ label: "اکسسوری آس" }]} />
+        <section className="space-y-3 rounded-2xl bg-(--color-brand-deep) p-8 text-center text-white md:p-12">
+          <h1 className="text-2xl font-extrabold md:text-4xl">اکسسوری آس — انتخابی برای خاص‌پسندان</h1>
+          <p className="mx-auto max-w-2xl text-sm leading-7 text-white/80 md:text-base">
+            اکسسوری‌های خاص و ماندگار برای تکمیل استایل روزمره و رسمی شما.
+          </p>
+          <div className="flex justify-center gap-3 pt-2">
+            <Link href="/shop" className="rounded-lg bg-white px-6 py-2.5 text-sm font-bold text-(--color-brand-deep)">
+              مشاهده فروشگاه
+            </Link>
+            <Link href="/about" className="rounded-lg border border-white/40 px-6 py-2.5 text-sm">
+              درباره ما
+            </Link>
           </div>
-        </div>
+        </section>
+
+        <section className="rounded-2xl border bg-white p-6 text-center">
+          <p className="text-lg font-extrabold text-(--color-wine)">٪۷۵ تخفیف به مناسبت روز دختر</p>
+          <p className="mt-1 text-sm text-(--color-muted-fg)">اکسسوری‌هایی برای امروز و سال‌های بعد — فروش ویژه!</p>
+          <Link href="/shop" className="mt-4 inline-block rounded-lg bg-(--color-wine) px-6 py-2 text-sm text-white">
+            مشاهده پیشنهادها
+          </Link>
+        </section>
+
+        <section className="space-y-3">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-extrabold">دسته‌بندی‌ها</h2>
+            <Link href="/shop" className="text-sm text-(--color-brand)">
+              مشاهده همه
+            </Link>
+          </div>
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+            {menu.cats.map((c) => (
+              <Link
+                key={c.slug}
+                href={`/shop?cat=${c.slug}`}
+                className="rounded-2xl border bg-white p-6 text-center text-sm font-bold hover:border-(--color-brand)"
+              >
+                {c.title}
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        <section className="rounded-2xl border bg-white p-6">
+          <h2 className="text-lg font-extrabold">چرا اکسسوری آس؟</h2>
+          <p className="mt-2 text-sm leading-7 text-(--color-muted-fg)">
+            {formatToman(500000)} به بالا ارسال رایگان — ۷ روز ضمانت بازگشت — کیفیت پرمیوم.
+          </p>
+        </section>
       </main>
       <Footer />
     </div>

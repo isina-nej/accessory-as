@@ -5,7 +5,13 @@ import { Providers } from "./providers";
 
 export const metadata: Metadata = {
   title: "اکسسوری آس | فروشگاه",
-  description: "اکسسوری آس، روایتی از سلیقه شما",
+  description: "اکسسوری آس، روایتی از سلیقه شما — گردنبند، انگشتر، دستبند، گوشواره و ست‌های خاص.",
+  openGraph: {
+    title: "اکسسوری آس",
+    description: "روایتی از سلیقه تو",
+    locale: "fa_IR",
+    type: "website",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
