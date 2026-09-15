@@ -25,7 +25,7 @@ function loadCa(): string | undefined {
 
 export function getPool(): mysql.Pool {
   if (!pool) {
-    const raw = process.env.DATABASE_URL;
+    const raw = (process.env.DATABASE_URL ?? "").trim();
     if (!raw) throw new Error("DATABASE_URL تنظیم نشده (.env.example را ببین)");
     // ponytail: به‌جای URI string، host/port جدا — هاست Aiven با URI تایم‌اوت می‌خورد
     const u = new URL(raw);
@@ -43,6 +43,24 @@ export function getPool(): mysql.Pool {
     });
   }
   return pool;
+}
+
+// اتصال خام برای تفکیک خطای connect از query
+export async function testConnection(): Promise<void> {
+  const raw = (process.env.DATABASE_URL ?? "").trim();
+  const u = new URL(raw);
+  const ca = loadCa();
+  const one = await mysql.createConnection({
+    host: u.hostname,
+    port: Number(u.port || 3306),
+    user: decodeURIComponent(u.username),
+    password: decodeURIComponent(u.password),
+    database: u.pathname.replace(/^\//, "").split("?")[0] || undefined,
+    connectTimeout: 15000,
+    ...(ca ? { ssl: { ca, rejectUnauthorized: true } } : {}),
+  });
+  await one.ping();
+  await one.end();
 }
 
 export const db = drizzle(
