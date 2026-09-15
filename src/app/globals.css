@@ -1,0 +1,24 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-brand: #0a5954;
+  --color-brand-deep: #00201d;
+  --color-wine: #9e1238;
+  --color-sand: #d6c2a1;
+  --color-mist: #f7fafa;
+  --color-ink: #111c21;
+  --color-muted-fg: #4a5463;
+  --font-sans: var(--font-doran);
+}
+
+:root {
+  --background: #ffffff;
+  --foreground: var(--color-ink);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  /* مستقیم به متغیر next/font وصل است تا وابسته به Tailwind نباشد */
+  font-family: var(--font-doran), Tahoma, "Segoe UI", system-ui, sans-serif;
+}
