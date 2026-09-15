@@ -253,3 +253,87 @@ export const walletRefunds = mysqlTable(
   },
   (t) => [index("wallet_refunds_user_idx").on(t.userId)],
 );
+
+// --- CMS: نقش‌ها (admin|content|support) ---
+export const staffRoles = mysqlTable(
+  "staff_roles",
+  {
+    userId: varchar("user_id", { length: 36 }).notNull(),
+    role: varchar("role", { length: 20 }).notNull(), // admin | content | support
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.role] }), index("staff_roles_user_idx").on(t.userId)],
+);
+
+// --- CMS: بنرها (hero/offers/mid/shine) ---
+export const banners = mysqlTable(
+  "banners",
+  {
+    id: varchar("id", { length: 36 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
+    slot: varchar("slot", { length: 30 }).notNull(), // hero | offer-side | mid-a | mid-b | shine
+    title: varchar("title", { length: 200 }).notNull(),
+    subtitle: text("subtitle"),
+    ctaLabel: varchar("cta_label", { length: 100 }),
+    ctaHref: varchar("cta_href", { length: 300 }),
+    imageUrl: text("image_url"),
+    sort: int("sort").notNull().default(0),
+    active: boolean("active").notNull().default(true),
+    startsAt: timestamp("starts_at"),
+    endsAt: timestamp("ends_at"),
+  },
+  (t) => [index("banners_slot_idx").on(t.slot)],
+);
+
+// --- CMS: صفحات و سئو ---
+export const pages = mysqlTable("pages", {
+  id: varchar("id", { length: 36 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
+  slug: varchar("slug", { length: 100 }).notNull().unique(), // about | contact | faq | terms | privacy
+  title: varchar("title", { length: 200 }).notNull(),
+  body: text("body").notNull(),
+  seoTitle: varchar("seo_title", { length: 200 }),
+  seoDesc: varchar("seo_desc", { length: 300 }),
+  updatedAt: timestamp("updated_at").notNull().defaultNow().onUpdateNow(),
+});
+
+// --- CMS: سوالات متداول ---
+export const faqs = mysqlTable(
+  "faqs",
+  {
+    id: varchar("id", { length: 36 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
+    q: varchar("q", { length: 300 }).notNull(),
+    a: text("a").notNull(),
+    sort: int("sort").notNull().default(0),
+    active: boolean("active").notNull().default(true),
+  },
+  (t) => [index("faqs_sort_idx").on(t.sort)],
+);
+
+// --- CMS: تنظیمات سایت (footer/seo/perks) ---
+export const settings = mysqlTable("settings", {
+  key: varchar("key", { length: 100 }).primaryKey(),
+  value: text("value").notNull(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow().onUpdateNow(),
+});
+
+// --- CMS: پیام‌های تماس ---
+export const contactMessages = mysqlTable(
+  "contact_messages",
+  {
+    id: varchar("id", { length: 36 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
+    name: varchar("name", { length: 100 }).notNull(),
+    phone: varchar("phone", { length: 20 }).notNull(),
+    body: text("body").notNull(),
+    read: boolean("read").notNull().default(false),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+  },
+  (t) => [index("contact_messages_read_idx").on(t.read)],
+);
+
+// --- CMS: کمپین شگفت‌انگیز ---
+export const campaigns = mysqlTable("campaigns", {
+  id: varchar("id", { length: 36 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
+  slug: varchar("slug", { length: 100 }).notNull().unique(), // amazing
+  title: varchar("title", { length: 200 }).notNull(),
+  active: boolean("active").notNull().default(true),
+  endsAt: timestamp("ends_at"),
+});

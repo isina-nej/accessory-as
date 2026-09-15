@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import { eq } from "drizzle-orm";
 import { db } from "./index";
-import { attributes, categories, coupons, productAttributes, productImages, products, reviews, shippingMethods } from "./schema";
+import { attributes, banners, campaigns, categories, contactMessages, coupons, faqs, pages, productAttributes, productImages, products, reviews, settings, shippingMethods } from "./schema";
 
 // tsx برخلاف Next خودش .env را لود نمی‌کند
 try {
@@ -154,6 +154,68 @@ async function main() {
     .onDuplicateKeyUpdate({
       set: { pct: 20, maxToman: 2000000, minToman: 1000000, active: true },
     });
+
+  // --- CMS seed ---
+  for (const b of [
+    { slot: "hero", title: "٪۷۵ تخفیف به مناسبت روز دختر", subtitle: "اکسسوری‌هایی برای امروز و سال‌های بعد", ctaLabel: "مشاهده بیشتر", ctaHref: "/shop", sort: 0 },
+    { slot: "offer-side", title: "جدیدترین اکسسوری‌های ترند", subtitle: "مجموعه‌ای از گردنبندها، دستبندها، انگشترها و گوشواره‌های خاص", ctaLabel: "لیست محصولات", ctaHref: "/shop", sort: 0 },
+    { slot: "mid-a", title: "بهترین گوشواره‌ها و دستبندها", subtitle: "گوشواره‌ها و دستبندهای خاص و مدرن برای تکمیل استایل روزانه و خاص شما", ctaLabel: "مشاهده بیشتر", ctaHref: "/shop", sort: 0 },
+    { slot: "mid-b", title: "ظرافتی که همراه تو می‌ماند", subtitle: null, ctaLabel: "مشاهده بیشتر", ctaHref: "/shop", sort: 0 },
+    { slot: "shine", title: "درخشش در هر نگاه", subtitle: "جزئیاتی کوچک با تاثیری بزرگ بر استایل شما", ctaLabel: "مشاهده محصولات", ctaHref: "/shop", sort: 0 },
+  ]) {
+    const existing = await db.select().from(banners).where(eq(banners.slot, b.slot)).limit(1);
+    if (existing.length === 0) await db.insert(banners).values({ ...b, active: true });
+  }
+
+  for (const p of [
+    { slug: "about", title: "درباره ما", body: "اکسسوری آس، روایتی از سلیقه شما.\n\nتهران، خیابان ولیعصر، بالاتر از خیابان زرتشت، کوچه جاوید، پلاک ۲۴\nتلفن پشتیبانی: ۰۲۱ ۷۰۰۸۰۰۱ ــ ۰۹۳۵ ۱۷۹ ۰۸۵۳" },
+    { slug: "contact", title: "تماس با ما", body: "تهران، خیابان ولیعصر، بالاتر از خیابان زرتشت، کوچه جاوید، پلاک ۲۴\nتلفن پشتیبانی: ۰۲۱ ۷۰۰۸۰۰۱ ــ ۰۹۳۵ ۱۷۹ ۰۸۵۳\nشنبه تا پنجشنبه، ۹ تا ۱۸" },
+    { slug: "terms", title: "شرایط استفاده", body: "شرایط استفاده از فروشگاه اکسسوری آس." },
+    { slug: "privacy", title: "حریم خصوصی", body: "سیاست حریم خصوصی فروشگاه اکسسوری آس." },
+  ]) {
+    await db.insert(pages).values(p).onDuplicateKeyUpdate({ set: { title: p.title } });
+  }
+
+  const existingFaqs = await db.select().from(faqs).limit(1);
+  if (existingFaqs.length === 0) {
+    const FAQS = [
+      ["سفارش من چه زمانی ارسال می‌شود؟", "سفارش‌های ثبت‌شده پس از تأیید، در کوتاه‌ترین زمان ممکن پردازش و ارسال می‌شوند."],
+      ["آیا امکان مرجوع کردن کالا وجود دارد؟", "در صورت وجود ایراد یا مغایرت با سفارش، تا ۷ روز امکان ثبت درخواست مرجوعی داری."],
+      ["چگونه وضعیت سفارش خود را پیگیری کنم؟", "پس از ثبت سفارش، کد رهگیری در صفحه جزئیات سفارش نمایش داده می‌شود."],
+      ["آیا محصولات دارای ضمانت کیفیت هستند؟", "تمام محصولات پیش از ارسال از نظر کیفیت و سلامت بررسی می‌شوند."],
+      ["روش‌های پرداخت به چه صورت است؟", "پرداخت از طریق درگاه‌های امن زرین‌پال و زیبال انجام می‌شود."],
+      ["آیا ارسال به سراسر کشور انجام می‌شود؟", "بله، سفارش‌ها به تمامی شهرهای ایران ارسال می‌شوند."],
+      ["در صورت داشتن سؤال چه کار کنم؟", "تیم پشتیبانی از طریق صفحه تماس با ما پاسخگوست."],
+      ["چگونه از موجود شدن محصولات مطلع شوم؟", "محصول را به علاقه‌مندی اضافه کن و شبکه‌های اجتماعی ما را دنبال کن."],
+    ] as const;
+    await db.insert(faqs).values(FAQS.map(([q, a], i) => ({ q, a, sort: i, active: true })));
+  }
+
+  for (const [key, value] of [
+    ["footer_seo_title", "اکسسوری آس، روایتی از سلیقه شما"],
+    ["footer_seo_body", "فروشگاه اکسسوری آس با هدف ارائه مجموعه‌ای از اکسسوری‌های خاص، مدرن و باکیفیت فعالیت خود را آغاز کرده است."],
+    ["footer_address", "تهران، خیابان ولیعصر، بالاتر از خیابان زرتشت، کوچه جاوید، پلاک ۲۴"],
+    ["footer_phones", "۰۲۱ ۷۰۰۸۰۰۱ ــ ۰۹۳۵ ۱۷۹ ۰۸۵۳"],
+    ["site_title", "اکسسوری آس | فروشگاه"],
+    ["site_desc", "اکسسوری آس، روایتی از سلیقه شما — گردنبند، انگشتر، دستبند، گوشواره و ست‌های خاص."],
+    ["hero_title", "انتخابی برای خاص‌پسندان"],
+    ["hero_sub", "اکسسوری آس"],
+    ["cat_title", "دسته‌بندی محصولات"],
+    ["cat_sub", "اکسسوری‌هایی برای امروز و سال‌های بعد"],
+    ["offer_title", "پیشنهاد شگفت‌انگیز"],
+    ["new_title", "محصولات جدید"],
+    ["shine_title", "درخشش در هر نگاه"],
+    ["shine_sub", "جزئیاتی کوچک با تاثیری بزرگ بر استایل شما"],
+  ] as const) {
+    await db.insert(settings).values({ key, value }).onDuplicateKeyUpdate({ set: { value } });
+  }
+
+  const existingContact = await db.select().from(contactMessages).limit(1);
+  if (existingContact.length === 0) {
+    await db.insert(contactMessages).values({ name: "نمونه", phone: "09120000000", body: "پیام نمونه — از پنل حذف کن.", read: true });
+  }
+
+  await db.insert(campaigns).values({ slug: "amazing", title: "پیشنهاد شگفت‌انگیز", active: true }).onDuplicateKeyUpdate({ set: { title: "پیشنهاد شگفت‌انگیز" } });
 
   const allP = await db.select().from(products);
   const allR = await db.select().from(reviews);
