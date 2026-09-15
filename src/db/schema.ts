@@ -89,12 +89,28 @@ export const products = mysqlTable(
     discountPct: int("discount_pct"),
     stock: int("stock").notNull().default(0),
     status: varchar("status", { length: 20 }).notNull().default("active"),
+    sku: varchar("sku", { length: 50 }),
+    description: text("description"),
     createdAt: timestamp("created_at").notNull().defaultNow(),
   },
   (t) => [
     index("products_status_idx").on(t.status),
     index("products_category_idx").on(t.categoryId),
   ],
+);
+
+export const reviews = mysqlTable(
+  "reviews",
+  {
+    id: varchar("id", { length: 36 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
+    productId: varchar("product_id", { length: 36 }).notNull(),
+    author: varchar("author", { length: 100 }).notNull(),
+    rating: int("rating").notNull(),
+    body: text("body").notNull(),
+    verified: boolean("verified").notNull().default(false),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+  },
+  (t) => [index("reviews_product_idx").on(t.productId)],
 );
 
 export const productImages = mysqlTable(

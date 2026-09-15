@@ -1,6 +1,6 @@
 import { and, asc, desc, eq, gte, like, lte, sql } from "drizzle-orm";
 import { db } from "@/db";
-import { attributes, categories, productAttributes, productImages, products } from "@/db/schema";
+import { attributes, categories, productAttributes, productImages, products, reviews } from "@/db/schema";
 import { PAGE_SIZE, type ShopProduct, type ShopQuery } from "./products";
 
 export async function getProducts(q: ShopQuery): Promise<{ items: ShopProduct[]; total: number }> {
@@ -136,4 +136,23 @@ export async function getRelated(categoryId: string | null, excludeId: string): 
       return { ...r, image: img?.url ?? null };
     }),
   );
+}
+
+export type ProductReview = typeof reviews.$inferSelect;
+
+export async function getReviews(productId: string, limit = 10): Promise<ProductReview[]> {
+  return db
+    .select()
+    .from(reviews)
+    .where(eq(reviews.productId, productId))
+    .orderBy(desc(reviews.createdAt))
+    .limit(limit);
+}
+
+export async function getRatingSummary(productId: string): Promise<{ avg: number; count: number }> {
+  const [row] = await db
+    .select({ avg: sql<number | null>`avg(${reviews.rating})`, count: sql<number>`count(*)` })
+    .from(reviews)
+    .where(eq(reviews.productId, productId));
+  return { avg: row?.avg == null ? 0 : Number(row.avg), count: Number(row?.count ?? 0) };
 }
