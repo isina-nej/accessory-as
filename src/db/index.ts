@@ -6,12 +6,14 @@ import * as schema from "./schema";
 // لیزی: ایمپورت ماژول در بیلد نترکد؛ خطا فقط موقع کوئری واقعی.
 let pool: mysql.Pool | undefined;
 
+// بک‌اسلش+n داخل env ورسل (بدون backslash-escape مستقیم در سورس)
+const BS_N = String.fromCharCode(92, 110);
+
 function loadCa(): string | undefined {
-  const direct = process.env.MYSQL_SSL_CA;
+  const direct = (process.env.MYSQL_SSL_CA ?? "").trim();
   if (direct) {
-    return direct.includes("BEGIN CERTIFICATE")
-      ? direct
-      : Buffer.from(direct, "base64").toString("utf8");
+    if (direct.includes("BEGIN CERTIFICATE")) return direct.split(BS_N).join("\n");
+    return Buffer.from(direct.replace(/\s+/g, ""), "base64").toString("utf8");
   }
   // ponytail: فایل لوکال فقط برای migrate/seed؛ روی ورسل کامیت نمی‌شود (*.pem)
   try {
