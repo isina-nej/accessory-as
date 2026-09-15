@@ -83,3 +83,57 @@ export async function getFilterMeta() {
     sizes: attrs.filter((a) => a.type === "size"),
   };
 }
+
+export async function getProductBySlug(slug: string) {
+  const [row] = await db.select().from(products).where(eq(products.slug, slug)).limit(1);
+  if (!row || row.status !== "active") return null;
+  const imgs = await db
+    .select()
+    .from(productImages)
+    .where(eq(productImages.productId, row.id))
+    .orderBy(asc(productImages.sort));
+  const [cat] = row.categoryId
+    ? await db.select().from(categories).where(eq(categories.id, row.categoryId)).limit(1)
+    : [undefined];
+  const links = await db
+    .select({ attributeId: productAttributes.attributeId })
+    .from(productAttributes)
+    .where(eq(productAttributes.productId, row.id));
+  const attrs =
+    links.length > 0
+      ? await db.select().from(attributes).where(
+          sql`${attributes.id} IN (${sql.join(links.map((l) => sql`${l.attributeId}`), sql`, `)})`,
+        )
+      : [];
+  const [cover] = imgs;
+  return {
+    ...row,
+    image: cover?.url ?? null,
+    images: imgs.map((i) => i.url),
+    categoryTitle: cat?.title ?? null,
+    colors: attrs.filter((a) => a.type === "color"),
+    sizes: attrs.filter((a) => a.type === "size"),
+  };
+}
+
+export async function getRelated(categoryId: string | null, excludeId: string): Promise<ShopProduct[]> {
+  if (!categoryId) return [];
+  const rows = await db
+    .select()
+    .from(products)
+    .where(and(eq(products.status, "active"), eq(products.categoryId, categoryId)))
+    .orderBy(desc(products.createdAt))
+    .limit(5);
+  const filtered = rows.filter((r) => r.id !== excludeId).slice(0, 4);
+  return Promise.all(
+    filtered.map(async (r) => {
+      const [img] = await db
+        .select()
+        .from(productImages)
+        .where(eq(productImages.productId, r.id))
+        .orderBy(asc(productImages.sort))
+        .limit(1);
+      return { ...r, image: img?.url ?? null };
+    }),
+  );
+}
