@@ -4,10 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
 import { isMobileOrEmail, isPhoneAccount, isValidMobile } from "@/lib/checkout";
-import { cn } from "@/lib/cn";
 import { toFa } from "@/lib/fa";
-
-const input = "h-11 w-full rounded-lg border bg-white px-3 text-sm";
+import { FIG_BTN, FIG_INPUT, FigError, FigLabel, FigSubmit } from "./fig";
 
 function useCountdown(active: boolean) {
   const [left, setLeft] = useState(60);
@@ -71,7 +69,7 @@ export function LoginFlow() {
     e.preventDefault();
     const v = idVal.trim();
     if (code.trim().length < 4) {
-      setErr("کد تایید را کامل وارد کن");
+      setErr("کد تایید را وارد کنید");
       return;
     }
     setPending(true);
@@ -159,15 +157,13 @@ export function LoginFlow() {
   }, []);
 
   return (
-    <div className="w-full rounded-2xl border bg-white p-5">
+    <div className="w-full">
       {step === "id" && (
-        <form onSubmit={submitId} className="space-y-3">
-          <label className="block text-sm">
-            <span className="mb-1 block">
-              شماره موبایل یا ایمیل خود را وارد کنید <span className="text-(--color-wine)">*</span>
-            </span>
+        <form onSubmit={submitId} className="space-y-4">
+          <label className="block">
+            <FigLabel hint={err ?? undefined}>شماره موبایل یا ایمیل خود را وارد کنید</FigLabel>
             <input
-              className={cn(input, err && "border-(--color-wine)")}
+              className={FIG_INPUT}
               value={idVal}
               onChange={(e) => setIdVal(e.target.value)}
               placeholder="شماره موبایل یا ایمیل"
@@ -175,97 +171,93 @@ export function LoginFlow() {
               autoComplete="username"
             />
           </label>
-          {err && <p className="text-sm text-(--color-wine)">{err}</p>}
-          <button disabled={pending} className="h-11 w-full rounded-lg bg-(--color-brand) font-bold text-white disabled:opacity-50">
+          <button disabled={pending} className={FIG_BTN}>
             {pending ? "…" : "ورود به اکسسوری آس"}
           </button>
-          <p className="text-center text-xs text-(--color-muted-fg)">
-            با ورود، <span className="underline">شرایط استفاده</span> را می‌پذیری.
+          <p className="text-center text-xs text-[#8a9398]">
+            با ورود، شرایط استفاده را می‌پذیری.
           </p>
         </form>
       )}
 
       {step === "otp" && (
-        <form onSubmit={submitOtp} className="space-y-3">
-          <p className="text-sm font-bold">کد تایید را وارد کنید</p>
-          <p className="text-xs text-(--color-muted-fg)">
-            کد تایید به {isValidMobile(idVal.trim()) ? `شماره ${toFa(idVal.trim())}` : idVal.trim()} ارسال شد.
+        <form onSubmit={submitOtp} className="space-y-4">
+          <label className="block">
+            <FigLabel hint={isValidMobile(idVal.trim()) ? `کد تأیید به شماره ${toFa(idVal.trim())} ارسال شد. لطفاً آن را وارد کنید.` : undefined}>
+              کد تایید را وارد کنید
+            </FigLabel>
+            <input
+              className={FIG_INPUT}
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+              placeholder="کد تایید"
+              dir="ltr"
+              inputMode="numeric"
+              maxLength={8}
+            />
+          </label>
+          <p className="flex items-center justify-between text-sm">
+            <span className="font-bold text-[#161b22]">
+              {left > 0 ? <>ارسال مجدد کد بعد از {toFa(`۰۱:${String(left).padStart(2, "0").slice(-2)}`)}</> : (
+                <button
+                  type="button"
+                  className="text-[#1888f1]"
+                  onClick={() => sendOtp(idVal.trim()).catch(() => setErr("ارسال مجدد ناموفق بود"))}
+                >
+                  ارسال مجدد کد
+                </button>
+              )}
+            </span>
           </p>
-          <input
-            className={input}
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-            placeholder="کد تایید"
-            dir="ltr"
-            inputMode="numeric"
-            maxLength={8}
-          />
-          <p className="text-xs text-(--color-muted-fg)">
-            {left > 0 ? (
-              <>ارسال مجدد کد بعد از {toFa(`۰۱:${String(left).padStart(2, "0").slice(-2)}`)}</>
-            ) : (
-              <button
-                type="button"
-                className="text-(--color-brand)"
-                onClick={() => sendOtp(idVal.trim()).catch(() => setErr("ارسال مجدد ناموفق بود"))}
-              >
-                ارسال مجدد کد
-              </button>
-            )}
-          </p>
-          {err && <p className="text-sm text-(--color-wine)">{err}</p>}
-          <button disabled={pending} className="h-11 w-full rounded-lg bg-(--color-brand) font-bold text-white disabled:opacity-50">
+          <FigError msg={err} />
+          <button disabled={pending} className={FIG_BTN}>
             {pending ? "…" : "تایید و ادامه"}
           </button>
-          <button type="button" onClick={() => setStep("password")} className="w-full text-center text-sm text-(--color-brand)">
+          <button type="button" onClick={() => setStep("password")} className="w-full text-center text-sm font-extrabold text-[#0a5a55]">
             ورود با رمز عبور
           </button>
         </form>
       )}
 
       {step === "password" && (
-        <form onSubmit={submitPassword} className="space-y-3">
-          <label className="block text-sm">
-            <span className="mb-1 block">رمز عبور <span className="text-(--color-wine)">*</span></span>
+        <form onSubmit={submitPassword} className="space-y-4">
+          <label className="block">
+            <FigLabel hint={err ?? undefined}>رمز عبور</FigLabel>
             <input
               type="password"
-              className={cn(input, err && "border-(--color-wine)")}
+              className={FIG_INPUT}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="رمز عبور"
               autoComplete="current-password"
             />
           </label>
-          {err && <p className="text-sm text-(--color-wine)">{err}</p>}
-          <button disabled={pending} className="h-11 w-full rounded-lg bg-(--color-brand) font-bold text-white disabled:opacity-50">
+          <button disabled={pending} className={FIG_BTN}>
             {pending ? "…" : "تایید و ادامه"}
           </button>
           <span className="flex justify-between text-sm">
-            <button type="button" onClick={() => setStep("otp")} className="text-(--color-brand)">ورود با شماره موبایل</button>
-            <a href="/forgot-password" className="text-(--color-muted-fg)">فراموشی رمز عبور</a>
+            <button type="button" onClick={() => setStep("otp")} className="font-extrabold text-[#0a5a55]">ورود با شماره موبایل</button>
+            <a href="/forgot-password" className="font-extrabold text-[#1888f1]">فراموشی رمز عبور</a>
           </span>
         </form>
       )}
 
       {step === "signup" && (
-        <form onSubmit={submitSignup} className="space-y-3">
-          <p className="text-sm font-bold">تکمیل ثبت‌نام</p>
-          <label className="block text-sm">
-            <span className="mb-1 block">نام و نام خانوادگی <span className="text-(--color-wine)">*</span></span>
-            <input className={input} value={name} onChange={(e) => setName(e.target.value)} placeholder="علی ملکی" maxLength={100} />
+        <form onSubmit={submitSignup} className="space-y-4">
+          <label className="block">
+            <FigLabel>نام و نام خانوادگی</FigLabel>
+            <input className={FIG_INPUT} value={name} onChange={(e) => setName(e.target.value)} placeholder="علی ملکی" maxLength={100} />
           </label>
-          <label className="block text-sm">
-            <span className="mb-1 block">رمز عبور <span className="text-(--color-wine)">*</span></span>
-            <input type="password" className={input} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="رمز عبور" autoComplete="new-password" />
+          <label className="block">
+            <FigLabel hint={password && password.length < 8 ? "رمز عبور شما باید حداقل ۸ حرف باشد." : undefined}>رمز عبور</FigLabel>
+            <input type="password" className={FIG_INPUT} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="رمز عبور" autoComplete="new-password" />
           </label>
-          <label className="block text-sm">
-            <span className="mb-1 block">تکرار رمز عبور <span className="text-(--color-wine)">*</span></span>
-            <input type="password" className={input} value={confirm} onChange={(e) => setConfirm(e.target.value)} placeholder="تکرار رمز عبور" autoComplete="new-password" />
+          <label className="block">
+            <FigLabel hint={confirm && password !== confirm ? "رمز خود را به درستی تکرار بکنید!" : undefined}>تکرار رمز عبور</FigLabel>
+            <input type="password" className={FIG_INPUT} value={confirm} onChange={(e) => setConfirm(e.target.value)} placeholder="تکرار رمز عبور" autoComplete="new-password" />
           </label>
-          {err && <p className="text-sm text-(--color-wine)">{err}</p>}
-          <button disabled={pending} className="h-11 w-full rounded-lg bg-(--color-brand) font-bold text-white disabled:opacity-50">
-            {pending ? "…" : "ورود به اکسسوری آس"}
-          </button>
+          <FigError msg={err} />
+          <FigSubmit pending={pending}>ورود به اکسسوری آس</FigSubmit>
         </form>
       )}
     </div>
