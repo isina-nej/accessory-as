@@ -19,6 +19,10 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  /* مستقیم به متغیر next/font وصل است تا وابسته به Tailwind نباشد */
-  font-family: var(--font-doran), Tahoma, "Segoe UI", system-ui, sans-serif;
+  /* Doran-only: no fallback fonts allowed */
+  font-family: var(--font-doran);
+}
+
+* {
+  font-family: inherit;
 }
