@@ -33,7 +33,10 @@ export function getPool(): mysql.Pool {
       port: Number(u.port || 3306),
       user: decodeURIComponent(u.username),
       password: decodeURIComponent(u.password),
-      database: u.pathname.replace(/^\//, "") || undefined,
+      database: u.pathname.replace(/^\//, "").split("?")[0] || undefined,
+      connectTimeout: 25000,
+      waitForConnections: true,
+      queueLimit: 0,
       ...(ca ? { ssl: { ca, rejectUnauthorized: true } } : {}),
     });
   }
