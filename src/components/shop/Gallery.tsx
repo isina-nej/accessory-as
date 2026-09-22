@@ -13,7 +13,10 @@ export function Gallery({ images, title }: { images: string[]; title: string }) 
           // eslint-disable-next-line @next/next/no-img-element
           <img src={cur} alt={title} className="h-full w-full object-cover" />
         ) : (
-          <span className="flex h-full items-center justify-center text-7xl">💍</span>
+          <span className="flex h-full w-full items-center justify-center">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/images/product-04.webp" alt="" className="h-full w-full object-cover" />
+          </span>
         )}
       </div>
       {list.length > 1 && (

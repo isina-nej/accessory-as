@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Diamond, MapPin, Package, Phone, RefreshCcw, Truck } from "lucide-react";
+import { Icon } from "@/components/ui/Icon";
 
 const LINK_GROUPS: { title: string; links: { label: string; href: string }[] }[] = [
   {
@@ -29,10 +29,16 @@ const LINK_GROUPS: { title: string; links: { label: string; href: string }[] }[]
 ];
 
 const PERKS = [
-  { icon: Package, title: "تحویل اکسپرس", sub: "تحویل سریع و بی‌تاخیر" },
-  { icon: Truck, title: "حمل و نقل رایگان", sub: "برای خرید بالای ۵۰۰ هزار تومن" },
-  { icon: RefreshCcw, title: "ضمانت بازگشت کالا", sub: "۷ روز ضمانت بازگشت کالا" },
-  { icon: Diamond, title: "کیفیت پرمیوم", sub: "متریال و کیفیت ساخت بی‌نقص" },
+  { icon: "icons-20--delivery", title: "تحویل اکسپرس", sub: "تحویل سریع و بی‌تاخیر" },
+  { icon: "icons-20--trolley", title: "حمل و نقل رایگان", sub: "برای خرید بالای ۵۰۰ هزار تومن" },
+  { icon: "icons-20--repeat", title: "ضمانت بازگشت کالا", sub: "۷ روز ضمانت بازگشت کالا" },
+  { icon: "icons-20--check-circle", title: "کیفیت پرمیوم", sub: "متریال و کیفیت ساخت بی‌نقص" },
+];
+
+const SOCIALS = [
+  { label: "تلگرام", icon: "icons-24--telegram-2" },
+  { label: "اینستاگرام", icon: "icons-24--instagram-2" },
+  { label: "واتساپ", icon: "icons-24--whatsapp-2" },
 ];
 
 export function Footer({ settings }: { settings?: Record<string, string> }) {
@@ -59,21 +65,21 @@ export function Footer({ settings }: { settings?: Record<string, string> }) {
           </Link>
           <p className="flex items-center gap-1.5 text-[13px] text-(--color-muted-fg)" dir="ltr">
             <span dir="rtl">{phones}</span>
-            <Phone className="h-4 w-4 text-(--color-brand)" />
+            <Icon name="icons-20--calling" className="h-4 w-4" alt="" />
           </p>
           <p className="flex items-center gap-1.5 text-[13px] text-(--color-muted-fg)">
             {address}
-            <MapPin className="h-4 w-4 shrink-0 text-(--color-brand)" />
+            <Icon name="icons-20--pinned-map" className="h-4 w-4 shrink-0" alt="" />
           </p>
           <div className="flex items-center gap-2">
-            {["تلگرام", "اینستاگرام", "واتساپ"].map((label) => (
+            {SOCIALS.map((s) => (
               <a
-                key={label}
+                key={s.label}
                 href="/contact"
-                aria-label={label}
+                aria-label={s.label}
                 className="flex h-9 w-9 items-center justify-center rounded-lg border border-black/10 text-(--color-muted-fg) hover:border-(--color-brand) hover:text-(--color-brand)"
               >
-                <span className="text-xs font-bold">{label.slice(0, 1)}</span>
+                <Icon name={s.icon} className="h-5 w-5" alt={s.label} />
               </a>
             ))}
           </div>
@@ -82,12 +88,9 @@ export function Footer({ settings }: { settings?: Record<string, string> }) {
         {/* ردیف میانی: نماد + ۳ ستون لینک */}
         <div className="grid gap-8 py-8 md:grid-cols-4">
           <div className="flex items-start justify-center md:justify-start">
-            <div className="flex h-28 w-28 items-center justify-center rounded-xl border border-black/10 bg-(--color-mist) text-center">
-              <span className="px-2 text-[11px] leading-5 text-(--color-muted-fg)">
-                نماد اعتماد
-                <br />
-                samandehi.ir
-              </span>
+            <div className="flex h-28 w-28 items-center justify-center overflow-hidden rounded-xl border border-black/10 bg-(--color-mist)">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/images/trust-badge.webp" alt="نماد اعتماد samandehi.ir" className="h-full w-full object-contain p-2" />
             </div>
           </div>
           {LINK_GROUPS.map((g) => (
@@ -115,7 +118,7 @@ export function Footer({ settings }: { settings?: Record<string, string> }) {
                 <span className="block text-sm font-bold">{f.title}</span>
                 <span className="block text-xs text-(--color-muted-fg)">{f.sub}</span>
               </span>
-              <f.icon className="h-6 w-6 shrink-0 text-(--color-brand)" />
+              <Icon name={f.icon} className="h-6 w-6 shrink-0" alt="" />
             </div>
           ))}
         </div>

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { ChevronDown, Minus, Plus, ShoppingBag, Trash2, User } from "lucide-react";
+import { Icon } from "@/components/ui/Icon";
 import { formatToman, toFa } from "@/lib/fa";
 import type { MegaMenuData } from "@/lib/menu";
 import { cartCount, useCart } from "@/stores/cart";
@@ -16,13 +16,13 @@ const NAV = [
 ];
 
 const CAT_ICONS: Record<string, string> = {
-  necklace: "📿",
-  ring: "💍",
-  bracelet: "🪙",
-  earring: "✨",
-  anklet: "⛓️",
-  "half-set": "💎",
-  "full-set": "👑",
+  necklace: "icons-20--necklace",
+  ring: "icons-20--ring",
+  bracelet: "icons-20--bracelet",
+  earring: "icons-20--ear-rings",
+  anklet: "icons-20--shopping-bag",
+  "half-set": "icons-20--durian",
+  "full-set": "icons-20--bag",
 };
 
 export function Header({ menu }: { menu: MegaMenuData }) {
@@ -97,7 +97,7 @@ export function Header({ menu }: { menu: MegaMenuData }) {
               aria-expanded={open === "menu"}
             >
               دسته‌بندی محصولات
-              <ChevronDown className={cn("h-4 w-4 transition-transform", open === "menu" && "rotate-180")} />
+              <Icon name="icons-20--direction-down" className={cn("h-4 w-4 transition-transform", open === "menu" && "rotate-180")} />
             </button>
             {open === "menu" && (
               <div
@@ -124,7 +124,7 @@ export function Header({ menu }: { menu: MegaMenuData }) {
               href="/account"
               className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm hover:bg-black/5"
             >
-              <User className="h-4 w-4 text-(--color-brand)" />
+              <Icon name="icons-20--user" className="h-4 w-4" />
               <span className="font-medium">{session.user.name || "حساب کاربری"}</span>
             </Link>
           ) : (
@@ -132,7 +132,7 @@ export function Header({ menu }: { menu: MegaMenuData }) {
               href="/login"
               className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm hover:bg-black/5"
             >
-              <User className="h-4 w-4" />
+              <Icon name="icons-20--user" className="h-4 w-4" />
               ورود یا ثبت‌نام
             </Link>
           )}
@@ -151,7 +151,7 @@ export function Header({ menu }: { menu: MegaMenuData }) {
               aria-label="سبد خرید"
               className="relative flex items-center gap-1 rounded-lg bg-(--color-brand) px-3 py-2 text-sm font-bold text-white hover:bg-[#084a46]"
             >
-              <ShoppingBag className="h-4 w-4" />
+              <Icon name="icons-20--shopping-basket" className="h-4 w-4 brightness-0 invert" />
               سبد
               {count > 0 && (
                 <span className="absolute -top-2 -left-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-(--color-wine) px-1 text-xs">
@@ -211,7 +211,7 @@ function MegaMenuPopup({ menu, onClose }: { menu: MegaMenuData; onClose: () => v
               className="flex items-center justify-between rounded-xl px-3 py-2 text-sm font-medium text-[#161b22] transition-colors hover:bg-(--color-mist) hover:text-(--color-brand)"
             >
               <span className="flex items-center gap-2">
-                <span className="text-base" aria-hidden>{CAT_ICONS[c.slug] ?? "💍"}</span>
+                <Icon name={CAT_ICONS[c.slug] ?? "icons-20--ring"} className="h-5 w-5" />
                 {c.title}
               </span>
               <span className="text-xs text-(--color-muted-fg)">←</span>
@@ -261,7 +261,7 @@ function CartHoverPopover({ count, onClose }: { count: number; onClose: () => vo
       {/* هدر پاپ‌اور */}
       <div className="flex items-center justify-between border-b pb-3">
         <span className="flex items-center gap-1.5 text-base font-extrabold text-[#161b22]">
-          <ShoppingBag className="h-4 w-4 text-(--color-brand)" />
+          <Icon name="icons-20--shopping-basket" className="h-4 w-4" />
           سبد خرید شما
         </span>
         <span className="text-xs text-(--color-muted-fg)">{toFa(count)} کالا</span>
@@ -292,7 +292,10 @@ function CartHoverPopover({ count, onClose }: { count: number; onClose: () => vo
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={p.image} alt={p.title} className="h-full w-full object-cover" />
                     ) : (
-                      <span className="text-xl">💍</span>
+                      <span className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-lg bg-(--color-mist)">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src="/images/product-05.webp" alt="" className="h-full w-full object-cover" />
+                    </span>
                     )}
                   </span>
                   <div className="min-w-0 flex-1">
@@ -315,7 +318,7 @@ function CartHoverPopover({ count, onClose }: { count: number; onClose: () => vo
                         className="text-(--color-muted-fg) hover:text-black"
                         aria-label="افزایش"
                       >
-                        <Plus className="h-3 w-3" />
+                        <Icon name="icons-other--plus-2" className="h-3 w-3" />
                       </button>
                       <span className="w-5 text-center">{toFa(l.qty)}</span>
                       <button
@@ -323,7 +326,7 @@ function CartHoverPopover({ count, onClose }: { count: number; onClose: () => vo
                         className="text-(--color-muted-fg) hover:text-black"
                         aria-label="کاهش"
                       >
-                        <Minus className="h-3 w-3" />
+                        <Icon name="icons-20--remove" className="h-3 w-3" />
                       </button>
                     </div>
                     <button
@@ -331,7 +334,7 @@ function CartHoverPopover({ count, onClose }: { count: number; onClose: () => vo
                       className="text-black/30 hover:text-(--color-wine)"
                       aria-label="حذف"
                     >
-                      <Trash2 className="h-3.5 w-3.5" />
+                      <Icon name="icons-20--remove-delete" className="h-3.5 w-3.5" />
                     </button>
                   </div>
                 </div>

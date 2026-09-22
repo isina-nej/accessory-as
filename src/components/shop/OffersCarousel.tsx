@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Icon } from "@/components/ui/Icon";
 import { type ShopProduct } from "@/lib/products";
 import { ProductCard } from "./ProductCard";
 
@@ -22,7 +22,7 @@ export function OffersCarousel({ items }: { items: ShopProduct[] }) {
             onClick={() => setI((v) => Math.max(0, v - 1))}
             aria-label="قبلی"
           >
-            <ChevronRight className="h-4 w-4" />
+            <Icon name="icons-20--direction-right" className="h-4 w-4" />
           </button>
           <button
             className="rounded-full border border-white/30 p-2 disabled:opacity-40"
@@ -30,7 +30,7 @@ export function OffersCarousel({ items }: { items: ShopProduct[] }) {
             onClick={() => setI((v) => Math.min(max, v + 1))}
             aria-label="بعدی"
           >
-            <ChevronLeft className="h-4 w-4" />
+            <Icon name="icons-20--direction-left" className="h-4 w-4" />
           </button>
         </div>
       </div>

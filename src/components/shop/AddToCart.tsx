@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ShoppingBag } from "lucide-react";
+import { Icon } from "@/components/ui/Icon";
 import { toFa } from "@/lib/fa";
 import { useCart } from "@/stores/cart";
 import { Button } from "../ui/button";
@@ -42,7 +42,7 @@ export function AddToCart({ id, title, stock }: { id: string; title: string; sto
         }}
         aria-label={`افزودن ${title} به سبد`}
       >
-        <ShoppingBag className="h-4 w-4" />
+        <Icon name="icons-20--add-to-cart-button" className="h-4 w-4 brightness-0 invert" />
         افزودن به سبد
       </Button>
     </div>

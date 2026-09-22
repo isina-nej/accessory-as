@@ -36,31 +36,31 @@ const DESC = (t: string) =>
 type P = {
   slug: string; title: string; cat: string; price: number;
   old?: number; off?: number; stock: number; sku: string;
-  colors: string[]; sizes: string[];
+  colors: string[]; sizes: string[]; img: string;
 };
 
-// بازه فیلتر فیگما: ۲۵۰هزار تا ۲۵میلیون
+// بازه فیلتر فیگما: ۲۵۰هزار تا ۲۵میلیون — عکس از public/images (فیگما)
 const PRODUCTS: P[] = [
-  { slug: "full-nagin-ring", title: "انگشتر فول نگین زنانه", cat: "ring", price: 4250000, old: 5312500, off: 20, stock: 12, sku: "WC009", colors: ["نقره‌ای", "طلایی"], sizes: ["20", "21", "22", "23", "24", "25"] },
-  { slug: "minimal-steel-ring", title: "انگشتر مینیمال استیل", cat: "ring", price: 1250000, stock: 30, sku: "WC011", colors: ["نقره‌ای"], sizes: ["20", "21", "22", "23", "24"] },
-  { slug: "gold-plated-ring", title: "انگشتر آبکاری طلا", cat: "ring", price: 2980000, old: 3500000, off: 15, stock: 0, sku: "WC012", colors: ["طلایی"], sizes: ["21", "22", "23"] },
-  { slug: "full-nagin-necklace", title: "گردنبند فول نگین زنانه", cat: "necklace", price: 5250000, old: 6562500, off: 20, stock: 5, sku: "WN007", colors: ["طلایی", "نقره‌ای"], sizes: [] },
-  { slug: "minimal-chain-necklace", title: "گردنبند زنجیری مینیمال", cat: "necklace", price: 1890000, stock: 18, sku: "WN008", colors: ["طلایی"], sizes: [] },
-  { slug: "pearl-necklace", title: "گردنبند مروارید", cat: "necklace", price: 7650000, stock: 3, sku: "WN009", colors: ["سفید"], sizes: [] },
-  { slug: "full-nagin-bracelet", title: "دستبند فول نگین", cat: "bracelet", price: 1870000, old: 2337500, off: 20, stock: 8, sku: "WB014", colors: ["طلایی", "نقره‌ای"], sizes: [] },
-  { slug: "cartier-bracelet", title: "دستبند کارتیر", cat: "bracelet", price: 2450000, stock: 10, sku: "WB015", colors: ["طلایی"], sizes: [] },
-  { slug: "bangle-bracelet", title: "دستبند النگویی", cat: "bracelet", price: 3980000, stock: 6, sku: "WB016", colors: ["طلایی"], sizes: [] },
-  { slug: "double-nagin-earring", title: "گوشواره دو عددی فول نگین", cat: "earring", price: 3050000, old: 3812500, off: 20, stock: 15, sku: "WE021", colors: ["نقره‌ای", "طلایی"], sizes: [] },
-  { slug: "hoop-earring", title: "گوشواره حلقه‌ای", cat: "earring", price: 1450000, stock: 22, sku: "WE022", colors: ["طلایی"], sizes: [] },
-  { slug: "pearl-drop-earring", title: "گوشواره مروارید آویز", cat: "earring", price: 2750000, stock: 7, sku: "WE023", colors: ["سفید"], sizes: [] },
-  { slug: "women-anklet", title: "پابند زنانه", cat: "anklet", price: 750000, stock: 20, sku: "WA031", colors: ["نقره‌ای"], sizes: [] },
-  { slug: "chain-anklet", title: "پابند زنجیری طلا", cat: "anklet", price: 1350000, stock: 14, sku: "WA032", colors: ["طلایی"], sizes: [] },
-  { slug: "minimal-anklet", title: "پابند مینیمال", cat: "anklet", price: 280000, stock: 40, sku: "WA033", colors: ["نقره‌ای", "صورتی"], sizes: [] },
-  { slug: "half-set-nagin", title: "نیم‌ست فول نگین", cat: "half-set", price: 6800000, old: 8500000, off: 20, stock: 4, sku: "WH041", colors: ["نقره‌ای"], sizes: [] },
-  { slug: "half-set-pearl", title: "نیم‌ست مروارید", cat: "half-set", price: 9200000, stock: 2, sku: "WH042", colors: ["سفید", "طلایی"], sizes: [] },
-  { slug: "full-set-nagin", title: "ست کامل فول نگین", cat: "full-set", price: 14800000, old: 16400000, off: 10, stock: 2, sku: "WF051", colors: ["نقره‌ای"], sizes: [] },
-  { slug: "full-set-gold", title: "ست کامل طلا", cat: "full-set", price: 23500000, stock: 1, sku: "WF052", colors: ["طلایی"], sizes: [] },
-  { slug: "full-set-minimal", title: "ست کامل مینیمال", cat: "full-set", price: 8950000, stock: 3, sku: "WF053", colors: ["نقره‌ای", "طلایی"], sizes: [] },
+  { slug: "full-nagin-ring", title: "انگشتر فول نگین زنانه", cat: "ring", price: 4250000, old: 5312500, off: 20, stock: 12, sku: "WC009", colors: ["نقره‌ای", "طلایی"], sizes: ["20", "21", "22", "23", "24", "25"], img: "/images/product-01.webp" },
+  { slug: "minimal-steel-ring", title: "انگشتر مینیمال استیل", cat: "ring", price: 1250000, stock: 30, sku: "WC011", colors: ["نقره‌ای"], sizes: ["20", "21", "22", "23", "24"], img: "/images/product-02.webp" },
+  { slug: "gold-plated-ring", title: "انگشتر آبکاری طلا", cat: "ring", price: 2980000, old: 3500000, off: 15, stock: 0, sku: "WC012", colors: ["طلایی"], sizes: ["21", "22", "23"], img: "/images/product-03.webp" },
+  { slug: "full-nagin-necklace", title: "گردنبند فول نگین زنانه", cat: "necklace", price: 5250000, old: 6562500, off: 20, stock: 5, sku: "WN007", colors: ["طلایی", "نقره‌ای"], sizes: [], img: "/images/product-04.webp" },
+  { slug: "minimal-chain-necklace", title: "گردنبند زنجیری مینیمال", cat: "necklace", price: 1890000, stock: 18, sku: "WN008", colors: ["طلایی"], sizes: [], img: "/images/product-05.webp" },
+  { slug: "pearl-necklace", title: "گردنبند مروارید", cat: "necklace", price: 7650000, stock: 3, sku: "WN009", colors: ["سفید"], sizes: [], img: "/images/product-06.webp" },
+  { slug: "full-nagin-bracelet", title: "دستبند فول نگین", cat: "bracelet", price: 1870000, old: 2337500, off: 20, stock: 8, sku: "WB014", colors: ["طلایی", "نقره‌ای"], sizes: [], img: "/images/product-07.webp" },
+  { slug: "cartier-bracelet", title: "دستبند کارتیر", cat: "bracelet", price: 2450000, stock: 10, sku: "WB015", colors: ["طلایی"], sizes: [], img: "/images/product-08.webp" },
+  { slug: "bangle-bracelet", title: "دستبند النگویی", cat: "bracelet", price: 3980000, stock: 6, sku: "WB016", colors: ["طلایی"], sizes: [], img: "/images/product-09.webp" },
+  { slug: "double-nagin-earring", title: "گوشواره دو عددی فول نگین", cat: "earring", price: 3050000, old: 3812500, off: 20, stock: 15, sku: "WE021", colors: ["نقره‌ای", "طلایی"], sizes: [], img: "/images/product-10.webp" },
+  { slug: "hoop-earring", title: "گوشواره حلقه‌ای", cat: "earring", price: 1450000, stock: 22, sku: "WE022", colors: ["طلایی"], sizes: [], img: "/images/product-11.webp" },
+  { slug: "pearl-drop-earring", title: "گوشواره مروارید آویز", cat: "earring", price: 2750000, stock: 7, sku: "WE023", colors: ["سفید"], sizes: [], img: "/images/product-12.webp" },
+  { slug: "women-anklet", title: "پابند زنانه", cat: "anklet", price: 750000, stock: 20, sku: "WA031", colors: ["نقره‌ای"], sizes: [], img: "/images/product-13.webp" },
+  { slug: "chain-anklet", title: "پابند زنجیری طلا", cat: "anklet", price: 1350000, stock: 14, sku: "WA032", colors: ["طلایی"], sizes: [], img: "/images/product-14.webp" },
+  { slug: "minimal-anklet", title: "پابند مینیمال", cat: "anklet", price: 280000, stock: 40, sku: "WA033", colors: ["نقره‌ای", "صورتی"], sizes: [], img: "/images/product-13.webp" },
+  { slug: "half-set-nagin", title: "نیم‌ست فول نگین", cat: "half-set", price: 6800000, old: 8500000, off: 20, stock: 4, sku: "WH041", colors: ["نقره‌ای"], sizes: [], img: "/images/cat-half-set.webp" },
+  { slug: "half-set-pearl", title: "نیم‌ست مروارید", cat: "half-set", price: 9200000, stock: 2, sku: "WH042", colors: ["سفید", "طلایی"], sizes: [], img: "/images/cat-half-set.webp" },
+  { slug: "full-set-nagin", title: "ست کامل فول نگین", cat: "full-set", price: 14800000, old: 16400000, off: 10, stock: 2, sku: "WF051", colors: ["نقره‌ای"], sizes: [], img: "/images/cat-full-set.webp" },
+  { slug: "full-set-gold", title: "ست کامل طلا", cat: "full-set", price: 23500000, stock: 1, sku: "WF052", colors: ["طلایی"], sizes: [], img: "/images/cat-full-set.webp" },
+  { slug: "full-set-minimal", title: "ست کامل مینیمال", cat: "full-set", price: 8950000, stock: 3, sku: "WF053", colors: ["نقره‌ای", "طلایی"], sizes: [], img: "/images/cat-full-set.webp" },
 ];
 
 const SEED_REVIEWS: Record<string, { author: string; rating: number; body: string }[]> = {
@@ -116,6 +116,8 @@ async function main() {
       });
     const [row] = await db.select().from(products).where(eq(products.slug, p.slug)).limit(1);
     if (!row) continue;
+    const [img] = await db.select().from(productImages).where(eq(productImages.productId, row.id)).limit(1);
+    if (!img) await db.insert(productImages).values({ productId: row.id, url: p.img, sort: 0 });
     await db.delete(productAttributes).where(eq(productAttributes.productId, row.id));
     const links: { productId: string; attributeId: string }[] = [];
     for (const c of p.colors) {
@@ -155,7 +157,14 @@ async function main() {
       set: { pct: 20, maxToman: 2000000, minToman: 1000000, active: true },
     });
 
-  // --- CMS seed ---
+  // --- CMS seed (بنرها با عکس فیگما) ---
+  const BANNER_IMGS: Record<string, string> = {
+    hero: "/images/banner-hero.webp",
+    "offer-side": "/images/banner-offer-side.webp",
+    "mid-a": "/images/banner-mid-a.webp",
+    "mid-b": "/images/banner-mid-b.webp",
+    shine: "/images/banner-shine.webp",
+  };
   for (const b of [
     { slot: "hero", title: "٪۷۵ تخفیف به مناسبت روز دختر", subtitle: "اکسسوری‌هایی برای امروز و سال‌های بعد", ctaLabel: "مشاهده بیشتر", ctaHref: "/shop", sort: 0 },
     { slot: "offer-side", title: "جدیدترین اکسسوری‌های ترند", subtitle: "مجموعه‌ای از گردنبندها، دستبندها، انگشترها و گوشواره‌های خاص", ctaLabel: "لیست محصولات", ctaHref: "/shop", sort: 0 },
@@ -164,7 +173,11 @@ async function main() {
     { slot: "shine", title: "درخشش در هر نگاه", subtitle: "جزئیاتی کوچک با تاثیری بزرگ بر استایل شما", ctaLabel: "مشاهده محصولات", ctaHref: "/shop", sort: 0 },
   ]) {
     const existing = await db.select().from(banners).where(eq(banners.slot, b.slot)).limit(1);
-    if (existing.length === 0) await db.insert(banners).values({ ...b, active: true });
+    if (existing.length === 0) {
+      await db.insert(banners).values({ ...b, imageUrl: BANNER_IMGS[b.slot] ?? null, active: true });
+    } else if (!existing[0].imageUrl && BANNER_IMGS[b.slot]) {
+      await db.update(banners).set({ imageUrl: BANNER_IMGS[b.slot] }).where(eq(banners.slot, b.slot));
+    }
   }
 
   for (const p of [

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Trash2 } from "lucide-react";
+import { Icon } from "@/components/ui/Icon";
 import { Breadcrumb } from "@/components/shop/Breadcrumb";
 import { formatToman, toFa } from "@/lib/fa";
 import { useCart } from "@/stores/cart";
@@ -100,7 +100,10 @@ export function CartView() {
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={p!.image} alt={p!.title} className="h-full w-full object-cover" />
               ) : (
-                <span className="text-3xl">💍</span>
+                <span className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-lg bg-(--color-mist)">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src="/images/product-03.webp" alt="" className="h-full w-full object-cover" />
+                  </span>
               )}
             </Link>
             <div className="flex flex-1 flex-col gap-1">
@@ -116,7 +119,7 @@ export function CartView() {
                   aria-label={`حذف ${p!.title}`}
                   className="flex items-center gap-1 text-xs text-(--color-wine)"
                 >
-                  <Trash2 className="h-4 w-4" />
+                  <Icon name="icons-20--remove-delete" className="h-4 w-4" />
                   حذف
                 </button>
               </div>

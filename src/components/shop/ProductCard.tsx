@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ShoppingBag } from "lucide-react";
+import { Icon } from "@/components/ui/Icon";
 import { formatToman, toFa } from "@/lib/fa";
 import { type ShopProduct } from "@/lib/products";
 import { useCart } from "@/stores/cart";
@@ -16,7 +16,10 @@ export function ProductCard({ p }: { p: ShopProduct }) {
           // eslint-disable-next-line @next/next/no-img-element
           <img src={p.image} alt={p.title} className="h-full w-full object-cover" />
         ) : (
-          <span className="flex h-full items-center justify-center text-4xl">💍</span>
+          <span className="flex h-full w-full items-center justify-center">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/images/product-02.webp" alt={p.title} className="h-full w-full object-cover" loading="lazy" />
+          </span>
         )}
         {p.discountPct ? (
           <span className="absolute top-2 right-2 rounded-full bg-(--color-wine) px-2 py-0.5 text-xs text-white">
@@ -36,7 +39,7 @@ export function ProductCard({ p }: { p: ShopProduct }) {
             <p className="font-bold">{formatToman(p.priceToman)}</p>
           </div>
           <Button size="sm" onClick={() => add(p.id)} aria-label={`افزودن ${p.title} به سبد`}>
-            <ShoppingBag className="h-4 w-4" />
+            <Icon name="icons-20--add-to-cart-button" className="h-4 w-4 brightness-0 invert" />
           </Button>
         </div>
         {p.stock === 0 ? <p className="text-xs text-(--color-wine)">ناموجود</p> : null}
