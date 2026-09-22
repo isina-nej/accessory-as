@@ -68,19 +68,20 @@ export function Header({ menu }: { menu: MegaMenuData }) {
     <header ref={rootRef} className="relative z-40 border-b border-[#D6DBDE] bg-white">
       <div className="mx-auto flex min-h-22 max-w-7xl items-center justify-between gap-8 px-4 py-5">
         {/* راست: لوگو عین فیگما */}
-        <Link href="/" className="flex items-center gap-2">
-          <span className="leading-tight opacity-80">
+        <Link href="/" className="flex items-center gap-3">
+          <span className="text-left font-serif font-black leading-none text-[#0A5A55]">
+            <span className="block text-2xl tracking-tighter">AS</span>
+            <span className="block text-[10px] tracking-widest font-sans font-medium">accessory</span>
+          </span>
+          <span aria-hidden className="h-8 w-px bg-black/10" />
+          <span className="leading-tight text-right">
             <span className="block text-base font-extrabold text-[#161B22]">اکسسوری آس</span>
             <span className="block text-xs font-medium text-[#8A9398]">روایتی از سلیقه تو</span>
-          </span>
-          <span className="text-base leading-tight font-bold text-[#0A5A55]">
-            AS
-            <span className="block text-xs font-medium">accessory</span>
           </span>
         </Link>
 
         {/* وسط: ناوبری */}
-        <nav className="hidden items-center gap-6 text-sm md:flex">
+        <nav className="hidden items-center gap-7 text-sm font-medium md:flex">
           <div
             className="relative"
             onMouseEnter={() => {
@@ -91,14 +92,15 @@ export function Header({ menu }: { menu: MegaMenuData }) {
           >
             <button
               className={cn(
-                "flex items-center gap-1 rounded-lg px-2 py-1.5 transition-colors hover:text-(--color-brand)",
-                open === "menu" && "text-(--color-brand)",
+                "flex items-center gap-1.5 rounded-lg py-1.5 transition-colors hover:text-(--color-brand)",
+                open === "menu" ? "text-(--color-brand)" : "text-[#161B22]",
               )}
               onClick={() => setOpen((v) => (v === "menu" ? null : "menu"))}
               aria-expanded={open === "menu"}
             >
-              دسته‌بندی محصولات
-              <Icon name="icons-20--direction-down" className={cn("h-5 w-5 transition-transform", open === "menu" && "rotate-180")} />
+              <Icon name="icons-20--menu-line-horizontal" className="h-4 w-4" alt="" />
+              <span>دسته بندی محصولات</span>
+              <Icon name="icons-20--direction-down" className={cn("h-4 w-4 transition-transform", open === "menu" && "rotate-180")} />
             </button>
             {open === "menu" && (
               <div
@@ -111,41 +113,19 @@ export function Header({ menu }: { menu: MegaMenuData }) {
             )}
           </div>
 
-          {NAV.map((n) => (
-            <Link key={n.label} href={n.href} className="hover:text-(--color-brand)">
-              {n.label}
-            </Link>
-          ))}
+          <Link href="/shop" className="text-[#161B22] hover:text-(--color-brand)">
+            فروشگاه
+          </Link>
+          <Link href="/contact" className="text-[#161B22] hover:text-(--color-brand)">
+            تماس با ما
+          </Link>
+          <Link href="/about" className="text-[#161B22] hover:text-(--color-brand)">
+            درباره ما
+          </Link>
         </nav>
 
-        {/* چپ: جستجو + پروفایل دولاینه + سبد */}
-        <div className="flex items-center gap-3">
-          <Link href="/shop" aria-label="جستجو" className="rounded-[10px] p-0.5 hover:bg-black/5">
-            <Icon name="icons-20--search" className="h-5 w-5" alt="" />
-          </Link>
-          <span aria-hidden className="h-8 w-px bg-black/10" />
-          {session?.user ? (
-            <Link href="/account" className="flex items-center gap-2">
-              <span className="leading-tight">
-                <span className="block text-[13px] font-bold text-[#161B22]">{session.user.name || "حساب کاربری"}</span>
-                <span className="block text-xs text-[#8A9398]">حساب کاربری</span>
-              </span>
-              <span className="flex h-5 w-5 items-center justify-center rounded-full">
-                <Icon name="icons-20--user" className="h-5 w-5" alt="" />
-              </span>
-            </Link>
-          ) : (
-            <Link href="/login" className="flex items-center gap-2">
-              <span className="leading-tight">
-                <span className="block text-[13px] font-bold text-[#161B22]">حساب کاربری</span>
-                <span className="block text-xs text-[#8A9398]">ورود یا ثبت نام</span>
-              </span>
-              <span className="flex h-5 w-5 items-center justify-center rounded-full">
-                <Icon name="icons-20--user" className="h-5 w-5" alt="" />
-              </span>
-            </Link>
-          )}
-
+        {/* چپ: سبد + پروفایل + خط + جستجو */}
+        <div className="flex items-center gap-4">
           <div
             className="relative"
             onMouseEnter={() => {
@@ -158,11 +138,11 @@ export function Header({ menu }: { menu: MegaMenuData }) {
               onClick={() => setOpen((v) => (v === "cart" ? null : "cart"))}
               aria-expanded={open === "cart"}
               aria-label="سبد خرید"
-              className="relative flex h-11 w-11 items-center justify-center rounded-[10px] bg-[#F8FAF9] hover:bg-[#E7EFEE]"
+              className="relative flex h-11 w-11 items-center justify-center rounded-xl bg-[#F8FAF9] border border-black/5 hover:bg-[#E7EFEE] transition-colors"
             >
               <Icon name="icons-20--shopping-basket" className="h-5 w-5" alt="" />
               {count > 0 && (
-                <span className="absolute -top-1 -left-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#9F1239] px-1 text-[10px] font-extrabold text-white">
+                <span className="absolute -top-1.5 -right-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#9F1239] px-1 text-[10px] font-extrabold text-white">
                   {toFa(count)}
                 </span>
               )}
@@ -177,6 +157,34 @@ export function Header({ menu }: { menu: MegaMenuData }) {
               </div>
             )}
           </div>
+
+          {session?.user ? (
+            <Link href="/account" className="flex items-center gap-2">
+              <span className="flex h-6 w-6 items-center justify-center">
+                <Icon name="icons-20--user" className="h-5 w-5" alt="" />
+              </span>
+              <span className="leading-tight text-right">
+                <span className="block text-[13px] font-bold text-[#161B22]">{session.user.name || "حساب کاربری"}</span>
+                <span className="block text-[11px] text-[#8A9398]">حساب کاربری</span>
+              </span>
+            </Link>
+          ) : (
+            <Link href="/login" className="flex items-center gap-2">
+              <span className="flex h-6 w-6 items-center justify-center">
+                <Icon name="icons-20--user" className="h-5 w-5" alt="" />
+              </span>
+              <span className="leading-tight text-right">
+                <span className="block text-[13px] font-bold text-[#161B22]">حساب کاربری</span>
+                <span className="block text-[11px] text-[#8A9398]">ورود یا ثبت نام</span>
+              </span>
+            </Link>
+          )}
+
+          <span aria-hidden className="h-8 w-px bg-black/10" />
+
+          <Link href="/shop" aria-label="جستجو" className="rounded-lg p-1 text-[#161B22] hover:bg-black/5">
+            <Icon name="icons-20--search" className="h-5 w-5" alt="" />
+          </Link>
         </div>
       </div>
 

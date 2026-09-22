@@ -28,13 +28,6 @@ const TABS = [
   { slug: "anklet", title: "پابند", icon: "icons-20--shopping-bag" },
 ];
 
-const PERKS = [
-  { icon: "icons-20--delivery", title: "تحویل اکسپرس", sub: "تحویل سریع و بی‌تاخیر" },
-  { icon: "icons-20--trolley", title: "حمل و نقل رایگان", sub: "برای خرید بالای ۵۰۰ هزار تومن" },
-  { icon: "icons-20--check-circle", title: "کیفیت پرمیوم", sub: "متریال و کیفیت ساخت بی‌نقص" },
-  { icon: "icons-20--repeat", title: "ضمانت بازگشت کالا", sub: "۷ روز ضمانت بازگشت کالا" },
-];
-
 const DOTS = ["#D6DBDE", "#0A5A55", "#D6C2A1"];
 
 function priceNum(n: number): string {
@@ -171,90 +164,157 @@ export default async function LandingPage() {
     <div className="flex min-h-full flex-1 flex-col bg-white">
       <Header menu={menu} />
 
-      {/* هیرو روی بک‌گراند کرم #F8F6F1 عین Rectangle 1 فیگما */}
-      <div className="bg-[#F8F6F1]">
-        <div className="mx-auto w-full max-w-7xl px-4">
-          {/* H: لیبل + تیتر ۶۶ + ساب + گیومه */}
-          <section className="relative pt-8 text-center">
-            <span aria-hidden className="pointer-events-none absolute top-2 left-4 text-[120px] leading-none text-[#D6DBDE] select-none md:left-16">
-              “
-            </span>
-            <p className="text-base text-[#8A9398]">اکسسوری آس</p>
-            <h1 className="mx-auto mt-2 max-w-4xl text-4xl leading-[1.7] font-extrabold text-[#01413E] md:text-[66px]">
-              {settings["hero_title"] ?? "انتخابی برای خاص‌پسندان"}
-            </h1>
-            <p className="mx-auto mt-3 max-w-xl text-lg text-[#4B5563]">
-              {settings["hero_sub"] ?? "اکسسوری‌های خاص و ماندگار برای تکمیل استایل روزمره و رسمی شما."}
-            </p>
+      {/* هیرو روی بک‌گراند ملایم با خطوط مواج و شاخه زیتون/جواهر عین عکس */}
+      <div className="relative overflow-hidden bg-[#FAFBFB] bg-[url('/images/figma-landing/hero-pattern.svg')] bg-top bg-no-repeat">
+        {/* شاخه برگ و جواهر آویزان در بالا سمت چپ */}
+        <div className="pointer-events-none absolute -top-8 -left-12 z-10 w-64 md:w-96 select-none">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/images/figma-landing/hero-branch.webp"
+            alt=""
+            className="h-auto w-full object-contain"
+            loading="eager"
+          />
+        </div>
+
+        {/* فرم موج ملایم در لبه راست */}
+        <div className="pointer-events-none absolute top-28 -right-8 h-32 w-32 rounded-full bg-[#E8F1F0] opacity-70 blur-xs" />
+
+        <div className="relative mx-auto w-full max-w-7xl px-4 pt-6 pb-10">
+          {/* بخش تیتر هیرو: گیومه چپ + تیتر بزرگ با هاله سفید + لیبل بالای راست */}
+          <section className="relative text-center">
+            <div className="mx-auto flex max-w-5xl items-center justify-center gap-3">
+              {/* گیومه سبز تیره */}
+              <span aria-hidden className="font-serif text-5xl font-black text-[#01413E] select-none md:text-7xl">
+                “
+              </span>
+
+              {/* تیتر و لیبل */}
+              <div className="relative">
+                <span className="absolute -top-5 right-2 text-xs font-medium text-[#8A9398] md:text-sm">
+                  اکسسوری آس
+                </span>
+                <h1 className="text-3xl font-black text-[#01413E] drop-shadow-[0_2px_10px_rgba(255,255,255,1)] md:text-[54px] md:leading-[1.4]">
+                  {settings["hero_title"] ?? "انتخابی برای خاص پسندان"}
+                </h1>
+              </div>
+            </div>
           </section>
 
-          {/* Body: راست پنل معرفی، چپ بنر فروش ویژه */}
-          <section className="mt-6 grid gap-4 pb-10 md:grid-cols-[520px_1fr]">
-            <div className="rounded-[10px] bg-white p-6">
-              <p className="text-right text-base leading-7 text-[#161B22]">
-                {bOfferSide?.subtitle ??
-                  "جدیدترین اکسسوری‌های ترند را کشف کنید. مجموعه‌ای از گردنبندها، دستبندها، انگشترها و گوشواره‌های خاص که برای درخشش بیشتر استایل شما انتخاب شده‌اند."}
-              </p>
+          {/* گرید دو کارت: چپ بنر فروش ویژه، راست پنل معرفی */}
+          <section className="mt-8 grid gap-5 md:grid-cols-2">
+            {/* بنر فروش ویژه (سمت چپ در تصویر) */}
+            <div className="relative min-h-[360px] overflow-hidden rounded-2xl bg-[#062e2b] shadow-sm md:min-h-[420px]">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={bHero?.imageUrl || "/images/figma-new/hero-banner.webp"}
+                alt={bHero?.title ?? "فروش ویژه"}
+                className="absolute inset-0 h-full w-full object-cover"
+                loading="eager"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+
+              {/* دکمه کپسولی شناور مشاهده بیشتر در بالا سمت چپ */}
               <Link
-                href={bOfferSide?.ctaHref || "/shop"}
-                className="mt-4 inline-flex w-44 items-center justify-center gap-2 rounded-[10px] bg-[linear-gradient(135deg,#00807A,#01413E)] px-4 py-3 text-base font-extrabold text-white"
+                href={bHero?.ctaHref || "/shop"}
+                className="absolute top-4 left-4 z-20 inline-flex items-center gap-2 rounded-full bg-white py-1.5 pr-3.5 pl-1.5 shadow-md transition-transform hover:scale-105"
               >
-                <Icon name="icons-20--add-to-cart-button" className="h-5 w-5 brightness-0 invert" alt="" />
-                {bOfferSide?.ctaLabel ?? "لیست محصولات"}
+                <span className="text-xs font-bold text-[#161B22]">
+                  {bHero?.ctaLabel ?? "مشاهده بیشتر"}
+                </span>
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#0A5A55] text-white">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M7 17L17 7M17 7H7M17 7V17" />
+                  </svg>
+                </span>
               </Link>
-              <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                {PERKS.map((f) => (
-                  <div key={f.title} className="flex items-center gap-2">
-                    <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#D7E8E7]">
-                      <Icon name={f.icon} className="h-6 w-6" alt="" />
-                    </span>
-                    <span>
-                      <span className="block text-[13px] font-bold text-[#161B22]">{f.title}</span>
-                      <span className="block text-xs text-[#4B5563]">{f.sub}</span>
-                    </span>
-                  </div>
-                ))}
+
+              {/* نشان فروش ویژه در بالا سمت راست */}
+              <div className="absolute top-6 right-6 inline-flex items-center gap-2 rounded-full bg-[#9F1239] px-5 py-2 shadow-md">
+                <span className="text-base font-black text-white">فروش ویژه!</span>
+                <Icon name="icons-20--discount-tag" className="h-5 w-5 brightness-0 invert" alt="" />
+              </div>
+
+              {/* متون بنر در سمت راست */}
+              <div className="absolute top-22 right-6 max-w-sm text-right">
+                <p className="text-2xl font-black text-white leading-tight md:text-[32px]">
+                  {bHero?.title ?? "٪۷۵ تخفیف به مناسبت روز دختر"}
+                </p>
+                <p className="mt-2 text-sm font-medium text-white/85 md:text-base">
+                  {bHero?.subtitle ?? "اکسسوری هایی برای امروز و سال های بعد"}
+                </p>
+              </div>
+
+              {/* اسلایدر تبی در پایین سمت راست */}
+              <div className="absolute bottom-0 right-16 flex items-center gap-4 rounded-t-2xl bg-white px-6 py-2 shadow-sm md:right-24" dir="rtl">
+                <span className="text-xs font-medium text-[#8A9398]">۰۱</span>
+                <span className="flex flex-col items-center gap-0.5">
+                  <span className="h-1.5 w-1.5 rounded-full bg-[#0A5A55]" />
+                  <span className="h-0.5 w-7 rounded-full bg-[#0A5A55]" />
+                  <span className="text-xs font-extrabold text-[#161B22]">۰۲</span>
+                </span>
+                <span className="text-xs font-medium text-[#8A9398]">۰۳</span>
               </div>
             </div>
 
-            <div className="relative overflow-hidden rounded-[10px]">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={bHero?.imageUrl || "/images/figma-landing/hero-bg.webp"}
-                alt={bHero?.title ?? "فروش ویژه"}
-                className="absolute inset-0 h-full w-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent" />
-              <Link
-                href={bHero?.ctaHref || "/shop"}
-                className="absolute top-4 left-4 z-10 inline-flex items-center gap-2 rounded-full bg-white px-3 py-1.5 text-sm font-bold text-[#161B22]"
-              >
-                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#0A5A55]">
+            {/* کارت معرفی و فیچرها (سمت راست در تصویر) */}
+            <div className="flex flex-col justify-between rounded-2xl border border-black/10 bg-white p-6 md:p-8 text-right shadow-sm">
+              <div>
+                <p className="text-sm font-medium leading-7 text-[#161B22] md:text-base md:leading-8">
+                  {bOfferSide?.subtitle ??
+                    "جدید ترین اکسسوری های ترند را کشف کنید. مجموعه ای از گردنبند ها، دستبند ها، انگشتر ها و گوشواره های خاص که برای درخشش بیشتر استایل شما انتخاب شده‌اند."}
+                </p>
+                <Link
+                  href={bOfferSide?.ctaHref || "/shop"}
+                  className="mt-6 inline-flex items-center gap-2 rounded-xl bg-[#0A5A55] px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-[#084A46]"
+                >
+                  <span>{bOfferSide?.ctaLabel ?? "لیست محصولات"}</span>
                   <Icon name="icons-20--vector-arrow-left" className="h-4 w-4 brightness-0 invert" alt="" />
-                </span>
-                {bHero?.ctaLabel ?? "مشاهده بیشتر"}
-              </Link>
-              <div className="relative flex h-full min-h-[320px] flex-col items-end justify-end p-6 text-right md:min-h-[391px] md:p-8">
-                <span className="rounded-full bg-[#9F1239] px-6 py-2 text-2xl font-extrabold text-white">
-                  فروش ویژه!
-                </span>
-                <p className="mt-3 text-3xl leading-snug font-bold text-white md:text-[38px]">
-                  {bHero?.title ?? "٪۷۵ تخفیف به مناسبت روز دختر"}
-                </p>
-                <p className="mt-1 text-2xl text-[#E8EBED]">
-                  {bHero?.subtitle ?? "اکسسوری‌هایی برای امروز و سال‌های بعد"}
-                </p>
-                <div className="mt-4 flex items-start gap-4" dir="rtl">
-                  {[
-                    { n: "۰۱", active: false },
-                    { n: "۰۲", active: true },
-                    { n: "۰۳", active: false },
-                  ].map((s) => (
-                    <span key={s.n} className="flex w-10 flex-col items-center gap-1">
-                      <span className={`h-1 w-full rounded-full ${s.active ? "bg-[#0A5A55]" : "bg-[#E8EBED]"}`} />
-                      <span className={`text-xs font-bold ${s.active ? "text-[#161B22]" : "text-[#8A9398]"}`}>{s.n}</span>
-                    </span>
-                  ))}
+                </Link>
+              </div>
+
+              {/* ۴ ویژگی ۲ در ۲ مطابق اسکرین‌شات */}
+              <div className="mt-8 grid grid-cols-2 gap-y-5 gap-x-4">
+                {/* ستون راست در RTL: حمل و نقل رایگان / ضمانت بازگشت کالا */}
+                <div className="flex items-center gap-3">
+                  <span>
+                    <span className="block text-xs font-bold text-[#161B22]">حمل و نقل رایگان</span>
+                    <span className="block text-[11px] text-[#4B5563]">برای خرید بالای ۵۰۰ هزار تومن</span>
+                  </span>
+                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#D7E8E7]">
+                    <Icon name="icons-20--truck" className="h-5 w-5" alt="" />
+                  </span>
+                </div>
+
+                {/* ستون چپ در RTL: تحویل اکسپرس / کیفیت پرمیوم */}
+                <div className="flex items-center gap-3">
+                  <span>
+                    <span className="block text-xs font-bold text-[#161B22]">تحویل اکسپرس</span>
+                    <span className="block text-[11px] text-[#4B5563]">تحویل سریع و بی تاخیر</span>
+                  </span>
+                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#D7E8E7]">
+                    <Icon name="icons-20--delivery" className="h-5 w-5" alt="" />
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <span>
+                    <span className="block text-xs font-bold text-[#161B22]">ضمانت بازگشت کالا</span>
+                    <span className="block text-[11px] text-[#4B5563]">۷ روز ضمانت بازگشت کالا</span>
+                  </span>
+                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#D7E8E7]">
+                    <Icon name="icons-20--repeat" className="h-5 w-5" alt="" />
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <span>
+                    <span className="block text-xs font-bold text-[#161B22]">کیفیت پرمیوم</span>
+                    <span className="block text-[11px] text-[#4B5563]">متریال و کیفیت ساخت بی‌نقص</span>
+                  </span>
+                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#D7E8E7]">
+                    <Icon name="icons-20--diamond" className="h-5 w-5" alt="" />
+                  </span>
                 </div>
               </div>
             </div>
