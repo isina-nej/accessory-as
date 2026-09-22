@@ -2,10 +2,11 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { ChevronDown, ShoppingBag, User } from "lucide-react";
+import { ChevronDown, Minus, Plus, ShoppingBag, Trash2, User } from "lucide-react";
 import { formatToman, toFa } from "@/lib/fa";
 import type { MegaMenuData } from "@/lib/menu";
 import { cartCount, useCart } from "@/stores/cart";
+import { authClient } from "@/lib/auth-client";
 import { cn } from "@/lib/cn";
 
 const NAV = [
@@ -14,11 +15,38 @@ const NAV = [
   { href: "/about", label: "درباره ما" },
 ];
 
+const CAT_ICONS: Record<string, string> = {
+  necklace: "📿",
+  ring: "💍",
+  bracelet: "🪙",
+  earring: "✨",
+  anklet: "⛓️",
+  "half-set": "💎",
+  "full-set": "👑",
+};
+
 export function Header({ menu }: { menu: MegaMenuData }) {
   const lines = useCart((s) => s.lines);
   const count = cartCount(lines);
+  const { data: session } = authClient.useSession();
+
   const [open, setOpen] = useState<"cart" | "menu" | null>(null);
   const rootRef = useRef<HTMLElement>(null);
+  const closeTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const cancelClose = () => {
+    if (closeTimerRef.current) {
+      clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+  };
+
+  const scheduleClose = () => {
+    cancelClose();
+    closeTimerRef.current = setTimeout(() => {
+      setOpen(null);
+    }, 180);
+  };
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -30,14 +58,16 @@ export function Header({ menu }: { menu: MegaMenuData }) {
     document.addEventListener("keydown", onKey);
     document.addEventListener("mousedown", onClick);
     return () => {
+      cancelClose();
       document.removeEventListener("keydown", onKey);
       document.removeEventListener("mousedown", onClick);
     };
   }, []);
 
   return (
-    <header ref={rootRef} className="relative border-b border-black/10 bg-white">
+    <header ref={rootRef} className="relative z-40 border-b border-black/10 bg-white">
       <div className="mx-auto flex h-22 max-w-7xl items-center justify-between px-4">
+        {/* راست: لوگو */}
         <Link href="/" className="flex items-center gap-2">
           <span className="flex h-10 w-10 items-center justify-center rounded-full bg-(--color-brand) font-bold text-white">
             AS
@@ -47,35 +77,79 @@ export function Header({ menu }: { menu: MegaMenuData }) {
             <span className="block text-xs text-(--color-muted-fg)">روایتی از سلیقه تو</span>
           </span>
         </Link>
+
+        {/* وسط: منوی دسکتاپ با هاور مگامنو */}
         <nav className="hidden items-center gap-6 text-sm md:flex">
-          <button
-            className={cn("flex items-center gap-1 hover:text-(--color-brand)", open === "menu" && "text-(--color-brand)")}
-            onClick={() => setOpen((v) => (v === "menu" ? null : "menu"))}
-            aria-expanded={open === "menu"}
+          <div
+            className="relative"
+            onMouseEnter={() => {
+              cancelClose();
+              setOpen("menu");
+            }}
+            onMouseLeave={scheduleClose}
           >
-            دسته‌بندی محصولات
-            <ChevronDown className="h-4 w-4" />
-          </button>
+            <button
+              className={cn(
+                "flex items-center gap-1 rounded-lg px-2 py-1.5 transition-colors hover:text-(--color-brand)",
+                open === "menu" && "text-(--color-brand)",
+              )}
+              onClick={() => setOpen((v) => (v === "menu" ? null : "menu"))}
+              aria-expanded={open === "menu"}
+            >
+              دسته‌بندی محصولات
+              <ChevronDown className={cn("h-4 w-4 transition-transform", open === "menu" && "rotate-180")} />
+            </button>
+            {open === "menu" && (
+              <div
+                className="absolute right-0 top-full pt-2"
+                onMouseEnter={cancelClose}
+                onMouseLeave={scheduleClose}
+              >
+                <MegaMenuPopup menu={menu} onClose={() => setOpen(null)} />
+              </div>
+            )}
+          </div>
+
           {NAV.map((n) => (
             <Link key={n.label} href={n.href} className="hover:text-(--color-brand)">
               {n.label}
             </Link>
           ))}
         </nav>
+
+        {/* چپ: حساب کاربری + هاور سبد خرید */}
         <div className="flex items-center gap-2">
-          <Link
-            href="/login"
-            className="flex items-center gap-1 rounded-lg px-3 py-2 text-sm hover:bg-black/5"
+          {session?.user ? (
+            <Link
+              href="/account"
+              className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm hover:bg-black/5"
+            >
+              <User className="h-4 w-4 text-(--color-brand)" />
+              <span className="font-medium">{session.user.name || "حساب کاربری"}</span>
+            </Link>
+          ) : (
+            <Link
+              href="/login"
+              className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm hover:bg-black/5"
+            >
+              <User className="h-4 w-4" />
+              ورود یا ثبت‌نام
+            </Link>
+          )}
+
+          <div
+            className="relative"
+            onMouseEnter={() => {
+              cancelClose();
+              setOpen("cart");
+            }}
+            onMouseLeave={scheduleClose}
           >
-            <User className="h-4 w-4" />
-            ورود یا ثبت‌نام
-          </Link>
-          <div className="relative">
             <button
               onClick={() => setOpen((v) => (v === "cart" ? null : "cart"))}
               aria-expanded={open === "cart"}
               aria-label="سبد خرید"
-              className="relative flex items-center gap-1 rounded-lg bg-(--color-brand) px-3 py-2 text-sm text-white"
+              className="relative flex items-center gap-1 rounded-lg bg-(--color-brand) px-3 py-2 text-sm font-bold text-white hover:bg-[#084a46]"
             >
               <ShoppingBag className="h-4 w-4" />
               سبد
@@ -85,12 +159,22 @@ export function Header({ menu }: { menu: MegaMenuData }) {
                 </span>
               )}
             </button>
-            {open === "cart" && <CartPopover onClose={() => setOpen(null)} />}
+            {open === "cart" && (
+              <div
+                className="absolute left-0 top-full pt-2"
+                onMouseEnter={cancelClose}
+                onMouseLeave={scheduleClose}
+              >
+                <CartHoverPopover count={count} onClose={() => setOpen(null)} />
+              </div>
+            )}
           </div>
         </div>
       </div>
+
+      {/* نو بار افقی موبایل */}
       <nav className="flex gap-4 overflow-x-auto border-t px-4 py-2 text-sm md:hidden">
-        <Link href="/shop" className="whitespace-nowrap">
+        <Link href="/shop" className="whitespace-nowrap font-medium">
           دسته‌بندی محصولات
         </Link>
         {NAV.map((n) => (
@@ -99,13 +183,61 @@ export function Header({ menu }: { menu: MegaMenuData }) {
           </Link>
         ))}
       </nav>
-      {open === "menu" && <MegaMenu menu={menu} onClose={() => setOpen(null)} />}
     </header>
   );
 }
 
-function CartPopover({ onClose }: { onClose: () => void }) {
+// مگامنوی هاور دسته‌بندی مطابق فریم 6299:4271 فیگما
+function MegaMenuPopup({ menu, onClose }: { menu: MegaMenuData; onClose: () => void }) {
+  const cats = menu.cats.length > 0 ? menu.cats : [
+    { slug: "necklace", title: "گردنبند" },
+    { slug: "ring", title: "انگشتر" },
+    { slug: "bracelet", title: "دستبند" },
+    { slug: "earring", title: "گوشواره" },
+    { slug: "anklet", title: "پابند" },
+    { slug: "half-set", title: "نیم‌ست" },
+    { slug: "full-set", title: "ست کامل" },
+  ];
+
+  return (
+    <div className="w-64 rounded-2xl border border-[#d6dbde] bg-white p-3 shadow-2xl animate-in fade-in zoom-in-95 duration-150">
+      <p className="px-3 py-1.5 text-xs font-bold text-(--color-muted-fg)">دسته‌بندی‌های آس</p>
+      <ul className="mt-1 space-y-1">
+        {cats.map((c) => (
+          <li key={c.slug}>
+            <Link
+              href={`/shop?cat=${c.slug}`}
+              onClick={onClose}
+              className="flex items-center justify-between rounded-xl px-3 py-2 text-sm font-medium text-[#161b22] transition-colors hover:bg-(--color-mist) hover:text-(--color-brand)"
+            >
+              <span className="flex items-center gap-2">
+                <span className="text-base" aria-hidden>{CAT_ICONS[c.slug] ?? "💍"}</span>
+                {c.title}
+              </span>
+              <span className="text-xs text-(--color-muted-fg)">←</span>
+            </Link>
+          </li>
+        ))}
+      </ul>
+      <div className="mt-2 border-t pt-2">
+        <Link
+          href="/shop"
+          onClick={onClose}
+          className="block rounded-xl bg-(--color-mist) px-3 py-2 text-center text-xs font-bold text-(--color-brand) hover:bg-[#e8efee]"
+        >
+          مشاهده تمام اکسسوری‌ها
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+// پاپ‌اور هاور سبد خرید مطابق فریم 749:332 فیگما
+function CartHoverPopover({ count, onClose }: { count: number; onClose: () => void }) {
   const lines = useCart((s) => s.lines);
+  const setQty = useCart((s) => s.setQty);
+  const remove = useCart((s) => s.remove);
+
   const [detail, setDetail] = useState<{ id: string; title: string; price: number; image: string | null }[]>([]);
 
   useEffect(() => {
@@ -125,72 +257,118 @@ function CartPopover({ onClose }: { onClose: () => void }) {
   }, 0);
 
   return (
-    <div className="absolute left-0 z-50 mt-2 w-80 rounded-2xl border bg-white p-4 shadow-xl">
+    <div className="w-88 rounded-2xl border border-[#d6dbde] bg-white p-4 shadow-2xl md:w-[420px] animate-in fade-in zoom-in-95 duration-150">
+      {/* هدر پاپ‌اور */}
+      <div className="flex items-center justify-between border-b pb-3">
+        <span className="flex items-center gap-1.5 text-base font-extrabold text-[#161b22]">
+          <ShoppingBag className="h-4 w-4 text-(--color-brand)" />
+          سبد خرید شما
+        </span>
+        <span className="text-xs text-(--color-muted-fg)">{toFa(count)} کالا</span>
+      </div>
+
       {lines.length === 0 ? (
-        <p className="py-6 text-center text-sm text-(--color-muted-fg)">سبد خالی است</p>
+        <div className="py-8 text-center">
+          <p className="text-3xl">🛍️</p>
+          <p className="mt-2 text-sm text-(--color-muted-fg)">سبد خرید شما خالی است</p>
+          <Link
+            href="/shop"
+            onClick={onClose}
+            className="mt-3 inline-block rounded-xl bg-(--color-mist) px-4 py-1.5 text-xs font-bold text-(--color-brand)"
+          >
+            مشاهده محصولات
+          </Link>
+        </div>
       ) : (
-        <div className="space-y-3">
-          {lines.slice(0, 4).map((l) => {
-            const p = detail.find((d) => d.id === l.id);
-            return (
-              <div key={l.id} className="flex items-center gap-2 text-sm">
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-(--color-mist)">
-                  {p?.image ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={p.image} alt={p.title} className="h-full w-full object-cover" />
-                  ) : (
-                    "💍"
-                  )}
-                </span>
-                <span className="flex-1 truncate">{p?.title ?? "…"}</span>
-                <span className="text-xs text-(--color-muted-fg)">×{toFa(l.qty)}</span>
-              </div>
-            );
-          })}
-          <p className="border-t pt-2 text-sm font-bold">جمع: {formatToman(subtotal)}</p>
-          <div className="flex gap-2">
-            <Link href="/cart" onClick={onClose} className="flex-1 rounded-lg border px-3 py-2 text-center text-sm">
+        <div className="mt-3 space-y-3">
+          {/* لیست آیتم‌ها */}
+          <div className="max-h-64 space-y-2.5 overflow-y-auto pr-1">
+            {lines.map((l) => {
+              const p = detail.find((d) => d.id === l.id);
+              return (
+                <div key={l.id} className="flex items-center gap-3 rounded-xl border border-black/5 p-2 bg-[#fcfdfd]">
+                  <span className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-(--color-mist)">
+                    {p?.image ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={p.image} alt={p.title} className="h-full w-full object-cover" />
+                    ) : (
+                      <span className="text-xl">💍</span>
+                    )}
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <Link
+                      href={`/products/${p?.title ? l.id : ""}`}
+                      onClick={onClose}
+                      className="block truncate text-xs font-bold text-[#161b22] hover:text-(--color-brand)"
+                    >
+                      {p?.title ?? "در حال دریافت…"}
+                    </Link>
+                    <p className="mt-0.5 text-xs font-bold text-(--color-brand)">
+                      {p ? formatToman(p.price * l.qty) : "—"}
+                    </p>
+                  </div>
+                  {/* دکمه‌های کم و زیاد و حذف */}
+                  <div className="flex items-center gap-1.5">
+                    <div className="flex items-center rounded-lg border bg-white px-1.5 py-0.5 text-xs font-bold">
+                      <button
+                        onClick={() => setQty(l.id, l.qty + 1)}
+                        className="text-(--color-muted-fg) hover:text-black"
+                        aria-label="افزایش"
+                      >
+                        <Plus className="h-3 w-3" />
+                      </button>
+                      <span className="w-5 text-center">{toFa(l.qty)}</span>
+                      <button
+                        onClick={() => setQty(l.id, l.qty - 1)}
+                        className="text-(--color-muted-fg) hover:text-black"
+                        aria-label="کاهش"
+                      >
+                        <Minus className="h-3 w-3" />
+                      </button>
+                    </div>
+                    <button
+                      onClick={() => remove(l.id)}
+                      className="text-black/30 hover:text-(--color-wine)"
+                      aria-label="حذف"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* خلاصه مجموع سبد مطابق فیگما */}
+          <div className="border-t pt-2.5">
+            <div className="flex items-center justify-between text-sm font-bold">
+              <span className="text-[#4b5563]">مجموع سبد خرید:</span>
+              <span className="text-base text-[#161b22]">{formatToman(subtotal)}</span>
+            </div>
+            <p className="mt-1.5 text-[11px] leading-4 text-(--color-muted-fg)">
+              مبلغ سفارش هنوز پرداخت نشده و در صورت اتمام موجودی، کالاها از سبد حذف می‌شوند.
+            </p>
+          </div>
+
+          {/* دکمه‌های عملیات */}
+          <div className="flex gap-2 pt-1">
+            <Link
+              href="/cart"
+              onClick={onClose}
+              className="flex-1 rounded-xl border border-black/15 py-2.5 text-center text-xs font-bold text-[#161b22] hover:bg-black/5"
+            >
               مشاهده سبد
             </Link>
             <Link
-              href="/checkout"
+              href="/checkout/address"
               onClick={onClose}
-              className="flex-1 rounded-lg bg-(--color-brand) px-3 py-2 text-center text-sm text-white"
+              className="flex-1 rounded-xl bg-(--color-brand) py-2.5 text-center text-xs font-bold text-white hover:bg-[#084a46]"
             >
               ثبت سفارش
             </Link>
           </div>
         </div>
       )}
-    </div>
-  );
-}
-
-function MegaMenu({ menu, onClose }: { menu: MegaMenuData; onClose: () => void }) {
-  return (
-    <div className="absolute inset-x-0 top-full z-50 border-t bg-white shadow-xl">
-      <div className="mx-auto grid max-w-7xl gap-6 p-6 md:grid-cols-4">
-        {menu.cats.map((c) => (
-          <div key={c.slug}>
-            <Link
-              href={`/shop?cat=${c.slug}`}
-              onClick={onClose}
-              className="text-sm font-bold text-(--color-brand)"
-            >
-              {c.title}
-            </Link>
-            <ul className="mt-2 space-y-1">
-              {(menu.byCat[c.slug] ?? []).slice(0, 3).map((p) => (
-                <li key={p.id}>
-                  <Link href={`/products/${p.slug}`} onClick={onClose} className="text-sm hover:underline">
-                    {p.title}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
-      </div>
     </div>
   );
 }

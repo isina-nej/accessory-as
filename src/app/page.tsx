@@ -6,11 +6,12 @@ import { Header } from "@/components/shop/Header";
 import { formatToman, toFa } from "@/lib/fa";
 import { getMegaMenu } from "@/lib/menu";
 import { getOffers } from "@/lib/get-products";
+import { getPublicBanners, getPublicCampaign, getPublicSettings } from "@/lib/cms-public";
 import { type ShopProduct } from "@/lib/products";
 
 export const revalidate = 60;
 
-const CATS = [
+const DEFAULT_CATS = [
   { slug: "necklace", title: "گردنبند", count: "۳۴ محصول" },
   { slug: "ring", title: "انگشتر", count: "۲۷ محصول" },
   { slug: "bracelet", title: "دستبند", count: "۲۳ محصول" },
@@ -26,6 +27,20 @@ const PERKS = [
 ];
 
 const TABS = ["همه محصولات", "گردنبند", "انگشتر", "دستبند", "گوشواره", "پابند"];
+
+function getRemainingTime(endsAt?: Date | null) {
+  if (!endsAt) return { days: "۰۳", hours: "۲۰", mins: "۳۵" };
+  const diff = endsAt.getTime() - Date.now();
+  if (diff <= 0) return { days: "۰۰", hours: "۰۰", mins: "۰۰" };
+  const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+  const m = Math.floor((diff / (1000 * 60)) % 60);
+  return {
+    days: toFa(String(d).padStart(2, "0")),
+    hours: toFa(String(h).padStart(2, "0")),
+    mins: toFa(String(m).padStart(2, "0")),
+  };
+}
 
 function LandingCard({ p }: { p: ShopProduct }) {
   return (
@@ -69,17 +84,21 @@ function LandingCard({ p }: { p: ShopProduct }) {
 }
 
 export default async function LandingPage() {
-  const menu = await getMegaMenu().catch((): Awaited<ReturnType<typeof getMegaMenu>> => ({ cats: [], byCat: {} }));
+  const [menu, banners, settings, campaign] = await Promise.all([
+    getMegaMenu().catch((): Awaited<ReturnType<typeof getMegaMenu>> => ({ cats: [], byCat: {} })),
+    getPublicBanners(),
+    getPublicSettings(),
+    getPublicCampaign(),
+  ]);
+
   let offers: ShopProduct[] = [];
   let newest: ShopProduct[] = [];
   try {
     offers = (await getOffers()).slice(0, 5);
     const { db } = await import("@/db");
-    const { products } = await import("@/db/schema");
-    const { desc, eq } = await import("drizzle-orm");
+    const { products, productImages } = await import("@/db/schema");
+    const { desc, eq, asc } = await import("drizzle-orm");
     const rows = await db.select().from(products).where(eq(products.status, "active")).orderBy(desc(products.createdAt)).limit(8);
-    const { productImages } = await import("@/db/schema");
-    const { asc } = await import("drizzle-orm");
     newest = await Promise.all(
       rows.map(async (r) => {
         const [img] = await db.select().from(productImages).where(eq(productImages.productId, r.id)).orderBy(asc(productImages.sort)).limit(1);
@@ -91,40 +110,71 @@ export default async function LandingPage() {
     newest = [];
   }
 
+  // Dynamic slot data with defaults
+  const bHero = banners["hero"];
+  const bOfferSide = banners["offer-side"];
+  const bMidA = banners["mid-a"];
+  const bMidB = banners["mid-b"];
+  const bShine = banners["shine"];
+
+  const heroSub = settings["hero_sub"] ?? "اکسسوری آس";
+  const heroTitle = settings["hero_title"] ?? "انتخابی برای خاص‌پسندان";
+  const catTitle = settings["cat_title"] ?? "دسته‌بندی محصولات";
+  const catSub = settings["cat_sub"] ?? "اکسسوری‌هایی برای امروز و سال‌های بعد";
+  const offerTitle = campaign?.title ?? settings["offer_title"] ?? "پیشنهاد شگفت‌انگیز";
+  const newTitle = settings["new_title"] ?? "محصولات جدید";
+
+  const timer = getRemainingTime(campaign?.endsAt);
+
   return (
     <div className="flex min-h-full flex-1 flex-col bg-white">
       <Header menu={menu} />
       <main className="mx-auto w-full max-w-7xl flex-1 px-4">
         <Breadcrumb trail={[{ label: "اکسسوری آس" }]} />
 
-        {/* هیرو — عین Main فیگما */}
+        {/* هیرو — داینامیک از CMS */}
         <section className="mt-2 text-center">
-          <p className="text-xs text-(--color-muted-fg)">اکسسوری آس</p>
-          <h1 className="mt-1 text-3xl font-extrabold text-[#0b3b38] md:text-5xl">انتخابی برای خاص‌پسندان</h1>
+          <p className="text-xs text-(--color-muted-fg)">{heroSub}</p>
+          <h1 className="mt-1 text-3xl font-extrabold text-[#0b3b38] md:text-5xl">{heroTitle}</h1>
           <div className="mt-4 grid gap-3 md:grid-cols-2">
             {/* بنر فروش ویژه راست */}
-            <div className="relative overflow-hidden rounded-2xl bg-[#062e2b] p-6 text-right text-white md:p-8">
+            <div
+              className="relative overflow-hidden rounded-2xl bg-[#062e2b] bg-cover bg-center p-6 text-right text-white md:p-8"
+              style={bHero?.imageUrl ? { backgroundImage: `url(${bHero.imageUrl})` } : undefined}
+            >
               <span className="inline-flex items-center gap-1 rounded-full bg-(--color-wine) px-3 py-1 text-xs font-bold">
-                فروش ویژه!
+                {bHero?.title ?? "٪۷۵ تخفیف به مناسبت روز دختر"}
               </span>
-              <p className="mt-4 text-xl font-extrabold md:text-3xl">٪۷۵ تخفیف به مناسبت روز دختر</p>
-              <p className="mt-2 text-sm text-white/80">اکسسوری‌هایی برای امروز و سال‌های بعد</p>
+              <p className="mt-4 text-xl font-extrabold md:text-3xl">
+                {bHero?.title ?? "٪۷۵ تخفیف به مناسبت روز دختر"}
+              </p>
+              <p className="mt-2 text-sm text-white/80">
+                {bHero?.subtitle ?? "اکسسوری‌هایی برای امروز و سال‌های بعد"}
+              </p>
               <div className="mt-6 flex items-center gap-2 text-xs">
                 <span className="rounded bg-white/15 px-2 py-1">۰۱</span>
                 <span className="rounded bg-white/15 px-2 py-1">۰۲</span>
                 <span className="rounded bg-white/15 px-2 py-1">۰۳</span>
               </div>
-              <Link href="/shop" className="mt-6 inline-flex items-center gap-1 text-xs text-white/90 underline-offset-4 hover:underline">
-                مشاهده بیشتر <ArrowUpLeft className="h-3.5 w-3.5" />
+              <Link
+                href={bHero?.ctaHref || "/shop"}
+                className="mt-6 inline-flex items-center gap-1 text-xs text-white/90 underline-offset-4 hover:underline"
+              >
+                {bHero?.ctaLabel ?? "مشاهده بیشتر"} <ArrowUpLeft className="h-3.5 w-3.5" />
               </Link>
             </div>
+
             {/* کارت معرفی چپ */}
             <div className="rounded-2xl border border-black/10 bg-white p-6 text-right md:p-8">
               <p className="text-sm leading-7 text-(--color-muted-fg)">
-                جدیدترین اکسسوری‌های ترند را کشف کنید. مجموعه‌ای از گردنبندها، دستبندها، انگشترها و گوشواره‌های خاص برای درخشش بیشتر استایل شما آماده‌اند.
+                {bOfferSide?.subtitle ??
+                  "جدیدترین اکسسوری‌های ترند را کشف کنید. مجموعه‌ای از گردنبندها، دستبندها، انگشترها و گوشواره‌های خاص برای درخشش بیشتر استایل شما آماده‌اند."}
               </p>
-              <Link href="/shop" className="mt-4 inline-flex items-center gap-1 rounded-lg bg-[#0a5954] px-4 py-2 text-sm font-bold text-white">
-                لیست محصولات <ArrowLeft className="h-4 w-4" />
+              <Link
+                href={bOfferSide?.ctaHref || "/shop"}
+                className="mt-4 inline-flex items-center gap-1 rounded-lg bg-[#0a5954] px-4 py-2 text-sm font-bold text-white"
+              >
+                {bOfferSide?.ctaLabel ?? "لیست محصولات"} <ArrowLeft className="h-4 w-4" />
               </Link>
               <div className="mt-6 grid grid-cols-2 gap-3">
                 {PERKS.map((f) => (
@@ -144,10 +194,10 @@ export default async function LandingPage() {
         {/* دسته‌بندی محصولات */}
         <section className="mt-12 text-center">
           <p className="text-xs tracking-widest text-black/10 select-none" aria-hidden>CATEGORIES</p>
-          <h2 className="text-xl font-extrabold md:text-2xl">دسته‌بندی محصولات</h2>
-          <p className="mt-1 text-xs text-(--color-muted-fg)">اکسسوری‌هایی برای امروز و سال‌های بعد</p>
+          <h2 className="text-xl font-extrabold md:text-2xl">{catTitle}</h2>
+          <p className="mt-1 text-xs text-(--color-muted-fg)">{catSub}</p>
           <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-5">
-            {CATS.map((c) => (
+            {DEFAULT_CATS.map((c) => (
               <Link key={c.slug} href={`/shop?cat=${c.slug}`} className="group overflow-hidden rounded-2xl border border-black/10 bg-(--color-mist)">
                 <div className="flex aspect-[4/5] flex-col items-center justify-end gap-1 bg-gradient-to-b from-[#e8efee] to-[#cfdcd9] p-4">
                   <span className="text-6xl" aria-hidden>💍</span>
@@ -166,11 +216,21 @@ export default async function LandingPage() {
         <section className="mt-10 overflow-hidden rounded-2xl bg-[#062e2b] p-4 text-white md:p-6">
           <div className="flex flex-col gap-4 md:flex-row">
             <div className="flex shrink-0 flex-col items-start justify-center gap-2 md:w-44">
-              <h2 className="text-xl leading-8 font-extrabold">پیشنهاد<br />شگفت<br />انگیز</h2>
+              <h2 className="text-xl leading-8 font-extrabold">
+                {offerTitle.includes(" ") ? (
+                  <>
+                    {offerTitle.split(" ").map((w, i) => (
+                      <span key={i} className="block">{w}</span>
+                    ))}
+                  </>
+                ) : (
+                  offerTitle
+                )}
+              </h2>
               <div className="flex items-center gap-1 text-center" dir="ltr">
-                <span className="rounded bg-white/15 px-2 py-1 text-xs">۰۳ <small>روز</small></span>:
-                <span className="rounded bg-white/15 px-2 py-1 text-xs">۲۰ <small>ساعت</small></span>:
-                <span className="rounded bg-white/15 px-2 py-1 text-xs">۳۵ <small>دقیقه</small></span>
+                <span className="rounded bg-white/15 px-2 py-1 text-xs">{timer.days} <small>روز</small></span>:
+                <span className="rounded bg-white/15 px-2 py-1 text-xs">{timer.hours} <small>ساعت</small></span>:
+                <span className="rounded bg-white/15 px-2 py-1 text-xs">{timer.mins} <small>دقیقه</small></span>
               </div>
               <Link href="/shop" className="mt-1 inline-flex items-center gap-1 text-xs underline-offset-4 hover:underline">
                 مشاهده همه <ChevronLeft className="h-3.5 w-3.5" />
@@ -186,17 +246,35 @@ export default async function LandingPage() {
 
         {/* دو بنر میانی */}
         <section className="mt-6 grid gap-3 md:grid-cols-2">
-          <div className="relative overflow-hidden rounded-2xl bg-[#0d3f3b] p-6 text-white md:min-h-56 md:p-8">
-            <p className="text-lg leading-8 font-extrabold">بهترین گوشواره‌ها<br />و دستبندها</p>
-            <p className="mt-2 max-w-55 text-xs leading-6 text-white/75">گوشواره‌ها و دستبندهای خاص و مدرن برای تکمیل استایل روزانه و خاص شما</p>
-            <Link href="/shop" className="mt-4 inline-flex items-center gap-1 text-xs underline-offset-4 hover:underline">
-              مشاهده بیشتر <ArrowUpLeft className="h-3.5 w-3.5" />
+          <div
+            className="relative overflow-hidden rounded-2xl bg-[#0d3f3b] bg-cover bg-center p-6 text-white md:min-h-56 md:p-8"
+            style={bMidA?.imageUrl ? { backgroundImage: `url(${bMidA.imageUrl})` } : undefined}
+          >
+            <p className="text-lg leading-8 font-extrabold whitespace-pre-line">
+              {bMidA?.title ?? "بهترین گوشواره‌ها\nو دستبندها"}
+            </p>
+            <p className="mt-2 max-w-55 text-xs leading-6 text-white/75">
+              {bMidA?.subtitle ?? "گوشواره‌ها و دستبندهای خاص و مدرن برای تکمیل استایل روزانه و خاص شما"}
+            </p>
+            <Link
+              href={bMidA?.ctaHref || "/shop"}
+              className="mt-4 inline-flex items-center gap-1 text-xs underline-offset-4 hover:underline"
+            >
+              {bMidA?.ctaLabel ?? "مشاهده بیشتر"} <ArrowUpLeft className="h-3.5 w-3.5" />
             </Link>
           </div>
-          <div className="relative overflow-hidden rounded-2xl bg-[#dce7e5] p-6 md:min-h-56 md:p-8">
-            <p className="text-lg leading-8 font-extrabold text-[#0b3b38]">ظرافتی که همراه<br />تو می‌ماند</p>
-            <Link href="/shop" className="mt-4 inline-flex items-center gap-1 text-xs text-[#0b3b38] underline-offset-4 hover:underline">
-              مشاهده بیشتر <ArrowUpLeft className="h-3.5 w-3.5" />
+          <div
+            className="relative overflow-hidden rounded-2xl bg-[#dce7e5] bg-cover bg-center p-6 md:min-h-56 md:p-8"
+            style={bMidB?.imageUrl ? { backgroundImage: `url(${bMidB.imageUrl})` } : undefined}
+          >
+            <p className="text-lg leading-8 font-extrabold text-[#0b3b38] whitespace-pre-line">
+              {bMidB?.title ?? "ظرافتی که همراه\nتو می‌ماند"}
+            </p>
+            <Link
+              href={bMidB?.ctaHref || "/shop"}
+              className="mt-4 inline-flex items-center gap-1 text-xs text-[#0b3b38] underline-offset-4 hover:underline"
+            >
+              {bMidB?.ctaLabel ?? "مشاهده بیشتر"} <ArrowUpLeft className="h-3.5 w-3.5" />
             </Link>
           </div>
         </section>
@@ -204,7 +282,7 @@ export default async function LandingPage() {
         {/* محصولات جدید + تب دسته */}
         <section className="mt-10">
           <div className="flex items-center justify-between">
-            <h2 className="border-l-2 border-(--color-brand) pl-2 text-lg font-extrabold">محصولات جدید</h2>
+            <h2 className="border-l-2 border-(--color-brand) pl-2 text-lg font-extrabold">{newTitle}</h2>
             <Link href="/shop" className="rounded-full border px-3 py-1 text-xs">مشاهده همه</Link>
           </div>
           <div className="mt-4 grid gap-4 md:grid-cols-[180px_1fr]">
@@ -227,15 +305,21 @@ export default async function LandingPage() {
         </section>
 
         {/* بنر درخشش */}
-        <section className="mt-10 overflow-hidden rounded-2xl bg-[#062e2b] p-8 text-center text-white md:p-12">
-          <h2 className="text-2xl font-extrabold md:text-4xl">درخشش در هر نگاه</h2>
-          <p className="mt-2 text-sm text-white/80">جزئیاتی کوچک با تاثیری بزرگ بر استایل شما</p>
-          <Link href="/shop" className="mt-5 inline-flex items-center gap-1 rounded-full border border-white/40 px-5 py-2 text-sm">
-            مشاهده محصولات <ArrowLeft className="h-4 w-4" />
+        <section
+          className="mt-10 overflow-hidden rounded-2xl bg-[#062e2b] bg-cover bg-center p-8 text-center text-white md:p-12"
+          style={bShine?.imageUrl ? { backgroundImage: `url(${bShine.imageUrl})` } : undefined}
+        >
+          <h2 className="text-2xl font-extrabold md:text-4xl">{bShine?.title ?? "درخشش در هر نگاه"}</h2>
+          <p className="mt-2 text-sm text-white/80">{bShine?.subtitle ?? "جزئیاتی کوچک با تاثیری بزرگ بر استایل شما"}</p>
+          <Link
+            href={bShine?.ctaHref || "/shop"}
+            className="mt-5 inline-flex items-center gap-1 rounded-full border border-white/40 px-5 py-2 text-sm"
+          >
+            {bShine?.ctaLabel ?? "مشاهده محصولات"} <ArrowLeft className="h-4 w-4" />
           </Link>
         </section>
       </main>
-      <Footer />
+      <Footer settings={settings} />
     </div>
   );
 }

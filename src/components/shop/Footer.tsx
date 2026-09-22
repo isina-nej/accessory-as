@@ -35,7 +35,14 @@ const PERKS = [
   { icon: Diamond, title: "کیفیت پرمیوم", sub: "متریال و کیفیت ساخت بی‌نقص" },
 ];
 
-export function Footer() {
+export function Footer({ settings }: { settings?: Record<string, string> }) {
+  const address = settings?.footer_address ?? "تهران، خیابان ولیعصر، بالاتر از خیابان زرتشت، کوچه جاوید، پلاک ۲۴";
+  const phones = settings?.footer_phones ?? "۰۲۱ ۷۰۰۸۰۰۱ ــ ۰۹۳۵ ۱۷۹ ۰۸۵۳";
+  const seoTitle = settings?.footer_seo_title ?? "اکسسوری آس، روایتی از سلیقه شما";
+  const seoBody =
+    settings?.footer_seo_body ??
+    "فروشگاه اکسسوری آس با هدف ارائه مجموعه‌ای از اکسسوری‌های خاص، مدرن و باکیفیت فعالیت خود را آغاز کرده است. ما باور داریم که جزئیات، نقش مهمی در شکل‌گیری استایل و بیان شخصیت هر فرد دارند. به همین دلیل تلاش می‌کنیم با انتخاب محصولاتی متنوع و طراحی‌هایی خاص، تجربه‌ای متفاوت از خرید اکسسوری را برای مشتریان خود فراهم کنیم. در کنار تنوع محصولات، اصالت کالا، ضمانت بازگشت، ارسال سریع و پشتیبانی واقعی را نیز به همراه داشته باشیم. خدمات مطمئن و تجربه خریدی آسان، به انتخابی قابل اعتماد برای علاقه‌مندان به اکسسوری و استایل مدرن تبدیل شویم.";
+
   return (
     <footer className="mt-12 border-t bg-white">
       <div className="mx-auto max-w-7xl px-4">
@@ -51,13 +58,11 @@ export function Footer() {
             </span>
           </Link>
           <p className="flex items-center gap-1.5 text-[13px] text-(--color-muted-fg)" dir="ltr">
-            <span dir="rtl">۰۹۳۵ ۱۷۹ ۰۸۵۳</span>
-            <span className="text-black/20">|</span>
-            <span dir="rtl">۰۲۱ ۷۰۰۸۰۰۱</span>
+            <span dir="rtl">{phones}</span>
             <Phone className="h-4 w-4 text-(--color-brand)" />
           </p>
           <p className="flex items-center gap-1.5 text-[13px] text-(--color-muted-fg)">
-            تهران، خیابان ولیعصر، بالاتر از خیابان زرتشت، کوچه جاوید، پلاک ۲۴
+            {address}
             <MapPin className="h-4 w-4 shrink-0 text-(--color-brand)" />
           </p>
           <div className="flex items-center gap-2">
@@ -117,13 +122,8 @@ export function Footer() {
 
         {/* متن سئو */}
         <div className="border-t py-6 text-center md:text-right">
-          <p className="text-sm font-bold text-(--color-brand)">اکسسوری آس، روایتی از سلیقه شما</p>
-          <p className="mt-2 text-xs leading-6 text-(--color-muted-fg)">
-            فروشگاه اکسسوری آس با هدف ارائه مجموعه‌ای از اکسسوری‌های خاص، مدرن و باکیفیت فعالیت خود را آغاز کرده است. ما باور داریم که جزئیات، نقش مهمی در شکل‌گیری
-            استایل و بیان شخصیت هر فرد دارند. به همین دلیل تلاش می‌کنیم با انتخاب محصولاتی متنوع و طراحی‌هایی خاص، تجربه‌ای متفاوت از خرید اکسسوری را برای مشتریان خود
-            فراهم کنیم. در کنار تنوع محصولات، اصالت کالا، ضمانت بازگشت، ارسال سریع و پشتیبانی واقعی را نیز به همراه داشته باشیم. خدمات مطمئن و تجربه خریدی آسان، به
-            انتخابی قابل اعتماد برای علاقه‌مندان به اکسسوری و استایل مدرن تبدیل شویم.
-          </p>
+          <p className="text-sm font-bold text-(--color-brand)">{seoTitle}</p>
+          <p className="mt-2 text-xs leading-6 text-(--color-muted-fg)">{seoBody}</p>
           <p className="mt-4 border-t pt-4 text-center text-xs text-(--color-muted-fg)">
             تمام حقوق این وب‌سایت برای فروشگاه اکسسوری آس است.
           </p>
