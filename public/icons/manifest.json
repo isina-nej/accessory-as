@@ -1,0 +1,487 @@
+{
+  "3458:2185": {
+    "name": "Icons 20 / vector arrow left",
+    "file": "icons-20--vector-arrow-left.svg",
+    "category": "Icons 20"
+  },
+  "3521:2687": {
+    "name": "Icons 20 / vector arrow right",
+    "file": "icons-20--vector-arrow-right.svg",
+    "category": "Icons 20"
+  },
+  "3458:2218": {
+    "name": "Icons 20 / user",
+    "file": "icons-20--user.svg",
+    "category": "Icons 20"
+  },
+  "3458:2219": {
+    "name": "Icons 20 / send icon",
+    "file": "icons-20--send-icon.svg",
+    "category": "Icons 20"
+  },
+  "3458:2233": {
+    "name": "Icons 20 / menu line horizontal",
+    "file": "icons-20--menu-line-horizontal.svg",
+    "category": "Icons 20"
+  },
+  "3468:2239": {
+    "name": "Icons 20 / direction down",
+    "file": "icons-20--direction-down.svg",
+    "category": "Icons 20"
+  },
+  "3472:2287": {
+    "name": "Icons 20 / direction left",
+    "file": "icons-20--direction-left.svg",
+    "category": "Icons 20"
+  },
+  "4534:4456": {
+    "name": "Icons 20 / direction right",
+    "file": "icons-20--direction-right.svg",
+    "category": "Icons 20"
+  },
+  "3477:2330": {
+    "name": "Icons 20 / direction up",
+    "file": "icons-20--direction-up.svg",
+    "category": "Icons 20"
+  },
+  "3469:2245": {
+    "name": "Icons 20 / search",
+    "file": "icons-20--search.svg",
+    "category": "Icons 20"
+  },
+  "3469:2253": {
+    "name": "Icons 20 / shopping basket",
+    "file": "icons-20--shopping-basket.svg",
+    "category": "Icons 20"
+  },
+  "3472:2259": {
+    "name": "Icons 20 / arrow icon",
+    "file": "icons-20--arrow-icon.svg",
+    "category": "Icons 20"
+  },
+  "3472:2277": {
+    "name": "Icons 20 / favorite icon",
+    "file": "icons-20--favorite-icon.svg",
+    "category": "Icons 20"
+  },
+  "3472:2285": {
+    "name": "Icons 20 / add to cart button",
+    "file": "icons-20--add-to-cart-button.svg",
+    "category": "Icons 20"
+  },
+  "3505:2567": {
+    "name": "Icons 20 / check cart",
+    "file": "icons-20--check-cart.svg",
+    "category": "Icons 20"
+  },
+  "3474:2312": {
+    "name": "Icons 20 / necklace",
+    "file": "icons-20--necklace.svg",
+    "category": "Icons 20"
+  },
+  "3474:2316": {
+    "name": "Icons 20 / ring",
+    "file": "icons-20--ring.svg",
+    "category": "Icons 20"
+  },
+  "3474:2325": {
+    "name": "Icons 20 / bracelet",
+    "file": "icons-20--bracelet.svg",
+    "category": "Icons 20"
+  },
+  "3474:2320": {
+    "name": "Icons 20 / ear rings",
+    "file": "icons-20--ear-rings.svg",
+    "category": "Icons 20"
+  },
+  "3474:2324": {
+    "name": "Icons 20 / durian",
+    "file": "icons-20--durian.svg",
+    "category": "Icons 20"
+  },
+  "3477:2344": {
+    "name": "Icons 20 / calling",
+    "file": "icons-20--calling.svg",
+    "category": "Icons 20"
+  },
+  "3478:2352": {
+    "name": "Icons 20 / directions sign",
+    "file": "icons-20--directions-sign.svg",
+    "category": "Icons 20"
+  },
+  "3505:2435": {
+    "name": "Icons 20 / edit user",
+    "file": "icons-20--edit-user.svg",
+    "category": "Icons 20"
+  },
+  "3505:2443": {
+    "name": "Icons 20 / spam email",
+    "file": "icons-20--spam-email.svg",
+    "category": "Icons 20"
+  },
+  "3505:2451": {
+    "name": "Icons 20 / time",
+    "file": "icons-20--time.svg",
+    "category": "Icons 20"
+  },
+  "3505:2459": {
+    "name": "Icons 20 / position circle",
+    "file": "icons-20--position-circle.svg",
+    "category": "Icons 20"
+  },
+  "3505:2527": {
+    "name": "Icons 20 / price tag",
+    "file": "icons-20--price-tag.svg",
+    "category": "Icons 20"
+  },
+  "3505:2535": {
+    "name": "Icons 20 / paint-bucket",
+    "file": "icons-20--paint-bucket.svg",
+    "category": "Icons 20"
+  },
+  "3505:2543": {
+    "name": "Icons 20 / sort size asc",
+    "file": "icons-20--sort-size-asc.svg",
+    "category": "Icons 20"
+  },
+  "3505:2551": {
+    "name": "Icons 20 / sorting",
+    "file": "icons-20--sorting.svg",
+    "category": "Icons 20"
+  },
+  "3505:2559": {
+    "name": "Icons 20 / remove delete",
+    "file": "icons-20--remove-delete.svg",
+    "category": "Icons 20"
+  },
+  "3508:2575": {
+    "name": "Icons 20 / kebab-menu",
+    "file": "icons-20--kebab-menu.svg",
+    "category": "Icons 20"
+  },
+  "3508:2583": {
+    "name": "Icons 20 / fee",
+    "file": "icons-20--fee.svg",
+    "category": "Icons 20"
+  },
+  "3508:2591": {
+    "name": "Icons 20 / information",
+    "file": "icons-20--information.svg",
+    "category": "Icons 20"
+  },
+  "3508:2603": {
+    "name": "Icons 20 / location user",
+    "file": "icons-20--location-user.svg",
+    "category": "Icons 20"
+  },
+  "3508:2615": {
+    "name": "Icons 20 / check pen",
+    "file": "icons-20--check-pen.svg",
+    "category": "Icons 20"
+  },
+  "3508:2623": {
+    "name": "Icons 20 / add-call",
+    "file": "icons-20--add-call.svg",
+    "category": "Icons 20"
+  },
+  "3508:2631": {
+    "name": "Icons 20 / location home",
+    "file": "icons-20--location-home.svg",
+    "category": "Icons 20"
+  },
+  "3508:2639": {
+    "name": "Icons 20 / trolley",
+    "file": "icons-20--trolley.svg",
+    "category": "Icons 20"
+  },
+  "3521:2673": {
+    "name": "Icons 20 / package bill",
+    "file": "icons-20--package-bill.svg",
+    "category": "Icons 20"
+  },
+  "3521:2681": {
+    "name": "Icons 20 / discount tag",
+    "file": "icons-20--discount-tag.svg",
+    "category": "Icons 20"
+  },
+  "3521:2737": {
+    "name": "Icons 20 / repeat",
+    "file": "icons-20--repeat.svg",
+    "category": "Icons 20"
+  },
+  "3603:1715": {
+    "name": "Icons 20 / bubble chat edit",
+    "file": "icons-20--bubble-chat-edit.svg",
+    "category": "Icons 20"
+  },
+  "3603:1721": {
+    "name": "Icons 20 / remove",
+    "file": "icons-20--remove.svg",
+    "category": "Icons 20"
+  },
+  "3605:1727": {
+    "name": "Icons 20 / layer",
+    "file": "icons-20--layer.svg",
+    "category": "Icons 20"
+  },
+  "3521:2706": {
+    "name": "Icons 20 / info package",
+    "file": "icons-20--info-package.svg",
+    "category": "Icons 20"
+  },
+  "3521:2729": {
+    "name": "Icons 20 / search package",
+    "file": "icons-20--search-package.svg",
+    "category": "Icons 20"
+  },
+  "3608:1798": {
+    "name": "Icons 20 / cancel package",
+    "file": "icons-20--cancel-package.svg",
+    "category": "Icons 20"
+  },
+  "3605:1739": {
+    "name": "Icons 20 / shopping bag",
+    "file": "icons-20--shopping-bag.svg",
+    "category": "Icons 20"
+  },
+  "3607:1758": {
+    "name": "Icons 20 / directions sign",
+    "file": "icons-20--directions-sign-2.svg",
+    "category": "Icons 20"
+  },
+  "3607:1759": {
+    "name": "Icons 20 / user",
+    "file": "icons-20--user-2.svg",
+    "category": "Icons 20"
+  },
+  "3607:1768": {
+    "name": "Icons 20 / semicircle logout",
+    "file": "icons-20--semicircle-logout.svg",
+    "category": "Icons 20"
+  },
+  "3607:1777": {
+    "name": "Icons 20 / delivery process",
+    "file": "icons-20--delivery-process.svg",
+    "category": "Icons 20"
+  },
+  "3607:1786": {
+    "name": "Icons 20 / delivery",
+    "file": "icons-20--delivery.svg",
+    "category": "Icons 20"
+  },
+  "3608:1806": {
+    "name": "Icons 20 / edit pen",
+    "file": "icons-20--edit-pen.svg",
+    "category": "Icons 20"
+  },
+  "3608:1814": {
+    "name": "Icons 20 / pinned map",
+    "file": "icons-20--pinned-map.svg",
+    "category": "Icons 20"
+  },
+  "3608:1826": {
+    "name": "Icons 20 / edit road",
+    "file": "icons-20--edit-road.svg",
+    "category": "Icons 20"
+  },
+  "3608:1838": {
+    "name": "Icons 20 / search map",
+    "file": "icons-20--search-map.svg",
+    "category": "Icons 20"
+  },
+  "3609:1854": {
+    "name": "Icons 20 / password lock",
+    "file": "icons-20--password-lock.svg",
+    "category": "Icons 20"
+  },
+  "3610:1862": {
+    "name": "Icons 20 / wallet",
+    "file": "icons-20--wallet.svg",
+    "category": "Icons 20"
+  },
+  "3729:2064": {
+    "name": "Icons 20 / credit card accept",
+    "file": "icons-20--credit-card-accept.svg",
+    "category": "Icons 20"
+  },
+  "3729:2071": {
+    "name": "Icons 20 / loading",
+    "file": "icons-20--loading.svg",
+    "category": "Icons 20"
+  },
+  "3731:2080": {
+    "name": "Icons 20 / check circle",
+    "file": "icons-20--check-circle.svg",
+    "category": "Icons 20"
+  },
+  "3766:2216": {
+    "name": "Icons 20 / copy",
+    "file": "icons-20--copy.svg",
+    "category": "Icons 20"
+  },
+  "4312:2178": {
+    "name": "Icons 20 / home",
+    "file": "icons-20--home.svg",
+    "category": "Icons 20"
+  },
+  "4329:2230": {
+    "name": "Icons 20 / bag",
+    "file": "icons-20--bag.svg",
+    "category": "Icons 20"
+  },
+  "6499:5863": {
+    "name": "Icons 20 / setting filter",
+    "file": "icons-20--setting-filter.svg",
+    "category": "Icons 20"
+  },
+  "3999:5708": {
+    "name": "Icons Solid 20 / home",
+    "file": "icons-solid-20--home.svg",
+    "category": "Icons Solid 20"
+  },
+  "3999:5709": {
+    "name": "Icons Solid 20 / menu line horizontal",
+    "file": "icons-solid-20--menu-line-horizontal.svg",
+    "category": "Icons Solid 20"
+  },
+  "3999:5710": {
+    "name": "Icons Solid 20 / shopping-basket",
+    "file": "icons-solid-20--shopping-basket-2.svg",
+    "category": "Icons Solid 20"
+  },
+  "3999:5711": {
+    "name": "Icons Solid 20 / search",
+    "file": "icons-solid-20--search-2.svg",
+    "category": "Icons Solid 20"
+  },
+  "3999:5712": {
+    "name": "Icons Solid 20 / user",
+    "file": "icons-solid-20--user-2.svg",
+    "category": "Icons Solid 20"
+  },
+  "3987:1896": {
+    "name": "Icons Solid 24 / home",
+    "file": "icons-solid-24--home-2.svg",
+    "category": "Icons Solid 24"
+  },
+  "3987:1914": {
+    "name": "Icons Solid 24 / menu line horizontal",
+    "file": "icons-solid-24--menu-line-horizontal-2.svg",
+    "category": "Icons Solid 24"
+  },
+  "3989:1952": {
+    "name": "Icons Solid 24 / shopping-basket",
+    "file": "icons-solid-24--shopping-basket-2.svg",
+    "category": "Icons Solid 24"
+  },
+  "3989:1975": {
+    "name": "Icons Solid 24 / search",
+    "file": "icons-solid-24--search-2.svg",
+    "category": "Icons Solid 24"
+  },
+  "3990:2024": {
+    "name": "Icons Solid 24 / user",
+    "file": "icons-solid-24--user-2.svg",
+    "category": "Icons Solid 24"
+  },
+  "3496:2426": {
+    "name": "Icons 24 / telegram",
+    "file": "icons-24--telegram-2.svg",
+    "category": "Icons 24"
+  },
+  "3496:2425": {
+    "name": "Icons 24 / instagram",
+    "file": "icons-24--instagram-2.svg",
+    "category": "Icons 24"
+  },
+  "3496:2427": {
+    "name": "Icons 24 / whatsapp",
+    "file": "icons-24--whatsapp-2.svg",
+    "category": "Icons 24"
+  },
+  "3521:2751": {
+    "name": "Icons 24 / heart rate",
+    "file": "icons-24--heart-rate-2.svg",
+    "category": "Icons 24"
+  },
+  "3696:1767": {
+    "name": "Icons 24 / vector arrow right",
+    "file": "icons-24--vector-arrow-right-2.svg",
+    "category": "Icons 24"
+  },
+  "3989:1930": {
+    "name": "Icons 24 / shopping basket",
+    "file": "icons-24--shopping-basket-2.svg",
+    "category": "Icons 24"
+  },
+  "3989:1967": {
+    "name": "Icons 24 / search",
+    "file": "icons-24--search-2.svg",
+    "category": "Icons 24"
+  },
+  "3990:2030": {
+    "name": "Icons 24 / user",
+    "file": "icons-24--user-2.svg",
+    "category": "Icons 24"
+  },
+  "3990:2133": {
+    "name": "Icons 24 / home",
+    "file": "icons-24--home-2.svg",
+    "category": "Icons 24"
+  },
+  "3520:2659": {
+    "name": "Icons other / edit pen",
+    "file": "icons-other--edit-pen-2.svg",
+    "category": "Icons other"
+  },
+  "3520:2667": {
+    "name": "Icons other / plus",
+    "file": "icons-other--plus-2.svg",
+    "category": "Icons other"
+  },
+  "3521:2712": {
+    "name": "Icons other / zoom out",
+    "file": "icons-other--zoom-out-2.svg",
+    "category": "Icons other"
+  },
+  "3521:2721": {
+    "name": "Icons other / check circle",
+    "file": "icons-other--check-circle-2.svg",
+    "category": "Icons other"
+  },
+  "3521:2743": {
+    "name": "Icons other / remove circle",
+    "file": "icons-other--remove-circle-2.svg",
+    "category": "Icons other"
+  },
+  "3558:1708": {
+    "name": "Icons other / favorite",
+    "file": "icons-other--favorite-2.svg",
+    "category": "Icons other"
+  },
+  "4741:24497": {
+    "name": "Icons other / remove delete",
+    "file": "icons-other--remove-delete-2.svg",
+    "category": "Icons other"
+  },
+  "4822:24739": {
+    "name": "Icons other / direction left",
+    "file": "icons-other--direction-left-2.svg",
+    "category": "Icons other"
+  },
+  "4822:24748": {
+    "name": "Icons other / direction down",
+    "file": "icons-other--direction-down-2.svg",
+    "category": "Icons other"
+  },
+  "5133:47464": {
+    "name": "Icons other / fee",
+    "file": "icons-other--fee-2.svg",
+    "category": "Icons other"
+  },
+  "5393:9346": {
+    "name": "Icons other / information",
+    "file": "icons-other--information-2.svg",
+    "category": "Icons other"
+  }
+}
