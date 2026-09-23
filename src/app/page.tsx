@@ -11,12 +11,13 @@ import { type ShopProduct } from "@/lib/products";
 export const revalidate = 60;
 
 /* ترتیب و متن‌ها عین فیگما node 1:2 — چپ‌به‌راست x: گردنبند، انگشتر، دستبند، گوشواره، پابند */
+/* ترتیب و متن‌ها عین فیگما node 1:2 و اسکرین‌شات کاربر — راست‌به‌چپ: پابند، گوشواره، دستبند، انگشتر، گردنبند */
 const CATS = [
-  { slug: "necklace", title: "گردنبند", count: "۳۴ محصول", img: "/images/cat-necklace.webp" },
-  { slug: "ring", title: "انگشتر", count: "۲۷ محصول", img: "/images/figma-landing/cat-ring.webp" },
-  { slug: "bracelet", title: "دستبند", count: "۲۳ محصول", img: "/images/figma-landing/cat-bracelet.webp" },
-  { slug: "earring", title: "گوشواره", count: "۱۸ محصول", img: "/images/cat-earring.webp" },
   { slug: "anklet", title: "پابند", count: "۱۴ محصول", img: "/images/figma-landing/cat-anklet.webp" },
+  { slug: "earring", title: "گوشواره", count: "۱۸ محصول", img: "/images/figma-landing/cat-earring.webp" },
+  { slug: "bracelet", title: "دستبند", count: "۲۳ محصول", img: "/images/figma-landing/cat-bracelet.webp" },
+  { slug: "ring", title: "انگشتر", count: "۲۷ محصول", img: "/images/figma-landing/cat-ring.webp" },
+  { slug: "necklace", title: "گردنبند", count: "۳۴ محصول", img: "/images/figma-landing/cat-necklace.webp" },
 ];
 
 const TABS = [
@@ -46,6 +47,64 @@ function getRemainingTime(endsAt?: Date | null) {
     hours: toFa(String(h).padStart(2, "0")),
     mins: toFa(String(m).padStart(2, "0")),
   };
+}
+
+/* کارت محصول در بخش پیشنهاد شگفت‌انگیز عین اسکرین‌شات فیگما */
+function OfferCard({ p }: { p: ShopProduct }) {
+  const href = p.id.startsWith("fb-") ? "/shop" : `/products/${p.slug}`;
+  const oldPrice = p.oldPriceToman ?? p.priceToman;
+  return (
+    <div className="group relative flex flex-col justify-between bg-white p-3 md:p-3.5 text-right transition hover:bg-[#FAFBFB]">
+      {/* ردیف بالا: آیکون قلب و بج تخفیف */}
+      <div className="flex items-center justify-between">
+        <button
+          type="button"
+          aria-label="علاقه‌مندی"
+          className="text-gray-300 transition hover:text-red-500"
+        >
+          <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+          </svg>
+        </button>
+        <span className="rounded-xs bg-[#9F1239] px-2 py-0.5 text-[10px] font-extrabold text-white">
+          ٪{toFa(String(p.discountPct || 20))} تخفیفـــــ
+        </span>
+      </div>
+
+      {/* تصویر محصول روی پایه سنگ مرمر سفید */}
+      <Link href={href} aria-label={p.title} className="my-2 block overflow-hidden">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={p.image || "/images/figma-landing/offers-anklet.webp"}
+          alt={p.title}
+          className="aspect-[154/107] w-full object-contain transition-transform duration-300 group-hover:scale-105"
+          loading="lazy"
+        />
+      </Link>
+
+      {/* نام محصول */}
+      <Link href={href} className="line-clamp-1 text-xs md:text-sm font-bold text-[#161B22] hover:text-[#0A5A55]">
+        {p.title}
+      </Link>
+
+      {/* ۳ نقطه رنگ انتخابی: نقره‌ای، سبز زمردی، طلایی */}
+      <div className="mt-1.5 flex items-center justify-start gap-1">
+        {DOTS.map((c) => (
+          <span key={c} className="h-3 w-3 rounded-full border border-black/10 shadow-xs" style={{ backgroundColor: c }} />
+        ))}
+      </div>
+
+      {/* قیمت‌ها: خط‌خورده خاکستری + قیمت نهایی تومن */}
+      <div className="mt-2 text-right">
+        <span className="block text-[11px] text-[#8A9398] line-through font-medium">
+          {priceNum(oldPrice)}
+        </span>
+        <span className="block text-xs md:text-sm font-extrabold text-[#161B22]">
+          {priceNum(p.priceToman)} تومن
+        </span>
+      </div>
+    </div>
+  );
 }
 
 /* کارت محصول فیگما: بج تخفیف، قلب، عکس، نام، ۳ نقطه رنگ، قیمت خط‌خورده + قیمت */
@@ -108,7 +167,7 @@ const FB_OFFER: ShopProduct = {
   oldPriceToman: 750000,
   discountPct: 20,
   stock: 10,
-  image: "/images/figma-landing/prod.webp",
+  image: "/images/figma-landing/offers-anklet.webp",
 };
 
 const FB_NEW: ShopProduct = {
@@ -323,91 +382,140 @@ export default async function LandingPage() {
       </div>
 
       {/* دسته‌بندی محصولات */}
-      <div className="mx-auto w-full max-w-7xl px-4">
-        <section className="relative mt-8 text-center">
-          <p aria-hidden className="pointer-events-none text-[64px] leading-none font-extrabold tracking-wide text-[#161B22]/5 select-none md:text-[110px]">
+      <div className="mx-auto w-full max-w-7xl px-4 mt-12 md:mt-16">
+        <section className="relative text-center">
+          <p
+            aria-hidden
+            className="pointer-events-none select-none font-serif text-[60px] md:text-[110px] font-bold tracking-[0.15em] text-transparent leading-none opacity-40 [-webkit-text-stroke:1.5px_rgba(22,27,34,0.08)]"
+          >
             CATEGORIES
           </p>
-          <h2 className="-mt-8 text-2xl font-extrabold text-[#161B22] md:-mt-14 md:text-[40px]">
-            {settings["cat_title"] ?? "دسته‌بندی محصولات"}
+          <h2 className="-mt-7 md:-mt-14 text-2xl md:text-[40px] font-extrabold text-[#161B22]">
+            {settings["cat_title"] ?? "دسته‌ بندی محصولات"}
           </h2>
-          <p className="mt-2 text-base text-[#4B5563]">
-            {settings["cat_sub"] ?? "اکسسوری‌هایی برای امروز و سال‌های بعد"}
+          <p className="mt-2 text-sm md:text-base font-medium text-[#8A9398]">
+            {settings["cat_sub"] ?? "اکسسوری هایی برای امروز و ســــال های بعد"}
           </p>
-          <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-5">
+          <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-5">
             {CATS.map((c) => (
               <Link
                 key={c.slug}
                 href={`/shop?cat=${c.slug}`}
-                className="group relative overflow-hidden rounded-[10px] bg-[#F8FAF9]"
+                className="group relative flex aspect-[204/223] flex-col justify-between overflow-hidden rounded-2xl bg-[#E8F1F0] p-4 text-center shadow-xs transition-all duration-300 hover:shadow-md"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={c.img}
                   alt={c.title}
-                  className="aspect-[204/260] w-full object-cover object-top transition-transform duration-300 group-hover:scale-105"
+                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                   loading="lazy"
                 />
-                <span className="absolute inset-0 bg-gradient-to-t from-[#324948] via-[#324948]/35 to-transparent" />
-                <span className="absolute inset-x-0 bottom-0 flex flex-col items-center gap-1 p-3">
-                  <span className="text-2xl font-bold text-[#F8FAF9]">{c.title}</span>
-                  <span className="text-base font-bold text-[#F9F9F9]">{c.count}</span>
-                  <span className="mt-1 inline-flex items-center gap-1.5 rounded-full bg-[#D7E8E7] px-4 py-1.5 text-sm font-bold text-[#161B22]">
-                    مشاهده بیشتر
-                    <Icon name="icons-20--direction-left" className="h-4 w-4" alt="" />
+                <span className="pointer-events-none absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-[#1F2D2D]/60 via-[#1F2D2D]/20 to-transparent" />
+                <div className="relative z-10 flex flex-col items-center">
+                  <span className="text-xl md:text-2xl font-extrabold text-white drop-shadow-sm tracking-tight">
+                    {c.title}
                   </span>
-                </span>
+                  <span className="mt-0.5 text-xs md:text-sm font-medium text-white/95 drop-shadow-xs">
+                    {c.count}
+                  </span>
+                </div>
+                <div className="relative z-10 mx-auto inline-flex items-center gap-2 rounded-full border border-white/40 bg-[#D7E8E7]/35 px-3 py-1.5 backdrop-blur-md shadow-xs transition-all duration-200 group-hover:bg-[#D7E8E7]/55">
+                  <span className="text-xs md:text-sm font-bold text-[#161B22] whitespace-nowrap">
+                    مشاهده بیشتر
+                  </span>
+                  <span className="flex h-6 w-6 md:h-7 md:w-7 items-center justify-center rounded-full bg-[#0A5A55] text-white shrink-0 transition-transform duration-200 group-hover:-translate-x-0.5">
+                    <svg className="h-3 w-3 md:h-3.5 md:w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M17 17L7 7m0 0h9m-9 0v9" />
+                    </svg>
+                  </span>
+                </div>
               </Link>
             ))}
           </div>
         </section>
       </div>
 
-      {/* پیشنهاد شگفت‌انگیز — باند تمام‌عرض گرادیانی */}
-      <section className="mt-10 bg-[linear-gradient(180deg,#01413E_0%,#0F5D5A_51%,#01413E_100%)]">
-        <div className="mx-auto grid w-full max-w-7xl gap-4 px-4 py-6 md:grid-cols-[152px_1fr_44px] md:items-center">
-          <div className="flex flex-row items-center justify-between gap-3 md:flex-col md:justify-center">
-            <p className="text-center text-2xl leading-10 font-extrabold text-[#F8FAF9] md:text-[40px] md:leading-[56px]">
-              پیشنهاد
-              <br />
-              شگفت
-              <br />
-              انگیز
-            </p>
-            <div className="flex items-start gap-1" dir="rtl">
-              {[
-                { n: timer.days, l: "روز" },
-                { n: timer.hours, l: "ساعت" },
-                { n: timer.mins, l: "دقیقه" },
-              ].map((t, i) => (
-                <span key={t.l} className="flex items-start gap-1">
-                  <span className="flex flex-col items-center gap-1">
-                    <span className="rounded-md bg-[#F8FAF9] px-2 py-1.5 text-sm font-bold text-[#161B22]">{t.n}</span>
-                    <span className="text-xs font-bold text-[#F8FAF9]">{t.l}</span>
-                  </span>
-                  {i < 2 && <span className="pt-1.5 text-base font-bold text-[#F8FAF9]">:</span>}
-                </span>
-              ))}
+      {/* پیشنهاد شگفت‌انگیز */}
+      <div className="mx-auto w-full max-w-7xl px-4 my-10 md:my-14">
+        <section className="relative overflow-hidden rounded-[20px] md:rounded-[24px] bg-[#02312E] bg-[url('/images/figma-landing/offers-bg.webp')] bg-cover bg-center p-5 md:p-7 shadow-xl">
+          {/* Subtle gradient overlay on top of silk texture */}
+          <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(1,65,62,0.65)_0%,rgba(15,93,90,0.5)_51%,rgba(1,65,62,0.65)_100%)]" />
+
+          <div className="relative z-10 flex flex-col-reverse md:flex-row items-center gap-5 md:gap-6 justify-between">
+            {/* Cards container with floating left arrow */}
+            <div className="relative flex-1 w-full">
+              {/* Floating circular arrow on left */}
+              <Link
+                href="/shop"
+                aria-label="مشاهده همه پیشنهادها"
+                className="absolute -left-3 md:-left-5 top-1/2 -translate-y-1/2 z-20 hidden md:flex h-9 w-9 md:h-10 md:w-10 items-center justify-center rounded-full bg-white text-[#161B22] shadow-xl hover:bg-gray-50 border border-gray-100 transition hover:scale-105"
+              >
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                </svg>
+              </Link>
+
+              {/* 5 Seamless Cards in single white box */}
+              <div className="overflow-hidden rounded-xl md:rounded-2xl bg-white shadow-md">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 divide-x divide-x-reverse divide-gray-100">
+                  {offers.map((p) => (
+                    <OfferCard key={p.id} p={p} />
+                  ))}
+                </div>
+              </div>
             </div>
-            <Link href="/shop" className="inline-flex items-center gap-1 text-sm font-bold text-white">
-              <Icon name="icons-20--direction-left" className="h-5 w-5 brightness-0 invert" alt="" />
-              مشاهده همه
-            </Link>
+
+            {/* Right Column: Title + Timer + View All */}
+            <div className="flex flex-col items-center justify-center text-center shrink-0 w-full md:w-44 gap-4">
+              <p className="text-center font-extrabold text-white text-3xl md:text-[38px] leading-[1.25] tracking-tight">
+                پیشنـهاد
+                <br />
+                شـگـفت
+                <br />
+                انگـــــیز
+              </p>
+
+              <div className="flex items-center justify-center gap-1.5" dir="rtl">
+                {/* دقیقه */}
+                <div className="flex flex-col items-center">
+                  <span className="flex h-9 w-9 md:h-10 md:w-10 items-center justify-center rounded-lg bg-white font-extrabold text-[#0D2B28] text-base md:text-lg shadow-sm">
+                    {timer.mins}
+                  </span>
+                  <span className="mt-1 text-[11px] font-medium text-white/90">دقیقه</span>
+                </div>
+
+                <span className="text-lg font-bold text-white mb-4">:</span>
+
+                {/* ساعت */}
+                <div className="flex flex-col items-center">
+                  <span className="flex h-9 w-9 md:h-10 md:w-10 items-center justify-center rounded-lg bg-white font-extrabold text-[#0D2B28] text-base md:text-lg shadow-sm">
+                    {timer.hours}
+                  </span>
+                  <span className="mt-1 text-[11px] font-medium text-white/90">ساعت</span>
+                </div>
+
+                <span className="text-lg font-bold text-white mb-4">:</span>
+
+                {/* روز */}
+                <div className="flex flex-col items-center">
+                  <span className="flex h-9 w-9 md:h-10 md:w-10 items-center justify-center rounded-lg bg-white font-extrabold text-[#0D2B28] text-base md:text-lg shadow-sm">
+                    {timer.days}
+                  </span>
+                  <span className="mt-1 text-[11px] font-medium text-white/90">روز</span>
+                </div>
+              </div>
+
+              <Link
+                href="/shop"
+                className="inline-flex items-center gap-1 text-sm font-semibold text-white/90 hover:text-white transition group"
+              >
+                <Icon name="icons-20--direction-left" className="h-4 w-4 brightness-0 invert transition-transform group-hover:-translate-x-1" alt="" />
+                مشاهده همه
+              </Link>
+            </div>
           </div>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-5">
-            {offers.map((p) => (
-              <FigmaCard key={p.id} p={p} />
-            ))}
-          </div>
-          <Link
-            href="/shop"
-            aria-label="بعدی"
-            className="mx-auto hidden h-11 w-11 items-center justify-center rounded-full bg-[#F8FAF9] md:flex"
-          >
-            <Icon name="icons-20--direction-left" className="h-5 w-5" alt="" />
-          </Link>
-        </div>
-      </section>
+        </section>
+      </div>
 
       {/* دو بنر میانی */}
       <div className="mx-auto w-full max-w-7xl px-4">
