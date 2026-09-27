@@ -261,21 +261,21 @@ export default async function LandingPage() {
           />
         </div>
 
-        <div className="relative mx-auto w-full max-w-[1280px] px-4 pt-6 pb-12">
+        <div className="relative mx-auto w-full max-w-[1280px] px-4 md:px-0 pt-6 pb-12">
           {/* تیتر هیرو: خوشنویسی اختصاصی، گیومه تکی سمت چپ، تگ اکسسوری آس سمت راست */}
-          <div className="relative z-10 flex items-center justify-center pt-2 md:pt-4">
+          <div className="relative z-10 flex items-center justify-center pt-6 md:pt-10 pb-2 md:pb-4">
             <div className="relative inline-flex items-center justify-center">
               {/* گیومه سبز تیره فقط سمت چپ عنوان (کنار پسندان و شاخه) */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/images/figma-landing/hero-quote.webp"
                 alt=""
-                className="pointer-events-none absolute -left-7 sm:-left-9 md:-left-12 lg:-left-14 top-0.5 sm:top-1 md:top-2 w-4 sm:w-5 md:w-7 lg:w-8 select-none"
+                className="pointer-events-none absolute -left-8 sm:-left-10 md:-left-14 lg:-left-16 top-0 sm:top-0.5 md:top-1 w-5 sm:w-6 md:w-8 lg:w-10 select-none"
                 aria-hidden
               />
 
               {/* تگ کج اکسسوری آس بالای انتخابی در سمت راست */}
-              <span className="pointer-events-none absolute right-2 sm:right-3 md:right-4 -top-4 sm:-top-5 md:-top-7 select-none text-[10px] sm:text-xs md:text-sm font-bold text-[#8A9398] -rotate-[7deg] whitespace-nowrap">
+              <span className="pointer-events-none absolute right-4 sm:right-6 md:right-8 -top-5 sm:-top-6 md:-top-8 select-none text-[10px] sm:text-xs md:text-sm font-bold text-[#8A9398] -rotate-[7deg] whitespace-nowrap">
                 اکسسوری آس
               </span>
 
@@ -289,16 +289,16 @@ export default async function LandingPage() {
               <img
                 src="/images/figma-landing/hero-title-calligraphy.webp"
                 alt={settings["hero_title"] ?? "انتخابی برای خاص پسندان"}
-                className="h-10 sm:h-13 md:h-18 lg:h-[84px] w-auto max-w-[85vw] md:max-w-4xl object-contain select-none"
+                className="h-10 sm:h-14 md:h-[72px] lg:h-[84px] w-auto max-w-[85vw] md:max-w-[900px] object-contain select-none"
                 loading="eager"
               />
             </div>
           </div>
 
-          {/* دو کارت هیرو در RTL: راست کارت معرفی و فیچرها، چپ بنر فروش ویژه */}
-          <div className="mt-8 md:mt-10 grid gap-6 md:grid-cols-[652fr_604fr] items-stretch">
-            {/* ۱. کارت معرفی و فیچرها (در RTL ستون راست) */}
-            <div className="flex flex-col justify-between rounded-3xl border border-black/10 bg-white p-6 md:p-8 text-right shadow-sm">
+          {/* دو کارت هیرو در RTL: راست کارت معرفی و فیچرها (520px)، چپ بنر فروش ویژه (736px) */}
+          <div className="mt-6 md:mt-8 grid gap-6 md:grid-cols-[520px_1fr] items-end">
+            {/* ۱. کارت معرفی و فیچرها (در RTL ستون راست — 520px) */}
+            <div className="flex flex-col justify-between rounded-3xl border border-black/10 bg-white p-6 md:p-8 text-right shadow-sm md:min-h-[389px]">
               <div>
                 <p className="text-sm font-medium leading-7 text-[#161B22] md:text-base md:leading-8">
                   {bOfferSide?.subtitle ??
@@ -357,8 +357,8 @@ export default async function LandingPage() {
               </div>
             </div>
 
-            {/* ۲. بنر فروش ویژه (در RTL ستون چپ) */}
-            <div className="relative min-h-[380px] md:min-h-[420px] overflow-hidden rounded-3xl bg-[#062e2b] shadow-sm flex flex-col justify-between p-6 md:p-8">
+            {/* ۲. بنر فروش ویژه (در RTL ستون چپ — 736px) */}
+            <div className="relative min-h-[380px] md:min-h-[449px] overflow-hidden rounded-3xl bg-[#062e2b] shadow-sm flex flex-col justify-between p-6 md:p-8">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={bHero?.imageUrl || "/images/figma-landing/hero-banner.webp"}
