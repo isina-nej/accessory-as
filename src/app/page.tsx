@@ -230,10 +230,28 @@ export default async function LandingPage() {
     <div className="flex min-h-full flex-1 flex-col bg-[#F8FAF9]" dir="rtl">
       <Header menu={menu} />
 
-      {/* ۱. بخش هیرو: پس‌زمینه لطیف فیگما با خطوط منحنی و شاخه برگ بالا چپ */}
-      <section className="relative overflow-hidden bg-[#F8F6F1] bg-[url('/images/figma-landing/hero-pattern.svg')] bg-top bg-no-repeat">
+      {/* ۱. بخش هیرو: پس‌زمینه لطیف فیگما با خطوط منحنی، بیضی‌های نعنایی، شاخه زیتون و کالیگرافی خاص‌پسندان */}
+      <section className="relative overflow-hidden bg-[#FAFBFB]">
+        {/* بیضی دکوراتیو سمت چپ (Ellipse 814) پشت شاخه زیتون */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -left-24 top-14 h-72 w-80 rounded-full bg-[#DEECEB] opacity-90 blur-[1px] md:-left-20 md:top-12 md:h-80 md:w-96"
+        />
+
+        {/* بیضی دکوراتیو سمت راست (Ellipse 813) */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -right-28 top-16 h-80 w-96 rounded-full bg-[#DEECEB] opacity-90 blur-[1px] md:-right-24 md:top-14 md:h-96 md:w-[460px]"
+        />
+
+        {/* پترن خطوط موج‌دار گیلوش فیگما (Design Elements) */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 top-12 z-0 h-48 md:h-56 bg-[url('/images/figma-landing/hero-waves.svg')] bg-center bg-no-repeat opacity-90"
+        />
+
         {/* شاخه جواهر و برگ آویزان در بالا سمت چپ عین فیگما نود 245:1064 */}
-        <div className="pointer-events-none absolute -top-8 -left-12 z-10 w-72 md:w-[480px] select-none">
+        <div className="pointer-events-none absolute -top-4 -left-8 md:top-2 md:-left-6 z-10 w-52 sm:w-64 md:w-80 lg:w-[350px] select-none">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/images/figma-landing/hero-branch.webp"
@@ -243,25 +261,37 @@ export default async function LandingPage() {
           />
         </div>
 
-        {/* لکه نور و فرم محو در لبه راست */}
-        <div className="pointer-events-none absolute top-28 -right-8 h-36 w-36 rounded-full bg-[#E8F1F0] opacity-70 blur-xs" />
-
         <div className="relative mx-auto w-full max-w-[1280px] px-4 pt-6 pb-12">
-          {/* تیتر هیرو: لیبل بالا، گیومه سبز، تیتر کشیده خاص‌پسندان */}
-          <div className="relative text-center">
-            <span className="block text-xs md:text-sm font-medium text-[#8A9398] mb-1">
-              اکسســوری آس
-            </span>
-            <div className="mx-auto flex max-w-5xl items-center justify-center gap-2 md:gap-3">
-              <span aria-hidden className="font-serif text-5xl font-black text-[#01413E] select-none md:text-7xl">
-                “
+          {/* تیتر هیرو: خوشنویسی اختصاصی، گیومه تکی سمت چپ، تگ اکسسوری آس سمت راست */}
+          <div className="relative z-10 flex items-center justify-center pt-2 md:pt-4">
+            <div className="relative inline-flex items-center justify-center">
+              {/* گیومه سبز تیره فقط سمت چپ عنوان (کنار پسندان و شاخه) */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/images/figma-landing/hero-quote.webp"
+                alt=""
+                className="pointer-events-none absolute -left-7 sm:-left-9 md:-left-12 lg:-left-14 top-0.5 sm:top-1 md:top-2 w-4 sm:w-5 md:w-7 lg:w-8 select-none"
+                aria-hidden
+              />
+
+              {/* تگ کج اکسسوری آس بالای انتخابی در سمت راست */}
+              <span className="pointer-events-none absolute right-2 sm:right-3 md:right-4 -top-4 sm:-top-5 md:-top-7 select-none text-[10px] sm:text-xs md:text-sm font-bold text-[#8A9398] -rotate-[7deg] whitespace-nowrap">
+                اکسسوری آس
               </span>
-              <h1 className="text-3xl font-black text-[#01413E] drop-shadow-[0_2px_12px_rgba(255,255,255,0.9)] md:text-[54px] md:leading-[1.35]">
-                {settings["hero_title"] ?? "انتخابی برای خــــــــاص پســــندان"}
+
+              {/* عنوان سئو برای دسترس‌پذیری */}
+              <h1 className="sr-only">
+                {settings["hero_title"] ?? "انتخابی برای خاص پسندان"}
               </h1>
-              <span aria-hidden className="font-serif text-5xl font-black text-[#01413E] select-none md:text-7xl">
-                “
-              </span>
+
+              {/* تایپوگرافی کشیده خوشنویسی وکتوری عین پیوست و فیگما */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/images/figma-landing/hero-title-calligraphy.webp"
+                alt={settings["hero_title"] ?? "انتخابی برای خاص پسندان"}
+                className="h-10 sm:h-13 md:h-18 lg:h-[84px] w-auto max-w-[85vw] md:max-w-4xl object-contain select-none"
+                loading="eager"
+              />
             </div>
           </div>
 
