@@ -124,8 +124,36 @@ export function Header({ menu }: { menu: MegaMenuData }) {
           </Link>
         </nav>
 
-        {/* چپ: سبد + پروفایل + خط + جستجو */}
+        {/* چپ: جستجو + خط + پروفایل + سبد (در RTL از راست به چپ: جستجو، خط، حساب کاربری، سبد خرید) */}
         <div className="flex items-center gap-4">
+          <Link href="/shop" aria-label="جستجو" className="rounded-lg p-1 text-[#161B22] hover:bg-black/5">
+            <Icon name="icons-20--search" className="h-5 w-5" alt="" />
+          </Link>
+
+          <span aria-hidden className="h-8 w-px bg-black/10" />
+
+          {session?.user ? (
+            <Link href="/account" className="flex items-center gap-2">
+              <span className="flex h-6 w-6 items-center justify-center">
+                <Icon name="icons-20--user" className="h-5 w-5" alt="" />
+              </span>
+              <span className="leading-tight text-right">
+                <span className="block text-[13px] font-bold text-[#161B22]">{session.user.name || "حساب کاربری"}</span>
+                <span className="block text-[11px] text-[#8A9398]">حساب کاربری</span>
+              </span>
+            </Link>
+          ) : (
+            <Link href="/login" className="flex items-center gap-2">
+              <span className="flex h-6 w-6 items-center justify-center">
+                <Icon name="icons-20--user" className="h-5 w-5" alt="" />
+              </span>
+              <span className="leading-tight text-right">
+                <span className="block text-[13px] font-bold text-[#161B22]">حساب کاربری</span>
+                <span className="block text-[11px] text-[#8A9398]">ورود یا ثبت نام</span>
+              </span>
+            </Link>
+          )}
+
           <div
             className="relative"
             onMouseEnter={() => {
@@ -157,34 +185,6 @@ export function Header({ menu }: { menu: MegaMenuData }) {
               </div>
             )}
           </div>
-
-          {session?.user ? (
-            <Link href="/account" className="flex items-center gap-2">
-              <span className="flex h-6 w-6 items-center justify-center">
-                <Icon name="icons-20--user" className="h-5 w-5" alt="" />
-              </span>
-              <span className="leading-tight text-right">
-                <span className="block text-[13px] font-bold text-[#161B22]">{session.user.name || "حساب کاربری"}</span>
-                <span className="block text-[11px] text-[#8A9398]">حساب کاربری</span>
-              </span>
-            </Link>
-          ) : (
-            <Link href="/login" className="flex items-center gap-2">
-              <span className="flex h-6 w-6 items-center justify-center">
-                <Icon name="icons-20--user" className="h-5 w-5" alt="" />
-              </span>
-              <span className="leading-tight text-right">
-                <span className="block text-[13px] font-bold text-[#161B22]">حساب کاربری</span>
-                <span className="block text-[11px] text-[#8A9398]">ورود یا ثبت نام</span>
-              </span>
-            </Link>
-          )}
-
-          <span aria-hidden className="h-8 w-px bg-black/10" />
-
-          <Link href="/shop" aria-label="جستجو" className="rounded-lg p-1 text-[#161B22] hover:bg-black/5">
-            <Icon name="icons-20--search" className="h-5 w-5" alt="" />
-          </Link>
         </div>
       </div>
 
