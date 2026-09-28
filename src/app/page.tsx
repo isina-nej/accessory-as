@@ -7,6 +7,7 @@ import { getMegaMenu } from "@/lib/menu";
 import { getOffers } from "@/lib/get-products";
 import { getPublicBanners, getPublicCampaign, getPublicSettings } from "@/lib/cms-public";
 import { type ShopProduct } from "@/lib/products";
+import { HeroBannerSlider } from "@/components/shop/HeroBannerSlider";
 
 export const revalidate = 60;
 
@@ -357,60 +358,44 @@ export default async function LandingPage() {
               </div>
             </div>
 
-            {/* ۲. بنر فروش ویژه (در RTL ستون چپ — 736px) */}
-            <div className="relative min-h-[380px] md:min-h-[449px] overflow-hidden rounded-3xl bg-[#062e2b] shadow-sm flex flex-col justify-between p-6 md:p-8">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={bHero?.imageUrl || "/images/figma-landing/hero-banner.webp"}
-                alt={bHero?.title ?? "فروش ویژه"}
-                className="absolute inset-0 h-full w-full object-cover scale-x-[-1]"
-                loading="eager"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/20 to-transparent" />
-
-              {/* ردیف بالای بنر در RTL: نشان فروش ویژه (راست) + دکمه مشاهده بیشتر (چپ) */}
-              <div className="relative z-20 flex items-center justify-between">
-                <div className="inline-flex items-center gap-2 rounded-full bg-[#9F1239] px-5 py-2 shadow-md">
-                  <span className="text-sm md:text-base font-black text-white">فـــروش ویـــــژه!</span>
-                  <Icon name="icons-20--discount-tag" className="h-5 w-5 brightness-0 invert" alt="" />
-                </div>
-
-                <Link
-                  href={bHero?.ctaHref || "/shop"}
-                  className="inline-flex items-center gap-2 rounded-full bg-white py-1.5 pr-4 pl-1.5 shadow-md transition-transform hover:scale-105"
-                >
-                  <span className="text-xs md:text-sm font-bold text-[#161B22]">
-                    {bHero?.ctaLabel ?? "مشاهــده بیشتــر"}
-                  </span>
-                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#0A5A55] text-white">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M7 17L17 7M17 7H7M17 7V17" />
-                    </svg>
-                  </span>
-                </Link>
-              </div>
-
-              {/* متون بنر در سمت راست */}
-              <div className="relative z-20 mt-auto text-right">
-                <p className="text-2xl font-black text-white leading-tight md:text-[34px]">
-                  {bHero?.title ?? "٪۷۵ تخفیــف به مناسـبت روز دختــــر"}
-                </p>
-                <p className="mt-2 text-sm font-medium text-white/90 md:text-base">
-                  {bHero?.subtitle ?? "اکسســوری ‌هایی برای امروز و ســـال ‌های بعد"}
-                </p>
-
-                {/* اسلایدر تبی در پایین سمت راست */}
-                <div className="mt-6 inline-flex items-center gap-4 rounded-t-2xl bg-white px-6 py-2 shadow-sm" dir="rtl">
-                  <span className="text-xs font-medium text-[#8A9398]">۰۱</span>
-                  <span className="flex flex-col items-center gap-0.5">
-                    <span className="h-1.5 w-1.5 rounded-full bg-[#0A5A55]" />
-                    <span className="h-0.5 w-7 rounded-full bg-[#0A5A55]" />
-                    <span className="text-xs font-extrabold text-[#161B22]">۰۲</span>
-                  </span>
-                  <span className="text-xs font-medium text-[#8A9398]">۰۳</span>
-                </div>
-              </div>
-            </div>
+            {/* ۲. بنر فروش ویژه متحرک و پویا با برش اختصاصی گوشه‌ها (Carved Notches) مطابق فیگما */}
+            <HeroBannerSlider
+              slides={[
+                {
+                  id: bHero?.id || "hero-1",
+                  title: bHero?.title || "٪۷۵ تخفیــف به مناسـبت روز دختــــر",
+                  subtitle: bHero?.subtitle || "اکسســوری ‌هایی برای امروز و ســـال ‌های بعد",
+                  badgeLabel: "فـــروش ویـــــژه!",
+                  badgeBg: "bg-[#9F1239]",
+                  badgeIcon: "icons-20--discount-tag",
+                  imageUrl: bHero?.imageUrl || "/images/figma-landing/hero-banner-1.webp",
+                  ctaLabel: bHero?.ctaLabel || "مشاهــده بیشتــر",
+                  ctaHref: bHero?.ctaHref || "/shop",
+                },
+                {
+                  id: "curated-2",
+                  title: "درخشش ماندگار با طلای ۱۸ عیار",
+                  subtitle: "طراحی‌های دست‌ساز و منحصر‌به‌فرد برای هر سلیقه",
+                  badgeLabel: "کالکشن جدید",
+                  badgeBg: "bg-[#0A5A55]",
+                  badgeIcon: "icons-20--diamond",
+                  imageUrl: "/images/figma-landing/hero-banner-2.webp",
+                  ctaLabel: "مشاهــده بیشتــر",
+                  ctaHref: "/shop?sort=newest",
+                },
+                {
+                  id: "curated-3",
+                  title: "زیبایی خیره‌کننده با ظرافت بی‌نظیر",
+                  subtitle: "تنوع بی‌نظیر انواع گوشواره، دستبند و گردنبند",
+                  badgeLabel: "طرح‌های برتر",
+                  badgeBg: "bg-[#8B5E1E]",
+                  badgeIcon: "icons-20--star",
+                  imageUrl: "/images/figma-landing/hero-banner-3.webp",
+                  ctaLabel: "مشاهــده بیشتــر",
+                  ctaHref: "/shop",
+                },
+              ]}
+            />
           </div>
         </div>
       </section>
