@@ -73,7 +73,9 @@ export function HeroBannerSlider({
   const clipId = `banner-cutout-${rawId.replace(/[:]/g, "")}`;
 
   // Dimensions for dynamic SVG clipPath
-  const [dims, setDims] = useState<{ w: number; h: number }>({ w: 736, h: 449 });
+  // ponytail: fixed design-space coordinate system; if layout ever becomes
+  // truly fluid, re-derive dims from ResizeObserver and scale constants below.
+  const [dims, setDims] = useState<{ w: number; h: number }>({ w: 672, h: 364 });
 
   useEffect(() => {
     const el = containerRef.current;
@@ -140,45 +142,44 @@ export function HeroBannerSlider({
     touchStartX.current = null;
   };
 
-  const isMobile = dims.w < 640;
-  // Exact notch proportions matching Figma reference (672x364 ref scaled to render size)
-  // Ref outer corners R~8px/672 => ~9px at 736w; notch fillet r~10px; walls slant ~20deg
-  // Ref 672px: pill 8..157 x 8..58 => nw1=185 nh1=68 (desktop); wall slant ~14deg
-  const nw1 = isMobile ? 158 : 185; // top-left notch width at top edge (CTA button)
-  const nh1 = isMobile ? 56 : 68;   // top-left notch height (ref button h~55 + margin)
-  const nw2 = isMobile ? 140 : 156; // bottom-right notch width at ceiling (tabs)
-  const nh2 = isMobile ? 48 : 56;   // bottom-right notch height (ref ~50 + margin)
-  const R = isMobile ? 8 : 9;       // main outer corners radius (ref ~8px)
-  const r = isMobile ? 8 : 10;      // notch fillet radius
-  // Calculate SVG clip path with smooth concave fillets
-  const w = dims.w;
-  const h = dims.h;
-  // Slanted notch walls like ref: TL ~25deg, BR ~20deg (x shrinks going down)
-  const slant1 = Math.round(nh1 * 0.25);
-  const slant2 = Math.round(nh2 * 0.3);
-  const xTop1 = nw1;              // wall x at top edge (y=0)
-  const xBot1 = nw1 - slant1;     // wall x at notch ceiling (y=nh1)
-  const xTop2 = w - nw2;          // wall x at notch ceiling (y=h-nh2)
-  const xBot2 = w - nw2 - slant2; // wall x at bottom edge (y=h)
+  // Pixel-measured from ref 672x364 (lum threshold, banner dark vs page white):
+  // top edge y=5, sides x=7/664, bottom y=353, TL wall x~155->135,
+  // BR wall x~521->509, badge x407..635 y34..86, pill x8..157 y8..55.
+  const SX = dims.w / 672;
+  const SY = dims.h / 364;
+  const X = (v: number) => Math.round(v * SX);
+  const Y = (v: number) => Math.round(v * SY);
+  // Banner body: full-bleed sides/top (x0..672, y0..302), bottom edge y=353
+  // with 30px concave quarter-circle cutouts where BG circles overlap.
+  const BOT = Y(353);
+  // BR tabs notch: wall x=521(top)->509(bottom), ceiling y=302
+  const BR_X_TOP = X(521);
+  const BR_X_BOT = X(509);
+  const BR_Y = Y(302);
+  // Outer corners: TR R~10 (x658..668,y5..15), BL R~8 (x7..15,y348..356)
+  const R_TR = Math.max(6, Math.round(10 * SX));
+  const R_BL = Math.max(5, Math.round(8 * SX));
+  // Concave joints: BG circle cutouts r~30 (left) / r~22 (bottom), notch
+  // fillets r~8 like the pill's own corner radius
+  const C_L = Math.round(30 * SX);
+  const C_B = Math.round(22 * SX);
+  const F = Math.max(5, Math.round(8 * SX));
 
   const pathD = [
-    `M ${xTop1 + r} 0`,
-    `L ${w - R} 0`,
-    `A ${R} ${R} 0 0 1 ${w} ${R}`,
-    `L ${w} ${h - nh2 - r}`,
-    `A ${r} ${r} 0 0 1 ${w - r} ${h - nh2}`,
-    `L ${xTop2 + r} ${h - nh2}`,
-    `A ${r} ${r} 0 0 0 ${xTop2} ${h - nh2 + r}`,
-    `L ${xBot2} ${h - r}`,
-    `A ${r} ${r} 0 0 1 ${xBot2 - r} ${h}`,
-    `L ${R} ${h}`,
-    `A ${R} ${R} 0 0 1 0 ${h - R}`,
-    `L 0 ${nh1 + r}`,
-    `A ${r} ${r} 0 0 1 ${r} ${nh1}`,
-    `L ${xBot1 - r} ${nh1}`,
-    `A ${r} ${r} 0 0 0 ${xBot1} ${nh1 - r}`,
-    `L ${xTop1} ${r}`,
-    `A ${r} ${r} 0 0 1 ${xTop1 + r} 0`,
+    `M 0 0`,
+    `L ${X(658)} 0`,
+    `A ${R_TR} ${R_TR} 0 0 1 ${X(668)} ${Y(15)}`,
+    `L ${X(668)} ${Y(280)}`,
+    `A ${F} ${F} 0 0 1 ${X(668) - F} ${BR_Y}`,
+    `L ${BR_X_TOP + F} ${BR_Y}`,
+    `A ${F} ${F} 0 0 0 ${BR_X_TOP} ${BR_Y + F}`,
+    `L ${BR_X_BOT} ${BOT - C_B}`,
+    `A ${C_B} ${C_B} 0 0 1 ${BR_X_BOT - C_B} ${BOT}`,
+    `L ${X(40)} ${BOT}`,
+    `A ${C_L} ${C_L} 0 0 0 ${X(15)} ${BOT - C_L}`,
+    `L ${X(13)} ${Y(120)}`,
+    `A ${C_L} ${C_L} 0 0 1 0 ${Y(100)}`,
+    `L 0 0`,
     `Z`,
   ].join(" ");
 
@@ -242,18 +243,19 @@ export function HeroBannerSlider({
               {/* نشان فروش ویژه در بالا سمت راست */}
               <div className="absolute top-4 right-4 sm:top-5 sm:right-6 md:top-6 md:right-8 z-20">
                 <div
-                  className={`inline-flex items-center gap-2.5 rounded-full ${
+                  className={`inline-flex items-center gap-2.5 rounded-[26px] ${
                     s.badgeBg || "bg-[#9F1239]"
-                  } py-2 pr-2 pl-5 sm:py-2.5 sm:pr-2.5 sm:pl-6 shadow-md transition-transform duration-500 ${
+                  } py-[7px] pr-[7px] pl-5 sm:py-2 sm:pr-2 sm:pl-6 shadow-md transition-transform duration-500 ${
                     isActive ? "translate-y-0 opacity-100" : "-translate-y-2 opacity-0"
                   }`}
                 >
-                  <span className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full border-2 border-white/90">
-                    <Icon
-                      name={s.badgeIcon || "icons-20--discount-percent"}
-                      className="h-4 w-4 sm:h-[18px] sm:w-[18px] brightness-0 invert"
-                      alt=""
-                    />
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-[2.5px] border-white/90">
+                    <span className="block h-5 w-5 [&>img]:h-full [&>img]:w-full [&>img]:brightness-0 [&>img]:invert">
+                      <Icon
+                        name={s.badgeIcon || "icons-20--discount-percent"}
+                        alt=""
+                      />
+                    </span>
                   </span>
                   <span className="text-sm sm:text-base md:text-lg font-black text-white whitespace-nowrap">
                     {s.badgeLabel || "فـــروش ویـــــژه!"}
@@ -289,10 +291,10 @@ export function HeroBannerSlider({
       <div
         className="absolute top-0 left-0 z-30 flex items-start justify-start pointer-events-none"
         style={{
-          width: nw1 + 26,
-          height: nh1 + 16,
-          paddingTop: 8,
-          paddingLeft: 8,
+          width: X(165),
+          height: Y(63),
+          paddingTop: Y(8),
+          paddingLeft: X(8),
         }}
       >
         <Link
@@ -323,14 +325,14 @@ export function HeroBannerSlider({
       <div
         className="absolute bottom-0 right-0 z-30 flex items-end justify-center pointer-events-auto"
         style={{
-          width: nw2 + 12,
-          height: nh2 + 6,
-          paddingBottom: 2,
-          paddingRight: 4,
+          width: X(151),
+          height: Y(51),
+          paddingBottom: Y(5),
+          paddingRight: X(4),
         }}
       >
         <div
-          className="flex items-center justify-center gap-4 sm:gap-6 select-none pt-1"
+          className="flex items-center justify-center gap-[15px] select-none"
           dir="ltr"
         >
           {slides.slice(0, 3).map((_, idx) => {
@@ -341,24 +343,24 @@ export function HeroBannerSlider({
                 key={idx}
                 type="button"
                 onClick={() => setCurrentIndex(idx)}
-                className="group flex min-w-[56px] sm:min-w-[64px] flex-col items-center gap-[3px] cursor-pointer p-0.5 transition-transform active:scale-90"
+                className="group flex min-w-12 flex-col items-center gap-[3px] cursor-pointer transition-transform active:scale-90"
                 aria-label={`اسلاید ${idx + 1}`}
                 aria-current={isActive ? "true" : undefined}
               >
                 <span
-                  className={`h-[6px] w-[6px] rounded-full transition-all duration-300 ${
+                  className={`h-2 w-2 rounded-full transition-all duration-300 ${
                     isActive ? "bg-[#0A5A55] opacity-100" : "bg-transparent opacity-0"
                   }`}
                 />
                 <span
                   className={`transition-all duration-300 ${
                     isActive
-                      ? "w-[56px] sm:w-[64px] h-2 rounded-full bg-[#0A5A55]"
-                      : "w-[56px] sm:w-[64px] h-2 rounded-full bg-[#ECEEF0] group-hover:bg-[#D8DDE1]"
+                      ? "w-12 h-1.5 rounded-full bg-[#0A5A55]"
+                      : "w-12 h-1.5 rounded-full bg-[#ECEEF0] group-hover:bg-[#D8DDE1]"
                   }`}
                 />
                 <span
-                  className={`text-[11px] sm:text-xs leading-5 transition-colors duration-200 ${
+                  className={`text-[11px] leading-5 transition-colors duration-200 ${
                     isActive
                       ? "font-extrabold text-[#101828]"
                       : "font-medium text-[#98A2B3] group-hover:text-[#667085]"

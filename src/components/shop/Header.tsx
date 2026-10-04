@@ -189,15 +189,45 @@ export function Header({ menu }: { menu: MegaMenuData }) {
       </div>
 
       {/* نو بار افقی موبایل */}
-      <nav className="flex gap-4 overflow-x-auto border-t px-4 py-2 text-sm md:hidden">
-        <Link href="/shop" className="whitespace-nowrap font-medium">
+      <nav className="flex gap-4 overflow-x-auto border-t border-black/5 bg-white px-4 py-2.5 text-[13px] font-medium text-[#161B22] md:hidden" aria-label="ناوبری موبایل">
+        <Link href="/shop" className="whitespace-nowrap rounded-full bg-[#E7EFEE] px-3 py-1.5 font-bold text-[#01413E]">
           دسته‌بندی محصولات
         </Link>
         {NAV.map((n) => (
-          <Link key={n.label} href={n.href} className="whitespace-nowrap">
+          <Link key={n.label} href={n.href} className="whitespace-nowrap rounded-full px-3 py-1.5 hover:bg-[#F8FAF9]">
             {n.label}
           </Link>
         ))}
+      </nav>
+      {/* نوبار پایین موبایل عین فیگما 4302:2078: خانه / دسته‌بندی / سبد / جستجو / اکانت */}
+      <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-black/10 bg-white/95 backdrop-blur md:hidden" aria-label="نوبار پایین">
+        <div className="mx-auto grid max-w-md grid-cols-5 px-2 pb-[env(safe-area-inset-bottom)] pt-1.5">
+          <Link href="/" className="flex flex-col items-center gap-0.5 rounded-lg py-1 text-[#0A5A55]">
+            <Icon name="icons-solid-20--home" className="h-6 w-6" alt="" />
+            <span className="text-[11px] font-bold">خانه</span>
+          </Link>
+          <Link href="/shop" className="flex flex-col items-center gap-0.5 rounded-lg py-1 text-[#4B5563]">
+            <Icon name="icons-20--menu-line-horizontal" className="h-6 w-6" alt="" />
+            <span className="text-[11px] font-medium">دسته‌بندی</span>
+          </Link>
+          <Link href="/cart" className="relative flex flex-col items-center gap-0.5 rounded-lg py-1 text-[#4B5563]">
+            <Icon name="icons-20--shopping-basket" className="h-6 w-6" alt="" />
+            <span className="text-[11px] font-medium">سبد خرید</span>
+            {count > 0 && (
+              <span className="absolute right-1/2 top-0 flex h-4 min-w-4 translate-x-4 items-center justify-center rounded-full bg-[#9F1239] px-1 text-[10px] font-extrabold text-white">
+                {toFa(count)}
+              </span>
+            )}
+          </Link>
+          <Link href="/shop" className="flex flex-col items-center gap-0.5 rounded-lg py-1 text-[#4B5563]">
+            <Icon name="icons-20--search" className="h-6 w-6" alt="" />
+            <span className="text-[11px] font-medium">جستجو</span>
+          </Link>
+          <Link href={session?.user ? "/account" : "/login"} className="flex flex-col items-center gap-0.5 rounded-lg py-1 text-[#4B5563]">
+            <Icon name="icons-20--user" className="h-6 w-6" alt="" />
+            <span className="text-[11px] font-medium">اکانت من</span>
+          </Link>
+        </div>
       </nav>
     </header>
   );

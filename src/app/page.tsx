@@ -8,23 +8,24 @@ import { getOffers } from "@/lib/get-products";
 import { getPublicBanners, getPublicCampaign, getPublicSettings } from "@/lib/cms-public";
 import { type ShopProduct } from "@/lib/products";
 import { HeroBannerSlider } from "@/components/shop/HeroBannerSlider";
+import { LandingAddBtn } from "@/components/shop/LandingAddBtn";
 
 export const revalidate = 60;
 
 /* دسته‌بندی‌ها عین نود 1:2 فیگما — راست به چپ در RTL: پابند، گوشواره، دستبند، انگشتر، گردنبند */
 const CATS = [
-  { slug: "anklet", title: "پابنـــد", count: "۱۴ محصــول", img: "/images/figma-landing/cat-anklet.webp" },
-  { slug: "earring", title: "گوشــــواره", count: "۱۸ محصــول", img: "/images/figma-landing/cat-earring.webp" },
-  { slug: "bracelet", title: "دســـتبند", count: "۲۳ محصــول", img: "/images/figma-landing/cat-bracelet.webp" },
-  { slug: "ring", title: "انگشـــتر", count: "۲۷ محصــول", img: "/images/figma-landing/cat-ring.webp" },
   { slug: "necklace", title: "گــــردنبند", count: "۳۴ محصــول", img: "/images/figma-landing/cat-necklace.webp" },
+  { slug: "ring", title: "انگشـــتر", count: "۲۷ محصــول", img: "/images/figma-landing/cat-ring.webp" },
+  { slug: "bracelet", title: "دســـتبند", count: "۲۳ محصــول", img: "/images/figma-landing/cat-bracelet.webp" },
+  { slug: "earring", title: "گوشــــواره", count: "۱۸ محصــول", img: "/images/figma-landing/cat-earring.webp" },
+  { slug: "anklet", title: "پابنـــد", count: "۱۴ محصــول", img: "/images/figma-landing/cat-anklet.webp" },
 ];
 
 /* تب‌های محصولات جدید عین فیگما نود 1:2 */
 const TABS = [
   { slug: "", title: "همه محصولات", icon: "icons-20--bag" },
   { slug: "necklace", title: "گـــردنبند", icon: "icons-20--necklace" },
-  { slug: "ring", title: "انگشتـــر", icon: "icons-20--ring" },
+  { slug: "ring", title: "انگشـــتر", icon: "icons-20--ring" },
   { slug: "bracelet", title: "دســـتبند", icon: "icons-20--bracelet" },
   { slug: "earring", title: "گوشـــواره", icon: "icons-20--ear-rings" },
   { slug: "anklet", title: "پابند", icon: "icons-20--shopping-bag" },
@@ -55,21 +56,17 @@ function OfferCard({ p }: { p: ShopProduct }) {
   const href = p.id.startsWith("fb-") ? "/shop" : `/products/${p.slug}`;
   const oldPrice = p.oldPriceToman ?? p.priceToman;
   return (
-    <div className="group relative flex flex-col justify-between bg-white p-3 md:p-3.5 text-right transition hover:bg-[#FAFBFB]">
-      {/* ردیف بالا: بج تخفیف (راست در RTL) و آیکون قلب (چپ در RTL) */}
+    <div className="group relative flex w-44 shrink-0 snap-start flex-col justify-between bg-white p-3 md:p-3.5 text-right transition hover:bg-[#FAFBFB] md:w-auto">
+      {/* ردیف بالا عین فیگما: دسته + قلب | بج تخفیف */}
       <div className="flex items-center justify-between">
-        <span className="rounded-xs bg-[#9F1239] px-2 py-0.5 text-[10px] font-extrabold text-white">
-          ٪{toFa(String(p.discountPct || 20))} تخفیفـــــ
+        <span className="flex items-center gap-1.5">
+          <span className="text-[10px] font-medium text-[#4B5563]">{CAT_LABEL[p.categoryId ?? ""] ?? "انگشتر"}</span>
+          <FavHeart id={p.id} />
         </span>
-        <button
-          type="button"
-          aria-label="علاقه‌مندی"
-          className="text-gray-300 transition hover:text-red-500"
-        >
-          <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
-          </svg>
-        </button>
+        <span className="flex items-center gap-1 rounded-md bg-[#9F1239] px-2 py-0.5 text-[10px] font-bold text-white">
+          <span>٪{toFa(String(p.discountPct || 20))}</span>
+          <span>تخفیفــــــ</span>
+        </span>
       </div>
 
       {/* تصویر محصول روی پایه سنگ مرمر سفید */}
@@ -95,13 +92,17 @@ function OfferCard({ p }: { p: ShopProduct }) {
         ))}
       </div>
 
-      {/* قیمت‌ها: خط‌خورده خاکستری + قیمت نهایی تومن */}
-      <div className="mt-2 text-right">
-        <span className="block text-[11px] text-[#8A9398] line-through font-medium">
+      {/* قیمت + سبد عین فیگما Shop */}
+      <div className="mt-2 flex items-end justify-between">
+        <span className="text-[11px] text-[#8A9398] line-through font-medium">
           {priceNum(oldPrice)}
         </span>
-        <span className="block text-xs md:text-sm font-extrabold text-[#161B22]">
-          {priceNum(p.priceToman)} تومن
+        <span className="flex items-center gap-1.5">
+          <span className="text-[11px] font-bold text-[#4B5563]">تومن</span>
+          <span className="text-xs md:text-sm font-extrabold text-[#161B22]">
+            {priceNum(p.priceToman)}
+          </span>
+          <AddBtn id={p.id} title={p.title} />
         </span>
       </div>
     </div>
@@ -113,19 +114,19 @@ function NewProductCard({ p }: { p: ShopProduct }) {
   const href = p.id.startsWith("fb-") ? "/shop" : `/products/${p.slug}`;
   const oldPrice = p.oldPriceToman ?? p.priceToman;
   return (
-    <div className="group relative flex flex-col justify-between bg-white p-3.5 md:p-4 text-right transition hover:bg-[#FAFBFB]">
-      {/* ردیف بالا: آیکون قلب در چپ */}
+    <div className="group relative flex w-44 shrink-0 snap-start flex-col justify-between bg-white p-3.5 md:p-4 text-right transition hover:bg-[#FAFBFB] md:w-auto">
+      {/* ردیف بالا عین فیگما: دسته + قلب | بج تخفیف */}
       <div className="flex items-center justify-between">
-        <span />
-        <button
-          type="button"
-          aria-label="علاقه‌مندی"
-          className="text-gray-300 transition hover:text-red-500"
-        >
-          <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
-          </svg>
-        </button>
+        <span className="flex items-center gap-1.5">
+          <span className="text-[10px] font-medium text-[#4B5563]">{CAT_LABEL[p.categoryId ?? ""] ?? "انگشتر"}</span>
+          <FavHeart id={p.id} />
+        </span>
+        {p.discountPct ? (
+          <span className="flex items-center gap-1 rounded-md bg-[#9F1239] px-2 py-0.5 text-[10px] font-bold text-white">
+            <span>٪{toFa(String(p.discountPct))}</span>
+            <span>تخفیفــــــ</span>
+          </span>
+        ) : <span />}
       </div>
 
       {/* تصویر محصول */}
@@ -151,19 +152,51 @@ function NewProductCard({ p }: { p: ShopProduct }) {
         ))}
       </div>
 
-      {/* ردیف قیمت */}
-      <div className="mt-2 text-right">
+      {/* قیمت + سبد عین فیگما Shop */}
+      <div className="mt-2 flex items-end justify-between">
         {oldPrice && oldPrice !== p.priceToman ? (
-          <span className="block text-[11px] text-[#8A9398] line-through font-medium">
+          <span className="text-[11px] text-[#8A9398] line-through font-medium">
             {priceNum(oldPrice)}
           </span>
-        ) : null}
-        <span className="block text-xs md:text-sm font-extrabold text-[#161B22]">
-          {priceNum(p.priceToman)} تومن
+        ) : <span />}
+        <span className="flex items-center gap-1.5">
+          <span className="text-[11px] font-bold text-[#4B5563]">تومن</span>
+          <span className="text-xs md:text-sm font-extrabold text-[#161B22]">
+            {priceNum(p.priceToman)}
+          </span>
+          <AddBtn id={p.id} title={p.title} />
         </span>
       </div>
     </div>
   );
+}
+
+/* shared bits for landing cards: category label, fav heart (server-action), add-to-cart (client store) */
+const CAT_LABEL: Record<string, string> = {
+  necklace: "گردنبند",
+  ring: "انگشتر",
+  bracelet: "دستبند",
+  earring: "گوشواره",
+  anklet: "پابند",
+};
+
+function FavHeart({ id }: { id: string }) {
+  return (
+    <button
+      type="button"
+      aria-label="علاقه‌مندی"
+      className="text-gray-300 transition hover:text-red-500"
+    >
+      <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+      </svg>
+    </button>
+  );
+}
+// ponytail: FavHeart static visual only; wire to toggleFavorite when landing gets user-aware fav state.
+
+function AddBtn({ id, title }: { id: string; title: string }) {
+  return <LandingAddBtn id={id} title={title} />;
 }
 
 const FB_OFFER: ShopProduct = {
@@ -201,16 +234,19 @@ export default async function LandingPage() {
   let offers: ShopProduct[] = [];
   let newest: ShopProduct[] = [];
   try {
-    offers = (await getOffers()).slice(0, 5);
     const { db } = await import("@/db");
     const { products, productImages } = await import("@/db/schema");
     const { desc, eq, asc } = await import("drizzle-orm");
+    const cover = async (id: string) => {
+      const [img] = await db.select().from(productImages).where(eq(productImages.productId, id)).orderBy(asc(productImages.sort)).limit(1);
+      return img?.url ?? null;
+    };
+    offers = await Promise.all(
+      (await getOffers()).slice(0, 5).map(async (r) => ({ ...r, image: (await cover(r.id)) ?? r.image ?? null })),
+    );
     const rows = await db.select().from(products).where(eq(products.status, "active")).orderBy(desc(products.createdAt)).limit(8);
     newest = await Promise.all(
-      rows.map(async (r) => {
-        const [img] = await db.select().from(productImages).where(eq(productImages.productId, r.id)).orderBy(asc(productImages.sort)).limit(1);
-        return { ...r, image: img?.url ?? null };
-      }),
+      rows.map(async (r) => ({ ...r, image: await cover(r.id) })),
     );
   } catch {
     offers = [];
@@ -415,12 +451,12 @@ export default async function LandingPage() {
           <p className="mt-2 text-sm md:text-base font-medium text-[#8A9398]">
             {settings["cat_sub"] ?? "اکسســـوری ‌هایـی برای امــروز و ســـــال ‌های بعد"}
           </p>
-          <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-5">
+          <div className="mt-8 flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory md:grid md:grid-cols-5 md:overflow-visible md:pb-0">
             {CATS.map((c) => (
               <Link
                 key={c.slug}
                 href={`/shop?cat=${c.slug}`}
-                className="group relative flex aspect-[204/223] flex-col justify-between overflow-hidden rounded-[14px] bg-[#E8F1F0] p-4 text-center shadow-xs transition-all duration-300 hover:shadow-md"
+                className="group relative flex aspect-[204/223] w-40 shrink-0 snap-start flex-col justify-between overflow-hidden rounded-[14px] bg-[#E8F1F0] p-4 text-center shadow-xs transition-all duration-300 hover:shadow-md md:w-auto"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
@@ -664,7 +700,7 @@ export default async function LandingPage() {
 
             {/* ۲. گرید یکپارچه محصولات (در RTL ستون چپ) با خطوط تفکیک ظریف */}
             <div className="overflow-hidden rounded-2xl border border-black/5 bg-white shadow-xs">
-              <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-x-reverse divide-y divide-gray-100">
+              <div className="flex gap-0 overflow-x-auto snap-x md:grid md:grid-cols-4 md:overflow-visible divide-x divide-x-reverse divide-gray-100">
                 {newest.map((p) => (
                   <NewProductCard key={p.id} p={p} />
                 ))}
