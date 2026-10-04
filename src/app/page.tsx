@@ -367,7 +367,7 @@ export default async function LandingPage() {
                   subtitle: bHero?.subtitle || "اکسســوری ‌هایی برای امروز و ســـال ‌های بعد",
                   badgeLabel: "فـــروش ویـــــژه!",
                   badgeBg: "bg-[#9F1239]",
-                  badgeIcon: "icons-20--discount-tag",
+                  badgeIcon: "icons-20--discount-percent",
                   imageUrl: bHero?.imageUrl || "/images/figma-landing/hero-banner-1.webp",
                   ctaLabel: bHero?.ctaLabel || "مشاهــده بیشتــر",
                   ctaHref: bHero?.ctaHref || "/shop",

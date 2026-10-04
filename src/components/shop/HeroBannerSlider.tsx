@@ -23,7 +23,7 @@ const DEFAULT_SLIDES: HeroSlide[] = [
     subtitle: "اکسســوری ‌هایی برای امروز و ســـال ‌های بعد",
     badgeLabel: "فـــروش ویـــــژه!",
     badgeBg: "bg-[#9F1239]",
-    badgeIcon: "icons-20--discount-tag",
+    badgeIcon: "icons-20--discount-percent",
     imageUrl: "/images/figma-landing/hero-banner-1.webp",
     ctaLabel: "مشاهــده بیشتــر",
     ctaHref: "/shop?sort=discount",
@@ -141,38 +141,44 @@ export function HeroBannerSlider({
   };
 
   const isMobile = dims.w < 640;
-  // Exact notch proportions matching Figma reference
-  // nw1 and nh1 accommodate the "مشاهده بیشتر" pill button
-  const nw1 = isMobile ? 148 : 178; 
-  const nh1 = isMobile ? 46 : 52;  
-  // nw2 and nh2 accommodate the pagination tabs (۰۱, ۰۲, ۰۳)
-  const nw2 = isMobile ? 142 : 168; 
-  const nh2 = isMobile ? 50 : 58;  
-  const R = isMobile ? 22 : 28;    // main outer corners radius
-  const r = isMobile ? 16 : 20;    // notch fillet radius
-
+  // Exact notch proportions matching Figma reference (672x364 ref scaled to render size)
+  // Ref outer corners R~8px/672 => ~9px at 736w; notch fillet r~10px; walls slant ~20deg
+  // Ref 672px: pill 8..157 x 8..58 => nw1=185 nh1=68 (desktop); wall slant ~14deg
+  const nw1 = isMobile ? 158 : 185; // top-left notch width at top edge (CTA button)
+  const nh1 = isMobile ? 56 : 68;   // top-left notch height (ref button h~55 + margin)
+  const nw2 = isMobile ? 140 : 156; // bottom-right notch width at ceiling (tabs)
+  const nh2 = isMobile ? 48 : 56;   // bottom-right notch height (ref ~50 + margin)
+  const R = isMobile ? 8 : 9;       // main outer corners radius (ref ~8px)
+  const r = isMobile ? 8 : 10;      // notch fillet radius
   // Calculate SVG clip path with smooth concave fillets
   const w = dims.w;
   const h = dims.h;
+  // Slanted notch walls like ref: TL ~25deg, BR ~20deg (x shrinks going down)
+  const slant1 = Math.round(nh1 * 0.25);
+  const slant2 = Math.round(nh2 * 0.3);
+  const xTop1 = nw1;              // wall x at top edge (y=0)
+  const xBot1 = nw1 - slant1;     // wall x at notch ceiling (y=nh1)
+  const xTop2 = w - nw2;          // wall x at notch ceiling (y=h-nh2)
+  const xBot2 = w - nw2 - slant2; // wall x at bottom edge (y=h)
 
   const pathD = [
-    `M ${nw1 + r} 0`,
+    `M ${xTop1 + r} 0`,
     `L ${w - R} 0`,
     `A ${R} ${R} 0 0 1 ${w} ${R}`,
     `L ${w} ${h - nh2 - r}`,
     `A ${r} ${r} 0 0 1 ${w - r} ${h - nh2}`,
-    `L ${w - nw2 + r} ${h - nh2}`,
-    `A ${r} ${r} 0 0 0 ${w - nw2} ${h - nh2 + r}`,
-    `L ${w - nw2} ${h - r}`,
-    `A ${r} ${r} 0 0 1 ${w - nw2 - r} ${h}`,
+    `L ${xTop2 + r} ${h - nh2}`,
+    `A ${r} ${r} 0 0 0 ${xTop2} ${h - nh2 + r}`,
+    `L ${xBot2} ${h - r}`,
+    `A ${r} ${r} 0 0 1 ${xBot2 - r} ${h}`,
     `L ${R} ${h}`,
     `A ${R} ${R} 0 0 1 0 ${h - R}`,
     `L 0 ${nh1 + r}`,
     `A ${r} ${r} 0 0 1 ${r} ${nh1}`,
-    `L ${nw1 - r} ${nh1}`,
-    `A ${r} ${r} 0 0 0 ${nw1} ${nh1 - r}`,
-    `L ${nw1} ${r}`,
-    `A ${r} ${r} 0 0 1 ${nw1 + r} 0`,
+    `L ${xBot1 - r} ${nh1}`,
+    `A ${r} ${r} 0 0 0 ${xBot1} ${nh1 - r}`,
+    `L ${xTop1} ${r}`,
+    `A ${r} ${r} 0 0 1 ${xTop1 + r} 0`,
     `Z`,
   ].join(" ");
 
@@ -236,27 +242,29 @@ export function HeroBannerSlider({
               {/* نشان فروش ویژه در بالا سمت راست */}
               <div className="absolute top-4 right-4 sm:top-5 sm:right-6 md:top-6 md:right-8 z-20">
                 <div
-                  className={`inline-flex items-center gap-2 rounded-full ${
+                  className={`inline-flex items-center gap-2.5 rounded-full ${
                     s.badgeBg || "bg-[#9F1239]"
-                  } px-3.5 py-1.5 sm:px-4 sm:py-2 md:px-5 md:py-2 shadow-md transition-transform duration-500 ${
+                  } py-2 pr-2 pl-5 sm:py-2.5 sm:pr-2.5 sm:pl-6 shadow-md transition-transform duration-500 ${
                     isActive ? "translate-y-0 opacity-100" : "-translate-y-2 opacity-0"
                   }`}
                 >
-                  <span className="text-xs sm:text-sm md:text-base font-black text-white whitespace-nowrap">
+                  <span className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full border-2 border-white/90">
+                    <Icon
+                      name={s.badgeIcon || "icons-20--discount-percent"}
+                      className="h-4 w-4 sm:h-[18px] sm:w-[18px] brightness-0 invert"
+                      alt=""
+                    />
+                  </span>
+                  <span className="text-sm sm:text-base md:text-lg font-black text-white whitespace-nowrap">
                     {s.badgeLabel || "فـــروش ویـــــژه!"}
                   </span>
-                  <Icon
-                    name={s.badgeIcon || "icons-20--discount-tag"}
-                    className="h-4 w-4 md:h-5 md:w-5 brightness-0 invert"
-                    alt=""
-                  />
                 </div>
               </div>
 
               {/* متون بنر در سمت راست (شناور در فضای خالی ابریشم بالای برش تب‌ها) */}
-              <div className="absolute right-4 sm:right-6 md:right-8 bottom-20 sm:bottom-24 md:bottom-28 left-4 sm:left-auto max-w-[90%] sm:max-w-[460px] md:max-w-[500px] text-right z-20">
+              <div className="absolute inset-x-0 bottom-[104px] sm:bottom-[112px] px-6 sm:px-10 text-center z-20">
                 <h2
-                  className={`text-xl sm:text-2xl md:text-[32px] lg:text-[34px] font-black text-white leading-tight md:leading-snug drop-shadow-sm transition-all duration-700 delay-100 ${
+                  className={`text-2xl sm:text-3xl md:text-[38px] md:leading-[1.4] font-black text-white drop-shadow-sm transition-all duration-700 delay-100 ${
                     isActive ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
                   }`}
                 >
@@ -264,7 +272,7 @@ export function HeroBannerSlider({
                 </h2>
                 {s.subtitle && (
                   <p
-                    className={`mt-1.5 sm:mt-2 text-xs sm:text-sm md:text-base font-medium text-white/90 drop-shadow-xs transition-all duration-700 delay-200 ${
+                    className={`mt-2 text-sm sm:text-base md:text-lg font-medium text-white/90 drop-shadow-xs transition-all duration-700 delay-200 ${
                       isActive ? "translate-y-0 opacity-100" : "translate-y-3 opacity-0"
                     }`}
                   >
@@ -279,32 +287,33 @@ export function HeroBannerSlider({
 
       {/* ۲. کلید «مشاهده بیشتر» دقیقاً داخل بریدگی بالا-چپ (Carved Top-Left Notch) */}
       <div
-        className="absolute top-0 left-0 z-30 flex items-center justify-start pointer-events-auto"
+        className="absolute top-0 left-0 z-30 flex items-start justify-start pointer-events-none"
         style={{
-          width: nw1,
-          height: nh1,
+          width: nw1 + 26,
+          height: nh1 + 16,
+          paddingTop: 8,
+          paddingLeft: 8,
         }}
       >
         <Link
           href={activeSlide.ctaHref || "/shop"}
-          className="group inline-flex items-center gap-2 rounded-full border border-[#D1D5DB] bg-white py-1 pr-3.5 pl-1 sm:py-1.5 sm:pr-4 sm:pl-1.5 shadow-xs transition-all duration-200 hover:scale-[1.03] hover:shadow-md active:scale-95"
+          className="group pointer-events-auto inline-flex flex-row-reverse items-center gap-2 rounded-full border border-gray-300 bg-white py-[5px] pl-[5px] pr-4 shadow-xs transition-all duration-200 hover:scale-[1.03] hover:shadow-md active:scale-95"
           aria-label={activeSlide.ctaLabel ?? "مشاهده بیشتر"}
         >
-          {/* دایره آیکون در سمت چپ در LTR / راست در RTL: ما dir=ltr می‌گذاریم تا آیکون دقیقاً سمت چپ دکمه باشد */}
-          <span className="flex h-7 w-7 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-full bg-[#0A5A55] text-white transition-transform duration-200 group-hover:-translate-x-0.5 group-hover:-translate-y-0.5">
+          <span className="flex h-9 w-9 sm:h-10 sm:w-10 md:h-11 md:w-11 shrink-0 items-center justify-center rounded-full bg-[#0A5A55] text-white transition-transform duration-200 group-hover:-translate-x-0.5 group-hover:-translate-y-0.5">
             <svg
-              className="h-3.5 w-3.5 sm:h-4 sm:w-4"
+              className="h-5 w-5 sm:h-[22px] sm:w-[22px]"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
-              strokeWidth="2.5"
+              strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
             >
-              <path d="M7 17L17 7M17 7H7M17 7V17" />
+              <path d="M17 17L7 7M16 7H7v9" />
             </svg>
           </span>
-          <span className="text-[11px] sm:text-xs md:text-sm font-bold text-[#161B22] group-hover:text-[#0A5A55] whitespace-nowrap pl-1">
+          <span className="text-[13px] sm:text-[15px] font-bold text-[#161B22] group-hover:text-[#0A5A55] whitespace-nowrap">
             {activeSlide.ctaLabel ?? "مشاهــده بیشتــر"}
           </span>
         </Link>
@@ -312,14 +321,16 @@ export function HeroBannerSlider({
 
       {/* ۳. نشانگر تب‌ها دقیقاً داخل بریدگی پایین-راست (Carved Bottom-Right Notch) */}
       <div
-        className="absolute bottom-0 right-0 z-30 flex items-center justify-center pointer-events-auto"
+        className="absolute bottom-0 right-0 z-30 flex items-end justify-center pointer-events-auto"
         style={{
-          width: nw2,
-          height: nh2,
+          width: nw2 + 12,
+          height: nh2 + 6,
+          paddingBottom: 2,
+          paddingRight: 4,
         }}
       >
         <div
-          className="flex items-center justify-center gap-3 sm:gap-4 md:gap-5 select-none"
+          className="flex items-center justify-center gap-4 sm:gap-6 select-none pt-1"
           dir="ltr"
         >
           {slides.slice(0, 3).map((_, idx) => {
@@ -330,30 +341,27 @@ export function HeroBannerSlider({
                 key={idx}
                 type="button"
                 onClick={() => setCurrentIndex(idx)}
-                className="group flex flex-col items-center gap-1 cursor-pointer p-0.5 transition-transform active:scale-90"
+                className="group flex min-w-[56px] sm:min-w-[64px] flex-col items-center gap-[3px] cursor-pointer p-0.5 transition-transform active:scale-90"
                 aria-label={`اسلاید ${idx + 1}`}
                 aria-current={isActive ? "true" : undefined}
               >
-                {/* نقطه فعال بالای خط نشانگر */}
                 <span
-                  className={`h-1.5 w-1.5 rounded-full transition-all duration-300 ${
-                    isActive ? "bg-[#0A5A55] opacity-100 scale-100" : "opacity-0 scale-50"
+                  className={`h-[6px] w-[6px] rounded-full transition-all duration-300 ${
+                    isActive ? "bg-[#0A5A55] opacity-100" : "bg-transparent opacity-0"
                   }`}
                 />
-                {/* خط نشانگر */}
                 <span
-                  className={`h-1 rounded-full transition-all duration-300 ${
+                  className={`transition-all duration-300 ${
                     isActive
-                      ? "w-6 sm:w-7 md:w-8 bg-[#0A5A55]"
-                      : "w-5 sm:w-6 bg-[#E5E7EB] group-hover:bg-[#CBD5E1]"
+                      ? "w-[56px] sm:w-[64px] h-2 rounded-full bg-[#0A5A55]"
+                      : "w-[56px] sm:w-[64px] h-2 rounded-full bg-[#ECEEF0] group-hover:bg-[#D8DDE1]"
                   }`}
                 />
-                {/* شماره اسلاید فارسی */}
                 <span
-                  className={`text-[11px] sm:text-xs transition-colors duration-200 ${
+                  className={`text-[11px] sm:text-xs leading-5 transition-colors duration-200 ${
                     isActive
-                      ? "font-black text-[#0A5A55]"
-                      : "font-medium text-[#8A9398] group-hover:text-[#4B5563]"
+                      ? "font-extrabold text-[#101828]"
+                      : "font-medium text-[#98A2B3] group-hover:text-[#667085]"
                   }`}
                 >
                   {faNum}
