@@ -34,7 +34,8 @@ export default async function AdminMessages({ searchParams }: { searchParams: Pr
                 <tr key={m.id} className="border-b">
                   <td className="px-2 py-2">
                     <span className="font-bold">{m.name}</span>
-                    <span className="block text-xs text-(--color-muted-fg)" dir="ltr">{m.phone}</span>
+                    <span className="block text-xs text-(--color-muted-fg)" dir="ltr">{m.email}</span>
+                    {m.phone && <span className="block text-xs text-(--color-muted-fg)" dir="ltr">{m.phone}</span>}
                     {!m.read && <span className="text-[11px] text-(--color-wine)">جدید</span>}
                   </td>
                   <td className="px-2 py-2 text-xs">{m.body}</td>

@@ -321,7 +321,8 @@ export const contactMessages = mysqlTable(
   {
     id: varchar("id", { length: 36 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
     name: varchar("name", { length: 100 }).notNull(),
-    phone: varchar("phone", { length: 20 }).notNull(),
+    email: varchar("email", { length: 255 }).notNull(),
+    phone: varchar("phone", { length: 20 }),
     body: text("body").notNull(),
     read: boolean("read").notNull().default(false),
     createdAt: timestamp("created_at").notNull().defaultNow(),

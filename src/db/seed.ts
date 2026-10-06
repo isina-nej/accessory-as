@@ -225,7 +225,7 @@ async function main() {
 
   const existingContact = await db.select().from(contactMessages).limit(1);
   if (existingContact.length === 0) {
-    await db.insert(contactMessages).values({ name: "نمونه", phone: "09120000000", body: "پیام نمونه — از پنل حذف کن.", read: true });
+    await db.insert(contactMessages).values({ name: "نمونه", email: "sample@accessory-as.local", phone: "09120000000", body: "پیام نمونه — از پنل حذف کن.", read: true });
   }
 
   await db.insert(campaigns).values({ slug: "amazing", title: "پیشنهاد شگفت‌انگیز", active: true }).onDuplicateKeyUpdate({ set: { title: "پیشنهاد شگفت‌انگیز" } });
