@@ -188,7 +188,7 @@ export function HeroBannerSlider({
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-[380px] sm:h-[410px] md:h-[449px] select-none"
+      className="relative w-full h-[380px] sm:h-[410px] md:h-[391px] select-none"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
       onTouchStart={handleTouchStart}
@@ -230,7 +230,7 @@ export function HeroBannerSlider({
               <img
                 src={s.imageUrl}
                 alt={s.title}
-                className={`absolute inset-0 h-full w-full object-cover transition-transform duration-1000 ease-out ${
+                className={`absolute inset-0 h-full w-full object-cover object-bottom transition-transform duration-1000 ease-out ${
                   isActive ? "scale-100" : "scale-105"
                 }`}
                 loading={idx === 0 ? "eager" : "lazy"}
@@ -241,7 +241,7 @@ export function HeroBannerSlider({
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />
 
               {/* نشان فروش ویژه در بالا سمت راست */}
-              <div className="absolute top-4 right-4 sm:top-5 sm:right-6 md:top-6 md:right-8 z-20">
+              <div className="absolute top-4 right-4 sm:top-5 sm:right-6 md:top-8 md:right-8 z-20">
                 <div
                   className={`inline-flex items-center gap-2.5 rounded-[26px] ${
                     s.badgeBg || "bg-[#9F1239]"
@@ -264,7 +264,7 @@ export function HeroBannerSlider({
               </div>
 
               {/* متون بنر در سمت راست (شناور در فضای خالی ابریشم بالای برش تب‌ها) */}
-              <div className="absolute inset-x-0 bottom-[104px] sm:bottom-[112px] px-6 sm:px-10 text-center z-20">
+              <div className="absolute inset-x-0 bottom-[104px] sm:bottom-[112px] md:bottom-[160px] px-6 sm:px-10 text-center z-20">
                 <h2
                   className={`text-2xl sm:text-3xl md:text-[38px] md:leading-[1.4] font-black text-white drop-shadow-sm transition-all duration-700 delay-100 ${
                     isActive ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
@@ -274,7 +274,7 @@ export function HeroBannerSlider({
                 </h2>
                 {s.subtitle && (
                   <p
-                    className={`mt-2 text-sm sm:text-base md:text-lg font-medium text-white/90 drop-shadow-xs transition-all duration-700 delay-200 ${
+                    className={`mt-2 text-sm sm:text-base md:text-2xl font-medium text-[#E8EBED] drop-shadow-xs transition-all duration-700 delay-200 ${
                       isActive ? "translate-y-0 opacity-100" : "translate-y-3 opacity-0"
                     }`}
                   >
