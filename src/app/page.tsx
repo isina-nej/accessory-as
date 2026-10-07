@@ -287,8 +287,33 @@ export default async function LandingPage() {
           className="pointer-events-none absolute inset-x-0 top-12 z-0 h-48 md:h-56 bg-[url('/images/figma-landing/hero-waves.svg')] bg-center bg-no-repeat opacity-90"
         />
 
-        {/* شاخه جواهر و برگ آویزان در بالا سمت چپ عین فیگما نود 245:1064 */}
-        <div className="pointer-events-none absolute -top-4 -left-8 md:top-2 md:-left-6 z-10 w-52 sm:w-64 md:w-80 lg:w-[350px] select-none">
+        {/* کادر مرجع دسکتاپ منطبق بر کادر اصلی ۱۴۴۰ پیکسل — برگ و گردنبند فیگما نود 245:1064 */}
+        <div className="pointer-events-none absolute inset-x-0 top-0 bottom-0 mx-auto max-w-[1440px] overflow-hidden">
+          {/* دسکتاپ: مقادیر دقیق هندسی فیگما */}
+          <div
+            className="hidden lg:block absolute select-none pointer-events-none z-10"
+            style={{
+              left: "-200.58px",
+              top: "9px", // ۹۷ پیکسل از بالای کادر اصلی منهای ۸۸ پیکسل ارتفاع منو
+              width: "483.16px",
+              height: "322.11px",
+              transform: "rotate(5.42deg)",
+              transformOrigin: "top left",
+            }}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/images/figma-landing/hero-branch.webp"
+              alt=""
+              className="h-full w-full object-cover select-none"
+              style={{ opacity: 0.87 }}
+              loading="eager"
+            />
+          </div>
+        </div>
+
+        {/* موبایل/تبلت: ابعاد و بیرون‌زدگی تنظیم‌شده متناسب با صفحه کوچک بدون برخورد با عنوان */}
+        <div className="lg:hidden pointer-events-none absolute -top-3 -left-14 sm:-top-2 sm:-left-10 z-10 w-32 sm:w-44 select-none opacity-60" style={{ transform: "rotate(5.42deg)", transformOrigin: "top left" }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/images/figma-landing/hero-branch.webp"
