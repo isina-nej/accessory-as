@@ -2,6 +2,7 @@ import { and, asc, desc, eq, gte, like, lte, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { attributes, categories, productAttributes, productImages, products, reviews } from "@/db/schema";
 import { PAGE_SIZE, type ShopProduct, type ShopQuery } from "./products";
+import { shopImage } from "./shop-images";
 
 export async function getProducts(q: ShopQuery): Promise<{ items: ShopProduct[]; total: number }> {
   const conds = [eq(products.status, "active")];
@@ -14,20 +15,15 @@ export async function getProducts(q: ShopQuery): Promise<{ items: ShopProduct[];
     conds.push(eq(products.categoryId, cat?.id ?? "__none__"));
   }
 
-  if (q.color || q.size) {
-    const attrConds = [];
-    if (q.color) attrConds.push(eq(attributes.label, q.color));
-    if (q.size) attrConds.push(eq(attributes.value, q.size));
-    const matched = await db.select({ id: attributes.id }).from(attributes).where(and(...attrConds));
-    const ids = matched.map((m) => m.id);
-    if (ids.length === 0) return { items: [], total: 0 };
-    const links = await db
-      .select({ productId: productAttributes.productId })
-      .from(productAttributes)
-      .where(sql`${productAttributes.attributeId} IN (${sql.join(ids.map((i) => sql`${i}`), sql`, `)})`);
-    const pids = [...new Set(links.map((l) => l.productId))];
-    if (pids.length === 0) return { items: [], total: 0 };
-    conds.push(sql`${products.id} IN (${sql.join(pids.map((i) => sql`${i}`), sql`, `)})`);
+  // Separate EXISTS clauses: color and size must each match an attribute on the same product.
+  for (const [type, value] of [["color", q.color], ["size", q.size]]) {
+    if (!value) continue;
+    conds.push(sql`exists (
+      select 1 from ${productAttributes}
+      join ${attributes} on ${attributes.id} = ${productAttributes.attributeId}
+      where ${productAttributes.productId} = ${products.id}
+        and ${attributes.type} = ${type} and ${attributes.value} = ${value}
+    )`);
   }
 
   const order =
@@ -35,7 +31,9 @@ export async function getProducts(q: ShopQuery): Promise<{ items: ShopProduct[];
       ? asc(products.priceToman)
       : q.sort === "expensive"
         ? desc(products.priceToman)
-        : desc(products.createdAt);
+        : q.sort === "popular"
+          ? desc(products.soldCount)
+          : desc(products.createdAt);
 
   const where = and(...conds);
   const [{ n }] = await db
@@ -58,7 +56,7 @@ export async function getProducts(q: ShopQuery): Promise<{ items: ShopProduct[];
         .where(eq(productImages.productId, r.id))
         .orderBy(asc(productImages.sort))
         .limit(1);
-      return { ...r, image: img?.url ?? null };
+      return { ...r, image: img?.url ?? shopImage(r.slug) };
     }),
   );
   return { items, total: Number(n) };
@@ -68,10 +66,13 @@ export async function getOffers(): Promise<ShopProduct[]> {
   const rows = await db
     .select()
     .from(products)
-    .where(eq(products.status, "active"))
+    .where(and(eq(products.status, "active"), sql`${products.discountPct} > 0`))
     .orderBy(desc(products.discountPct))
     .limit(5);
-  return rows.map((r) => ({ ...r, image: null }));
+  return Promise.all(rows.map(async (r) => {
+    const [img] = await db.select().from(productImages).where(eq(productImages.productId, r.id)).orderBy(asc(productImages.sort)).limit(1);
+    return { ...r, image: img?.url ?? shopImage(r.slug) };
+  })); // ponytail: use bundled seeded images until product_images is populated.
 }
 
 export async function getFilterMeta() {
@@ -108,7 +109,7 @@ export async function getProductBySlug(slug: string) {
   const [cover] = imgs;
   return {
     ...row,
-    image: cover?.url ?? null,
+    image: cover?.url ?? shopImage(row.slug),
     images: imgs.map((i) => i.url),
     categoryTitle: cat?.title ?? null,
     colors: attrs.filter((a) => a.type === "color"),
@@ -133,7 +134,7 @@ export async function getRelated(categoryId: string | null, excludeId: string): 
         .where(eq(productImages.productId, r.id))
         .orderBy(asc(productImages.sort))
         .limit(1);
-      return { ...r, image: img?.url ?? null };
+      return { ...r, image: img?.url ?? shopImage(r.slug) };
     }),
   );
 }

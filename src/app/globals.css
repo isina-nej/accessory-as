@@ -26,3 +26,29 @@ body {
 * {
   font-family: inherit;
 }
+
+/* Two native range inputs share one track in the shop price filter. */
+.shop-range { pointer-events: none; }
+.shop-range::-webkit-slider-thumb {
+  pointer-events: auto;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid white;
+  background: #0a5a55;
+  box-shadow: 0 2px 10px #0002;
+  cursor: grab;
+}
+.shop-range::-moz-range-thumb {
+  pointer-events: auto;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid white;
+  background: #0a5a55;
+  box-shadow: 0 2px 10px #0002;
+  cursor: grab;
+}
+.shop-range:focus-visible::-webkit-slider-thumb { outline: 2px solid #01413e; outline-offset: 2px; }
+.shop-range:focus-visible::-moz-range-thumb { outline: 2px solid #01413e; outline-offset: 2px; }

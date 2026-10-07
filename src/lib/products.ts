@@ -23,7 +23,7 @@ export const shopQuerySchema = z.object({
 });
 
 export type ShopQuery = z.infer<typeof shopQuerySchema>;
-export const PAGE_SIZE = 12;
+export const PAGE_SIZE = 16; // Four columns × four rows in the Figma shop listing.
 
 export type ShopProduct = {
   id: string;

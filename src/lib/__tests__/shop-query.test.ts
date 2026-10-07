@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { shopQuerySchema } from "../products";
+import { PAGE_SIZE, shopQuerySchema } from "../products";
+import { shopImage } from "../shop-images";
 import { withQuery } from "../shop-query";
 
 const base = shopQuerySchema.parse({});
@@ -16,5 +17,14 @@ describe("shop query", () => {
   });
   it("rejects bad sort", () => {
     expect(shopQuerySchema.safeParse({ sort: "nope" }).success).toBe(false);
+  });
+  it("shows four rows of four cards per shop page", () => {
+    expect(PAGE_SIZE).toBe(16);
+  });
+  it("uses only jewelry assets for seeded shop products", () => {
+    expect(shopImage("full-nagin-ring")).toBe("/images/figma-new/prod-card.webp");
+    expect(shopImage("double-nagin-earring")).toBe("/images/figma-new/prod-card.webp");
+    expect(shopImage("women-anklet")).toBe("/images/figma-landing/offers-anklet.webp");
+    expect(shopImage("unknown")).toBeNull();
   });
 });

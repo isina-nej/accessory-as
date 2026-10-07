@@ -7,9 +7,9 @@ import { Header } from "@/components/shop/Header";
 import { OffersCarousel } from "@/components/shop/OffersCarousel";
 import { Pagination } from "@/components/shop/Pagination";
 import { ProductGrid } from "@/components/shop/ProductGrid";
-import { SearchBox } from "@/components/shop/SearchBox";
 import { SortBar } from "@/components/shop/SortBar";
 import { getFilterMeta, getOffers, getProducts } from "@/lib/get-products";
+import { getPublicCampaign } from "@/lib/cms-public";
 import { getMegaMenu } from "@/lib/menu";
 import { shopQuerySchema } from "@/lib/products";
 
@@ -36,6 +36,7 @@ export default async function ShopPage({
   let meta = { cats: [], colors: [], sizes: [] } as Awaited<ReturnType<typeof getFilterMeta>>;
   let menu: Awaited<ReturnType<typeof getMegaMenu>> = { cats: [], byCat: {} };
   let dbError = false;
+  const campaign = await getPublicCampaign();
   try {
     [{ items, total }, offers, meta, menu] = await Promise.all([
       getProducts(q),
@@ -50,19 +51,19 @@ export default async function ShopPage({
   return (
     <div className="flex min-h-full flex-1 flex-col bg-(--color-mist)">
       <Header menu={menu} />
-      <main className="mx-auto w-full max-w-7xl flex-1 space-y-4 px-4 py-6">
-        <Breadcrumb trail={[{ href: "/", label: "اکسسوری آس" }, { label: "فروشگاه" }]} />
+      <main className="mx-auto w-full max-w-[1440px] flex-1 px-4 pb-16 pt-6 lg:px-20 lg:pt-5">
+        <div className="mb-6 text-xs text-[#8A9398]">
+          <Breadcrumb trail={[{ href: "/", label: "اکسسوری آس" }, { label: "فروشگاه" }]} />
+        </div>
         <Suspense fallback={<CardSkeleton />}>
-          <OffersCarousel items={offers} />
+          <OffersCarousel items={offers} endsAt={campaign?.active ? campaign.endsAt?.toISOString() : null} />
         </Suspense>
-        <SearchBox q={q} base="/shop" />
-        <div className="grid gap-4 lg:grid-cols-[330px_1fr]">
-          <FiltersSidebar q={q} meta={meta} base="/shop" />
-          <div className="space-y-4">
+        <div className="mt-8 grid items-start gap-6 lg:grid-cols-[330px_minmax(0,1fr)]">
+          <div className="order-2 min-w-0 space-y-6">
             <SortBar q={q} total={total} base="/shop" />
             {dbError ? (
-              <div className="rounded-2xl border bg-white p-10 text-center">
-                دیتابیس وصل نیست. MySQL را چک کن و seed بزن.
+              <div className="rounded-[10px] border border-[#D6DBDE] bg-white p-10 text-center">
+                محصولات فعلاً در دسترس نیستند. لطفاً دوباره تلاش کنید.
               </div>
             ) : (
               <Suspense fallback={<GridSkeleton />}>
@@ -70,6 +71,9 @@ export default async function ShopPage({
               </Suspense>
             )}
             <Pagination q={q} total={total} base="/shop" />
+          </div>
+          <div className="order-1">
+            <FiltersSidebar q={q} meta={meta} base="/shop" />
           </div>
         </div>
       </main>
