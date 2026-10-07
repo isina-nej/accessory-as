@@ -65,7 +65,7 @@ export function Header({ menu }: { menu: MegaMenuData }) {
   }, []);
 
   return (
-    <header ref={rootRef} className="relative z-40 border-b border-[#D6DBDE] bg-white">
+    <header ref={rootRef} className="relative z-40 border-b border-[#D6DBDE] bg-white w-full max-w-full overflow-hidden md:overflow-visible">
       <div className="mx-auto flex min-h-22 max-w-7xl items-center justify-between gap-8 px-4 py-5">
         {/* راست: لوگو عین فیگما */}
         <Link href="/" className="flex items-center gap-3">
@@ -189,7 +189,7 @@ export function Header({ menu }: { menu: MegaMenuData }) {
       </div>
 
       {/* نو بار افقی موبایل */}
-      <nav className="flex gap-4 overflow-x-auto border-t border-black/5 bg-white px-4 py-2.5 text-[13px] font-medium text-[#161B22] md:hidden" aria-label="ناوبری موبایل">
+      <nav className="flex gap-3 overflow-x-auto border-t border-black/5 bg-white px-4 py-2 text-xs sm:text-[13px] font-medium text-[#161B22] md:hidden w-full max-w-full" aria-label="ناوبری موبایل">
         <Link href="/shop" className="whitespace-nowrap rounded-full bg-[#E7EFEE] px-3 py-1.5 font-bold text-[#01413E]">
           دسته‌بندی محصولات
         </Link>

@@ -112,7 +112,7 @@ export function HeroBannerSlider({
 
   return (
     <div
-      className="relative w-full aspect-[736/391] min-h-[340px] md:min-h-[391px] select-none"
+      className="relative w-full max-w-[736px] h-[260px] sm:h-[310px] md:h-[391px] select-none"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
       onTouchStart={handleTouchStart}
@@ -149,19 +149,15 @@ export function HeroBannerSlider({
               }`}
               aria-hidden={!isActive}
             >
-              {/* تصویر اسلاید: مقیاس ۲۵٪ (۷۵۲ × ۴۴۸ نسبت به قاب ۷۳۶ × ۳۹۱) با برش ۵۷px بالا، ۸px چپ، ۸px راست و ۰px پایین */}
+              {/* تصویر اسلاید: در دسکتاپ مقیاس ۲۵٪ (۷۵۲ × ۴۴۸ با برش ۵۷px بالا و ۸px طرفین)، در موبایل پوشش کامل */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={s.imageUrl}
                 alt={s.title}
                 className={`absolute select-none pointer-events-none object-cover transition-transform duration-1000 ease-out ${
                   isActive ? "scale-100" : "scale-105"
-                }`}
+                } inset-0 h-full w-full md:inset-auto`}
                 style={{
-                  width: "102.174%", // 752px / 736px
-                  height: "114.578%", // 448px / 391px
-                  left: "-1.087%", // -8px / 736px
-                  top: "-14.578%", // -57px / 391px
                   maxWidth: "none",
                 }}
                 loading={idx === 0 ? "eager" : "lazy"}
@@ -172,32 +168,32 @@ export function HeroBannerSlider({
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />
 
               {/* نشان فروش ویژه در بالا سمت راست */}
-              <div className="absolute top-4 right-4 sm:top-5 sm:right-6 md:top-8 md:right-8 z-20">
+              <div className="absolute top-2.5 right-2.5 sm:top-4 sm:right-4 md:top-8 md:right-8 z-20">
                 <div
-                  className={`inline-flex items-center gap-2.5 rounded-[26px] ${
+                  className={`inline-flex items-center gap-1.5 sm:gap-2.5 rounded-[26px] ${
                     s.badgeBg || "bg-[#9F1239]"
-                  } py-[7px] pr-[7px] pl-5 sm:py-2 sm:pr-2 sm:pl-6 shadow-md transition-transform duration-500 ${
+                  } py-1 pr-1 pl-3 sm:py-[7px] sm:pr-[7px] sm:pl-5 md:py-2 md:pr-2 md:pl-6 shadow-md transition-transform duration-500 ${
                     isActive ? "translate-y-0 opacity-100" : "-translate-y-2 opacity-0"
                   }`}
                 >
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-[2.5px] border-white/90">
-                    <span className="block h-5 w-5 [&>img]:h-full [&>img]:w-full [&>img]:brightness-0 [&>img]:invert">
+                  <span className="flex h-6 w-6 sm:h-8 sm:w-8 md:h-10 md:w-10 shrink-0 items-center justify-center rounded-full border sm:border-2 md:border-[2.5px] border-white/90">
+                    <span className="block h-3.5 w-3.5 sm:h-4 sm:w-4 md:h-5 md:w-5 [&>img]:h-full [&>img]:w-full [&>img]:brightness-0 [&>img]:invert">
                       <Icon
                         name={s.badgeIcon || "icons-20--discount-percent"}
                         alt=""
                       />
                     </span>
                   </span>
-                  <span className="text-sm sm:text-base md:text-lg font-black text-white whitespace-nowrap">
+                  <span className="text-xs sm:text-sm md:text-lg font-black text-white whitespace-nowrap">
                     {s.badgeLabel || "فـــروش ویـــــژه!"}
                   </span>
                 </div>
               </div>
 
               {/* متون بنر در سمت راست (شناور در فضای خالی ابریشم بالای برش تب‌ها) */}
-              <div className="absolute inset-x-0 bottom-[90px] sm:bottom-[100px] md:bottom-[120px] px-6 sm:px-10 text-center z-20">
+              <div className="absolute inset-x-0 bottom-10 sm:bottom-12 md:bottom-[120px] px-4 sm:px-6 md:px-10 text-center z-20">
                 <h2
-                  className={`text-xl sm:text-2xl md:text-[32px] md:leading-[1.4] font-black text-white drop-shadow-sm transition-all duration-700 delay-100 ${
+                  className={`text-lg sm:text-xl md:text-[32px] md:leading-[1.4] font-black text-white drop-shadow-sm transition-all duration-700 delay-100 ${
                     isActive ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
                   }`}
                 >
@@ -205,7 +201,7 @@ export function HeroBannerSlider({
                 </h2>
                 {s.subtitle && (
                   <p
-                    className={`mt-2 text-xs sm:text-sm md:text-lg font-medium text-[#E8EBED] drop-shadow-xs transition-all duration-700 delay-200 ${
+                    className={`mt-1 sm:mt-2 text-xs sm:text-sm md:text-lg font-medium text-[#E8EBED] drop-shadow-xs transition-all duration-700 delay-200 ${
                       isActive ? "translate-y-0 opacity-100" : "translate-y-3 opacity-0"
                     }`}
                   >
