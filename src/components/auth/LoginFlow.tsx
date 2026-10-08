@@ -1,265 +1,143 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
-import { isMobileOrEmail, isPhoneAccount, isValidMobile } from "@/lib/checkout";
+import { completeSignup } from "@/lib/auth-actions";
+import { needsSignup, normalizeDigits, safeNextPath } from "@/lib/auth-ui";
+import { isMobileOrEmail, isPhoneAccount } from "@/lib/checkout";
 import { toFa } from "@/lib/fa";
-import { FIG_BTN, FIG_INPUT, FigError, FigLabel, FigSubmit } from "./fig";
+import { AuthButton, AuthError, AuthField, ResendCode } from "./fig";
 
-function useCountdown(active: boolean) {
-  const [left, setLeft] = useState(60);
-  useEffect(() => {
-    if (!active) return;
-    setLeft(60);
-    const t = setInterval(() => setLeft((v) => (v <= 1 ? 0 : v - 1)), 1000);
-    return () => clearInterval(t);
-  }, [active]);
-  return left;
-}
+type Step = "id" | "otp" | "password" | "signup";
 
 export function LoginFlow() {
   const router = useRouter();
-  const sp = useSearchParams();
-  const next = sp.get("next") ?? "/";
-
-  const [step, setStep] = useState<"id" | "otp" | "password" | "signup">("id");
+  const params = useSearchParams();
+  const next = safeNextPath(params.get("next") ?? params.get("callbackURL"));
+  const [step, setStep] = useState<Step>("id");
   const [idVal, setIdVal] = useState("");
   const [code, setCode] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [confirm, setConfirm] = useState("");
-  const [err, setErr] = useState<string | null>(null);
+  const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
-  const [otpSent, setOtpSent] = useState(false);
-  const left = useCountdown(otpSent);
-  const started = useRef(false);
+  const [deadline, setDeadline] = useState(0);
+  const [left, setLeft] = useState(0);
+  const id = normalizeDigits(idVal.trim());
 
-  async function sendOtp(id: string) {
-    if (isPhoneAccount(id)) {
-      const r = await authClient.phoneNumber.sendOtp({ phoneNumber: id });
-      if (r.error) throw new Error("ارسال کد ناموفق بود");
-    } else {
-      const r = await authClient.emailOtp.sendVerificationOtp({ email: id, type: "sign-in" });
-      if (r.error) throw new Error("ارسال کد ناموفق بود");
-    }
-    setOtpSent(true);
-  }
-
-  async function submitId(e: React.FormEvent) {
-    e.preventDefault();
-    const v = idVal.trim();
-    if (!isMobileOrEmail(v)) {
-      setErr("شماره / ایمیل نامعتبر است!");
-      return;
-    }
-    setPending(true);
-    setErr(null);
-    try {
-      await sendOtp(v);
-      setStep("otp");
-    } catch {
-      setErr("ارسال کد ناموفق بود؛ دوباره تلاش کن");
-    } finally {
-      setPending(false);
-    }
-  }
-
-  async function submitOtp(e: React.FormEvent) {
-    e.preventDefault();
-    const v = idVal.trim();
-    if (code.trim().length < 4) {
-      setErr("کد تایید را وارد کنید");
-      return;
-    }
-    setPending(true);
-    setErr(null);
-    try {
-      if (isPhoneAccount(v)) {
-        const r = await authClient.phoneNumber.verify({ phoneNumber: v, code: code.trim() });
-        if (r.error) {
-          // کاربر جدیدِ موبایلی → تکمیل ثبت‌نام
-          setStep("signup");
-          return;
-        }
-        router.push(next);
-      } else {
-        const r = await authClient.signIn.emailOtp({
-          email: v,
-          otp: code.trim(),
-          fetchOptions: { onSuccess: () => router.push(next) },
-        } as Parameters<typeof authClient.signIn.emailOtp>[0]);
-        if (r?.error) setErr("کد اشتباه است؛ دوباره تلاش کن");
-      }
-    } catch {
-      setErr("تایید کد ناموفق بود");
-    } finally {
-      setPending(false);
-    }
-  }
-
-  async function submitPassword(e: React.FormEvent) {
-    e.preventDefault();
-    setPending(true);
-    setErr(null);
-    try {
-      const v = idVal.trim();
-      const body = isPhoneAccount(v)
-        ? { phoneNumber: v, password }
-        : { email: v, password };
-      const r = await authClient.signIn.email(body as { email: string; password: string });
-      if (r.error) setErr("رمز عبور اشتباه است!");
-      else router.push(next);
-    } catch {
-      setErr("ورود ناموفق بود");
-    } finally {
-      setPending(false);
-    }
-  }
-
-  async function submitSignup(e: React.FormEvent) {
-    e.preventDefault();
-    if (name.trim().length < 2) {
-      setErr("نام و نام خانوادگی را کامل وارد کن");
-      return;
-    }
-    if (password.length < 8) {
-      setErr("رمز عبور شما باید حداقل ۸ حرف باشد.");
-      return;
-    }
-    if (password !== confirm) {
-      setErr("رمز خود را به درستی تکرار بکنید!");
-      return;
-    }
-    setPending(true);
-    setErr(null);
-    try {
-      const v = idVal.trim();
-      const r = isPhoneAccount(v)
-        ? await authClient.signUp.email({
-            email: `${v.replace(/[^0-9]/g, "")}@phone.accessory-as.local`,
-            password,
-            name: name.trim(),
-          })
-        : await authClient.signUp.email({ email: v, password, name: name.trim() });
-      if (r.error) setErr("ثبت‌نام ناموفق بود؛ شاید قبلاً ثبت شده‌ای");
-      else router.push(next);
-    } catch {
-      setErr("ثبت‌نام ناموفق بود");
-    } finally {
-      setPending(false);
-    }
-  }
-
-  // جلوگیری از double-submit در StrictMode — ponytail: بدون تغییر منطق
   useEffect(() => {
-    started.current = true;
-  }, []);
+    if (!deadline) return;
+    const timer = setInterval(() => setLeft(Math.max(0, Math.ceil((deadline - Date.now()) / 1000))), 1000);
+    return () => clearInterval(timer);
+  }, [deadline]);
+
+  async function sendOtp() {
+    if (isPhoneAccount(id)) {
+      const { error } = await authClient.phoneNumber.sendOtp({ phoneNumber: id });
+      if (error) throw new Error("ارسال کد ناموفق بود.");
+    } else {
+      const { error } = await authClient.emailOtp.sendVerificationOtp({ email: id, type: "sign-in" });
+      if (error) throw new Error("ارسال کد ناموفق بود.");
+    }
+    setDeadline(Date.now() + 60_000);
+    setLeft(60);
+    setCode("");
+  }
+
+  async function submitId(event: React.FormEvent) {
+    event.preventDefault();
+    if (!isMobileOrEmail(id)) return setError("شماره / ایمیل نامعتبر است!");
+    setPending(true); setError("");
+    try { await sendOtp(); setStep("otp"); }
+    catch { setError("ارسال کد ناموفق بود؛ دوباره تلاش کنید."); }
+    finally { setPending(false); }
+  }
+
+  async function resend() {
+    if (left > 0 || pending) return;
+    setPending(true); setError("");
+    try { await sendOtp(); }
+    catch { setError("ارسال مجدد کد ناموفق بود."); }
+    finally { setPending(false); }
+  }
+
+  async function submitOtp(event: React.FormEvent) {
+    event.preventDefault();
+    if (!/^\d{6}$/.test(normalizeDigits(code.trim()))) return setError("کد تایید را به‌درستی وارد کنید.");
+    setPending(true); setError("");
+    try {
+      const response = isPhoneAccount(id)
+        ? await authClient.phoneNumber.verify({ phoneNumber: id, code: normalizeDigits(code.trim()) })
+        : await authClient.signIn.emailOtp({ email: id, otp: normalizeDigits(code.trim()) });
+      if (response.error || !response.data?.user) return setError("کد اشتباه است؛ دوباره تلاش کنید.");
+      if (needsSignup(response.data.user, id)) setStep("signup");
+      else router.replace(next);
+    } catch { setError("تایید کد ناموفق بود؛ دوباره تلاش کنید."); }
+    finally { setPending(false); }
+  }
+
+  async function submitPassword(event: React.FormEvent) {
+    event.preventDefault();
+    if (!password) return setError("رمز عبور را وارد کنید.");
+    setPending(true); setError("");
+    try {
+      const response = isPhoneAccount(id)
+        ? await authClient.signIn.phoneNumber({ phoneNumber: id, password })
+        : await authClient.signIn.email({ email: id, password });
+      if (response.error) setError("رمز عبور اشتباه است!");
+      else router.replace(next);
+    } catch { setError("ورود ناموفق بود؛ دوباره تلاش کنید."); }
+    finally { setPending(false); }
+  }
+
+  async function submitSignup(event: React.FormEvent) {
+    event.preventDefault();
+    if (name.trim().length < 2) return setError("نام و نام خانوادگی را کامل وارد کنید.");
+    if (password.length < 8) return setError("رمز عبور شما باید حداقل ۸ حرف باشد.");
+    if (password.length > 128) return setError("رمز عبور بیش‌ازحد طولانی است.");
+    if (password !== confirm) return setError("رمز خود را به‌درستی تکرار کنید!");
+    setPending(true); setError("");
+    try {
+      const result = await completeSignup(name, password);
+      if (!result.ok) return setError(result.error ?? "ثبت‌نام ناموفق بود.");
+      router.replace(next);
+    } catch { setError("ثبت‌نام ناموفق بود؛ دوباره تلاش کنید."); }
+    finally { setPending(false); }
+  }
 
   return (
     <div className="w-full">
-      {step === "id" && (
-        <form onSubmit={submitId} className="space-y-4">
-          <label className="block">
-            <FigLabel hint={err ?? undefined}>شماره موبایل یا ایمیل خود را وارد کنید</FigLabel>
-            <input
-              className={FIG_INPUT}
-              value={idVal}
-              onChange={(e) => setIdVal(e.target.value)}
-              placeholder="شماره موبایل یا ایمیل"
-              dir="ltr"
-              autoComplete="username"
-            />
-          </label>
-          <button disabled={pending} className={FIG_BTN}>
-            {pending ? "…" : "ورود به اکسسوری آس"}
-          </button>
-          <p className="text-center text-xs text-[#8a9398]">
-            با ورود، شرایط استفاده را می‌پذیری.
-          </p>
-        </form>
-      )}
+      {step === "id" && <form noValidate onSubmit={submitId} className="space-y-8">
+        <AuthField id="login-identifier" label="شماره موبایل یا ایمیل خود را وارد کنید" placeholder="شماره موبایل یا ایمیل" icon="icons-20--edit-user" value={idVal} onChange={(e) => { setIdVal(e.target.value); setError(""); }} error={error} autoComplete="username" spellCheck={false} inputMode="email" reserveHint />
+        <AuthButton type="submit" pending={pending}>ورود به اکسسوری آس</AuthButton>
+      </form>}
 
-      {step === "otp" && (
-        <form onSubmit={submitOtp} className="space-y-4">
-          <label className="block">
-            <FigLabel hint={isValidMobile(idVal.trim()) ? `کد تأیید به شماره ${toFa(idVal.trim())} ارسال شد. لطفاً آن را وارد کنید.` : undefined}>
-              کد تایید را وارد کنید
-            </FigLabel>
-            <input
-              className={FIG_INPUT}
-              value={code}
-              onChange={(e) => setCode(e.target.value)}
-              placeholder="کد تایید"
-              dir="ltr"
-              inputMode="numeric"
-              maxLength={8}
-            />
-          </label>
-          <p className="flex items-center justify-between text-sm">
-            <span className="font-bold text-[#161b22]">
-              {left > 0 ? <>ارسال مجدد کد بعد از {toFa(`۰۱:${String(left).padStart(2, "0").slice(-2)}`)}</> : (
-                <button
-                  type="button"
-                  className="text-[#1888f1]"
-                  onClick={() => sendOtp(idVal.trim()).catch(() => setErr("ارسال مجدد ناموفق بود"))}
-                >
-                  ارسال مجدد کد
-                </button>
-              )}
-            </span>
-          </p>
-          <FigError msg={err} />
-          <button disabled={pending} className={FIG_BTN}>
-            {pending ? "…" : "تایید و ادامه"}
-          </button>
-          <button type="button" onClick={() => setStep("password")} className="w-full text-center text-sm font-extrabold text-[#0a5a55]">
-            ورود با رمز عبور
-          </button>
-        </form>
-      )}
+      {step === "otp" && <form noValidate onSubmit={submitOtp} className="space-y-8">
+        <AuthField id="login-otp" label="کد تایید را وارد کنید" placeholder="کد تایید" icon="/images/auth/otp.png" value={code} onChange={(e) => { setCode(normalizeDigits(e.target.value)); setError(""); }} error={error} hintTone="error" hint={`کد تایید به ${isPhoneAccount(id) ? "شماره" : "آدرس ایمیل"} ${toFa(id)} ارسال شد. لطفاً آن را وارد کنید.`} inputMode="numeric" autoComplete="one-time-code" maxLength={6} />
+        <ResendCode left={left} pending={pending} onResend={resend} />
+        <AuthButton type="submit" pending={pending}>تایید و ادامه</AuthButton>
+      </form>}
 
-      {step === "password" && (
-        <form onSubmit={submitPassword} className="space-y-4">
-          <label className="block">
-            <FigLabel hint={err ?? undefined}>رمز عبور</FigLabel>
-            <input
-              type="password"
-              className={FIG_INPUT}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="رمز عبور"
-              autoComplete="current-password"
-            />
-          </label>
-          <button disabled={pending} className={FIG_BTN}>
-            {pending ? "…" : "تایید و ادامه"}
-          </button>
-          <span className="flex justify-between text-sm">
-            <button type="button" onClick={() => setStep("otp")} className="font-extrabold text-[#0a5a55]">ورود با شماره موبایل</button>
-            <a href="/forgot-password" className="font-extrabold text-[#1888f1]">فراموشی رمز عبور</a>
-          </span>
-        </form>
-      )}
+      {step === "password" && <form noValidate onSubmit={submitPassword} className="space-y-8">
+        <AuthField id="login-password" label="رمز عبور" required={false} type="password" placeholder="رمز عبور" icon="icons-20--password-lock" value={password} onChange={(e) => { setPassword(e.target.value); setError(""); }} error={error} autoComplete="current-password" />
+        <div className="flex flex-col items-start gap-6 text-sm font-extrabold text-[#168bd4]">
+          <button type="button" onClick={() => { setError(""); setStep("id"); }} className="focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#01413e]">ورود با شماره موبایل <span aria-hidden>‹</span></button>
+          <button type="button" onClick={() => router.push(`/forgot-password?identifier=${encodeURIComponent(id)}`)} className="focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#01413e]">فراموشی رمز عبور <span aria-hidden>‹</span></button>
+        </div>
+        <AuthButton type="submit" pending={pending}>تایید و ادامه</AuthButton>
+      </form>}
 
-      {step === "signup" && (
-        <form onSubmit={submitSignup} className="space-y-4">
-          <label className="block">
-            <FigLabel>نام و نام خانوادگی</FigLabel>
-            <input className={FIG_INPUT} value={name} onChange={(e) => setName(e.target.value)} placeholder="علی ملکی" maxLength={100} />
-          </label>
-          <label className="block">
-            <FigLabel hint={password && password.length < 8 ? "رمز عبور شما باید حداقل ۸ حرف باشد." : undefined}>رمز عبور</FigLabel>
-            <input type="password" className={FIG_INPUT} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="رمز عبور" autoComplete="new-password" />
-          </label>
-          <label className="block">
-            <FigLabel hint={confirm && password !== confirm ? "رمز خود را به درستی تکرار بکنید!" : undefined}>تکرار رمز عبور</FigLabel>
-            <input type="password" className={FIG_INPUT} value={confirm} onChange={(e) => setConfirm(e.target.value)} placeholder="تکرار رمز عبور" autoComplete="new-password" />
-          </label>
-          <FigError msg={err} />
-          <FigSubmit pending={pending}>ورود به اکسسوری آس</FigSubmit>
-        </form>
-      )}
+      {step === "signup" && <form noValidate onSubmit={submitSignup} className="space-y-6">
+        <AuthField id="signup-name" label="نام و نام خانوادگی" placeholder="علی ملکی" icon="icons-20--edit-user" value={name} onChange={(e) => { setName(e.target.value); setError(""); }} maxLength={100} autoComplete="name" error={error && name.trim().length < 2 ? error : null} />
+        <AuthField id="signup-password" label="رمز عبور" type="password" placeholder="رمز عبور" icon="icons-20--password-lock" value={password} onChange={(e) => { setPassword(e.target.value); setError(""); }} autoComplete="new-password" error={error && password.length < 8 ? error : null} />
+        <AuthField id="signup-confirm" label="تکرار رمز عبور" type="password" placeholder="تکرار رمز عبور" icon="icons-20--password-lock" value={confirm} onChange={(e) => { setConfirm(e.target.value); setError(""); }} autoComplete="new-password" error={error && password !== confirm ? error : null} />
+        <AuthError>{error && name.trim().length >= 2 && password.length >= 8 && password === confirm ? error : null}</AuthError>
+        <div className="pt-2"><AuthButton type="submit" pending={pending}>ورود به اکسسوری آس</AuthButton></div>
+      </form>}
+
+
     </div>
   );
 }

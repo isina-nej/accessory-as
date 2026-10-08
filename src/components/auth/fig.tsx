@@ -1,43 +1,61 @@
-"use client";
+import type { ComponentProps, ReactNode } from "react";
+import { Icon } from "@/components/ui/Icon";
+import Image from "next/image";
 
-import { useRouter } from "next/navigation";
+const input = "h-12 w-full rounded-lg border border-[#d6dbde] bg-[#f8faf9] py-2.5 pr-10 pl-3 text-right text-sm font-bold text-[#161b22] placeholder:text-[#8a9398] focus:border-[#01413e] focus:outline-none focus:ring-2 focus:ring-[#01413e]/15 aria-invalid:border-[#9f1239]";
 
-// استایل عین فیگما: لیبل ۱۳px #4B5563 + ستاره #9F1239، فیلد h-12 bg #F8FAF9 border #D6DBDE radius 8، هینت ۱۱px #9F1239، دکمه h-13 radius 10
-export const FIG_INPUT = "h-12 w-full rounded-lg border border-[#d6dbde] bg-[#f8faf9] px-3 text-sm text-[#161b22] placeholder:text-[#8a9398] focus:border-[#0a5a55] focus:outline-none";
-export const FIG_BTN = "h-13 w-full rounded-[10px] bg-[#0a5a55] py-3.5 text-base font-extrabold text-white disabled:opacity-50 hover:bg-[#084a46]";
-
-export function FigLabel({ children, hint }: { children: React.ReactNode; hint?: string }) {
+export function AuthField({ label, icon, hint, hintTone = "muted", error, required = true, reserveHint = true, ...props }: ComponentProps<"input"> & {
+  label: string;
+  icon?: string;
+  hint?: string;
+  hintTone?: "muted" | "error";
+  error?: string | null;
+  required?: boolean;
+  reserveHint?: boolean;
+}) {
   return (
-    <span className="mb-1 block">
-      <span className="text-[13px] font-bold text-[#4b5563]">
-        <span className="ml-1 font-extrabold text-[#9f1239]">*</span>
-        {children}
-      </span>
-      {hint && <span className="mt-1 block text-[11px] font-medium text-[#9f1239]">{hint}</span>}
-    </span>
+    <div className="w-full text-right">
+      <label htmlFor={props.id} className="mb-2 flex h-[22px] items-center gap-0.5 text-[13px] font-bold text-[#4b5563]">
+        {label}{required && <span aria-hidden="true" className="text-sm font-extrabold text-[#9f1239]">*</span>}
+      </label>
+      <div className="relative">
+        <input {...props} required={required} aria-invalid={!!error} aria-describedby={hint || error ? `${props.id}-hint` : undefined} className={`${input} ${props.className ?? ""}`} />
+        {icon && (icon.startsWith("/") ? <Image src={icon} alt="" width={28} height={28} className="pointer-events-none absolute top-2 right-2.5 h-7 w-7 object-contain" /> : <Icon name={icon} className="pointer-events-none absolute top-3.5 right-3.5 h-5 w-5 opacity-55" />)}
+      </div>
+      <p id={`${props.id}-hint`} role={error ? "alert" : undefined} className={`mt-2 ${reserveHint || error || hint ? "min-h-[18px]" : "hidden"} text-[11px] leading-[18px] ${error || hintTone === "error" ? "text-[#9f1239]" : "text-[#8a9398]"}`}>{error || hint || " "}</p>
+    </div>
   );
 }
 
-export function FigError({ msg }: { msg: string | null }) {
-  if (!msg) return null;
-  return <p className="text-[11px] font-medium text-[#9f1239]">{msg}</p>;
-}
-
-export function FigSubmit({ pending, children, onBack }: { pending: boolean; children: React.ReactNode; onBack?: () => void }) {
-  const router = useRouter();
+export function AuthButton({ children, pending = false, ...props }: ComponentProps<"button"> & { children: ReactNode; pending?: boolean }) {
   return (
-    <span className="block space-y-2">
-      <button disabled={pending} className={FIG_BTN}>
-        {pending ? "…" : children}
-      </button>
-      {onBack && (
-        <button type="button" onClick={onBack} className="w-full text-center text-sm text-[#0a5a55]">
-          بازگشت
-        </button>
+    <button
+      {...props}
+      disabled={pending || props.disabled}
+      className="flex h-[52px] w-full items-center justify-center gap-3 rounded-[10px] bg-[radial-gradient(65.01%_290.66%_at_49.73%_50.88%,#00807A_0%,#01413E_100%)] px-4 text-base font-extrabold text-white shadow-[6px_6px_45px_rgba(20,132,127,0.16)] transition-[filter] hover:brightness-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#01413e] disabled:cursor-wait disabled:opacity-60"
+    >
+      {pending ? (
+        "لطفاً صبر کنید…"
+      ) : (
+        <>
+          <span>{children}</span>
+          <Icon name="icons-20--vector-arrow-left" className="h-5 w-5 shrink-0 brightness-0 invert" />
+        </>
       )}
-      <button type="button" onClick={() => router.push("/")} className="w-full text-center text-xs text-[#8a9398]">
-        صفحه اصلی
-      </button>
-    </span>
+    </button>
   );
+}
+
+export function AuthError({ children }: { children?: string | null }) {
+  return children ? <p role="alert" className="text-right text-[11px] leading-[18px] text-[#9f1239]">{children}</p> : null;
+}
+
+export function ResendCode({ left, pending, onResend }: { left: number; pending: boolean; onResend: () => void }) {
+  return left > 0 ? (
+    <div className="flex h-6 items-center gap-2 text-sm font-bold">
+      <span className="text-[#8a9398]">ارسال مجدد کد بعد از</span>
+      <span aria-hidden className="h-4 w-4 rounded-full border-[3px] border-[#0a5a55] border-t-transparent" />
+      <span dir="ltr" className="text-[#161b22]">۰:{String(left).padStart(2, "0").replace(/[0-9]/g, (d) => "۰۱۲۳۴۵۶۷۸۹"[+d])}</span>
+    </div>
+  ) : <button type="button" disabled={pending} onClick={onResend} className="h-6 text-sm font-extrabold text-[#168bd4] hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#01413e] disabled:opacity-50">ارسال مجدد کد</button>;
 }

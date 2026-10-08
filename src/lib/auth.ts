@@ -12,6 +12,9 @@ export const auth = betterAuth({
       sendOTP: async ({ phoneNumber, code }) => {
         console.log(`[auth:sms] otp for ${phoneNumber}: ${code}`);
       },
+      sendPasswordResetOTP: async ({ phoneNumber, code }) => {
+        console.log(`[auth:sms] reset otp for ${phoneNumber}: ${code}`);
+      },
       signUpOnVerification: {
         getTempEmail: (p) => `${p.replace(/[^0-9]/g, "")}@phone.accessory-as.local`,
         getTempName: (p) => p,
