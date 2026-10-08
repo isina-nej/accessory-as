@@ -87,7 +87,9 @@ export function LoginFlow() {
         ? await authClient.signIn.phoneNumber({ phoneNumber: id, password })
         : await authClient.signIn.email({ email: id, password });
       if (response.error) setError("رمز عبور اشتباه است!");
-      else router.replace(next);
+      else {
+        window.location.href = next;
+      }
     } catch { setError("ورود ناموفق بود؛ دوباره تلاش کنید."); }
     finally { setPending(false); }
   }
