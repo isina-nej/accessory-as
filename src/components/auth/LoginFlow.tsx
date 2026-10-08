@@ -46,9 +46,15 @@ export function LoginFlow() {
     setCode("");
   }
 
-  async function submitId(event: React.FormEvent) {
+  function submitId(event: React.FormEvent) {
     event.preventDefault();
     if (!isMobileOrEmail(id)) return setError("شماره / ایمیل نامعتبر است!");
+    setError("");
+    setStep("password");
+  }
+
+  async function useCode() {
+    if (pending) return;
     setPending(true); setError("");
     try { await sendOtp(); setStep("otp"); }
     catch { setError("ارسال کد ناموفق بود؛ دوباره تلاش کنید."); }
@@ -113,21 +119,22 @@ export function LoginFlow() {
     <div className="w-full">
       {step === "id" && <form noValidate onSubmit={submitId} className="space-y-8">
         <AuthField id="login-identifier" label="شماره موبایل یا ایمیل خود را وارد کنید" placeholder="شماره موبایل یا ایمیل" icon="icons-20--edit-user" value={idVal} onChange={(e) => { setIdVal(e.target.value); setError(""); }} error={error} autoComplete="username" spellCheck={false} inputMode="email" reserveHint />
-        {isMobileOrEmail(id) && <button type="button" onClick={() => { setError(""); setStep("password"); }} className="-mt-6 block text-sm font-bold text-[#168bd4] hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#01413e]">ورود با رمز عبور</button>}
-        <AuthButton type="submit" pending={pending}>ورود به اکسسوری آس</AuthButton>
+        <AuthButton type="submit">ادامه با رمز عبور</AuthButton>
       </form>}
 
       {step === "otp" && <form noValidate onSubmit={submitOtp} className="space-y-8">
         <AuthField id="login-otp" label="کد تایید را وارد کنید" placeholder="کد تایید" icon="/images/auth/otp.png" value={code} onChange={(e) => { setCode(normalizeDigits(e.target.value)); setError(""); }} error={error} hintTone="error" hint={`کد تایید به ${isPhoneAccount(id) ? "شماره" : "آدرس ایمیل"} ${toFa(id)} ارسال شد. لطفاً آن را وارد کنید.`} inputMode="numeric" autoComplete="one-time-code" maxLength={6} />
         <ResendCode left={left} pending={pending} onResend={resend} />
         <AuthButton type="submit" pending={pending}>تایید و ادامه</AuthButton>
+        <button type="button" onClick={() => { setError(""); setStep("password"); }} className="w-full text-center text-sm font-bold text-[#168bd4] hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#01413e]">ورود با رمز عبور</button>
       </form>}
 
       {step === "password" && <form noValidate onSubmit={submitPassword} className="space-y-8">
         <AuthField id="login-password" label="رمز عبور" required={false} type="password" placeholder="رمز عبور" icon="icons-20--password-lock" value={password} onChange={(e) => { setPassword(e.target.value); setError(""); }} error={error} autoComplete="current-password" />
-        <div className="flex flex-col items-start gap-6 text-sm font-extrabold text-[#168bd4]">
-          <button type="button" onClick={() => { setError(""); setStep("id"); }} className="focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#01413e]">ورود با شماره موبایل <span aria-hidden>‹</span></button>
+        <div className="flex flex-col items-start gap-4 text-sm font-extrabold text-[#168bd4]">
+          <button type="button" disabled={pending} onClick={useCode} className="focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#01413e] disabled:opacity-50">ورود با کد تایید <span aria-hidden>‹</span></button>
           <button type="button" onClick={() => router.push(`/forgot-password?identifier=${encodeURIComponent(id)}`)} className="focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#01413e]">فراموشی رمز عبور <span aria-hidden>‹</span></button>
+          <button type="button" onClick={() => { setError(""); setStep("id"); }} className="focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#01413e]">تغییر شماره موبایل یا ایمیل <span aria-hidden>‹</span></button>
         </div>
         <AuthButton type="submit" pending={pending}>تایید و ادامه</AuthButton>
       </form>}
