@@ -39,7 +39,7 @@ export function getPool(): mysql.Pool {
       connectTimeout: 25000,
       waitForConnections: true,
       queueLimit: 0,
-      ...(ca ? { ssl: { ca, rejectUnauthorized: true } } : {}),
+      ssl: ca ? { ca, rejectUnauthorized: false } : { rejectUnauthorized: false },
     });
   }
   return pool;
