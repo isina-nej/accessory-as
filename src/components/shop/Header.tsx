@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { Icon } from "@/components/ui/Icon";
-import { formatToman, toFa } from "@/lib/fa";
+import { toFa } from "@/lib/fa";
 import type { MegaMenuData } from "@/lib/menu";
 import { cartCount, useCart } from "@/stores/cart";
 import { authClient } from "@/lib/auth-client";
@@ -32,6 +32,8 @@ export function Header({ menu }: { menu: MegaMenuData }) {
 
   const [open, setOpen] = useState<"cart" | "menu" | null>(null);
   const rootRef = useRef<HTMLElement>(null);
+  const cartTriggerRef = useRef<HTMLButtonElement>(null);
+  const cartPanelRef = useRef<HTMLDivElement>(null);
   const closeTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const cancelClose = () => {
@@ -44,16 +46,22 @@ export function Header({ menu }: { menu: MegaMenuData }) {
   const scheduleClose = () => {
     cancelClose();
     closeTimerRef.current = setTimeout(() => {
-      setOpen(null);
+      setOpen((current) => current === "menu" ? null : current);
     }, 180);
   };
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setOpen(null);
+      if (e.key === "Escape") {
+        if (cartPanelRef.current) cartTriggerRef.current?.focus();
+        setOpen(null);
+      }
     };
     const onClick = (e: MouseEvent) => {
-      if (rootRef.current && !rootRef.current.contains(e.target as Node)) setOpen(null);
+      const target = e.target as Node;
+      if (cartPanelRef.current?.contains(target) || cartTriggerRef.current?.contains(target)) return;
+      if (cartPanelRef.current) setOpen(null);
+      else if (rootRef.current && !rootRef.current.contains(target)) setOpen(null);
     };
     document.addEventListener("keydown", onKey);
     document.addEventListener("mousedown", onClick);
@@ -65,7 +73,7 @@ export function Header({ menu }: { menu: MegaMenuData }) {
   }, []);
 
   return (
-    <header ref={rootRef} className="relative z-40 border-b border-[#D6DBDE] bg-white w-full max-w-full overflow-hidden md:overflow-visible">
+    <header ref={rootRef} className="relative z-40 w-full max-w-full border-b border-[#D6DBDE] bg-white">
       <div className="mx-auto flex min-h-22 max-w-7xl items-center justify-between gap-8 px-4 py-5">
         {/* راست: لوگو عین فیگما */}
         <Link href="/" className="flex items-center gap-3">
@@ -154,34 +162,27 @@ export function Header({ menu }: { menu: MegaMenuData }) {
             </Link>
           )}
 
-          <div
-            className="relative"
-            onMouseEnter={() => {
-              cancelClose();
-              setOpen("cart");
-            }}
-            onMouseLeave={scheduleClose}
-          >
+          <div className="relative">
             <button
-              onClick={() => setOpen((v) => (v === "cart" ? null : "cart"))}
+              ref={cartTriggerRef}
+              onClick={() => {
+                cancelClose();
+                setOpen((v) => (v === "cart" ? null : "cart"));
+              }}
               aria-expanded={open === "cart"}
+              aria-haspopup="dialog"
+              aria-controls="cart-popover"
               aria-label="سبد خرید"
-              className="relative flex h-11 w-11 items-center justify-center rounded-xl bg-[#F8FAF9] border border-black/5 hover:bg-[#E7EFEE] transition-colors"
+              className="relative flex h-11 w-11 items-center justify-center rounded-[10px] border border-[#D6DBDE] bg-[#F8FAF9] transition-colors hover:bg-[#E7EFEE] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0A5A55]"
             >
               <Icon name="icons-20--shopping-basket" className="h-5 w-5" alt="" />
               {count > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#9F1239] px-1 text-[10px] font-extrabold text-white">
-                  {toFa(count)}
-                </span>
+                <span aria-hidden="true" className="absolute bottom-1.5 left-1.5 h-3 w-3 rounded-full bg-[#9F1239] shadow-[0_4px_6px_rgba(159,18,57,0.15)]" />
               )}
             </button>
             {open === "cart" && (
-              <div
-                className="absolute left-0 top-full pt-2"
-                onMouseEnter={cancelClose}
-                onMouseLeave={scheduleClose}
-              >
-                <CartHoverPopover count={count} onClose={() => setOpen(null)} />
+              <div ref={cartPanelRef} className="fixed inset-x-3 top-3 z-50 md:absolute md:-left-4 md:right-auto md:top-[calc(100%+22px)] md:w-[472px]">
+                <CartHoverPopover onClose={() => setOpen(null)} />
               </div>
             )}
           </div>
@@ -278,146 +279,108 @@ function MegaMenuPopup({ menu, onClose }: { menu: MegaMenuData; onClose: () => v
   );
 }
 
-// پاپ‌اور هاور سبد خرید مطابق فریم 749:332 فیگما
-function CartHoverPopover({ count, onClose }: { count: number; onClose: () => void }) {
+// پاپ‌آپ سبد خرید مطابق فریم 749:332 فیگما؛ داده‌ها از API سبد می‌آیند.
+function CartHoverPopover({ onClose }: { onClose: () => void }) {
   const lines = useCart((s) => s.lines);
   const setQty = useCart((s) => s.setQty);
   const remove = useCart((s) => s.remove);
-
-  const [detail, setDetail] = useState<{ id: string; title: string; price: number; image: string | null }[]>([]);
+  const [snapshot, setSnapshot] = useState<{
+    ids: string; failed: boolean; data: {
+      id: string; slug: string; title: string; price: number;
+      oldPrice: number | null; stock: number; image: string | null;
+    }[];
+  }>({ ids: "", failed: false, data: [] });
+  const ids = lines.map((l) => l.id).join(",");
 
   useEffect(() => {
-    if (lines.length === 0) {
-      setDetail([]);
-      return;
-    }
-    fetch(`/api/cart?ids=${lines.map((l) => l.id).join(",")}`)
-      .then((r) => r.json())
-      .then((j) => setDetail(j.ok ? j.data : []))
-      .catch(() => setDetail([]));
-  }, [lines]);
+    if (!ids) return;
+    const controller = new AbortController();
+    fetch(`/api/cart?ids=${encodeURIComponent(ids)}`, { signal: controller.signal })
+      .then((r) => {
+        if (!r.ok) throw new Error("Cart request failed");
+        return r.json();
+      })
+      .then((j) => {
+        if (!j.ok || !Array.isArray(j.data)) throw new Error("Cart response failed");
+        if (!controller.signal.aborted) setSnapshot({ ids, failed: false, data: j.data });
+      })
+      .catch(() => { if (!controller.signal.aborted) setSnapshot({ ids, failed: true, data: [] }); });
+    return () => controller.abort();
+  }, [ids]);
 
-  const subtotal = lines.reduce((n, l) => {
-    const p = detail.find((d) => d.id === l.id);
-    return n + (p ? p.price * l.qty : 0);
-  }, 0);
+  const loading = !!ids && snapshot.ids !== ids;
+  const failed = !loading && snapshot.failed;
+  const products = new Map((loading || failed ? [] : snapshot.data).map((p) => [p.id, p]));
+  const subtotal = lines.reduce((sum, l) => sum + (products.get(l.id)?.price ?? 0) * l.qty, 0);
+  const ready = !failed && !loading && lines.length <= 50 && lines.every((l) => {
+    const p = products.get(l.id);
+    return p && p.stock >= l.qty;
+  });
 
   return (
-    <div className="w-88 rounded-2xl border border-[#d6dbde] bg-white p-4 shadow-2xl md:w-[420px] animate-in fade-in zoom-in-95 duration-150">
-      {/* هدر پاپ‌اور */}
-      <div className="flex items-center justify-between border-b pb-3">
-        <span className="flex items-center gap-1.5 text-base font-extrabold text-[#161b22]">
-          <Icon name="icons-20--shopping-basket" className="h-4 w-4" />
-          سبد خرید شما
-        </span>
-        <span className="text-xs text-(--color-muted-fg)">{toFa(count)} کالا</span>
+    <section id="cart-popover" role="dialog" aria-label="سبد خرید شما" dir="rtl" className="flex max-h-[calc(100dvh-24px)] w-full flex-col gap-6 overflow-y-auto rounded-[10px] border border-[#D6DBDE] bg-white p-6 text-[#161B22] shadow-[0_16px_70px_rgba(0,0,0,0.08)] md:max-h-[calc(100dvh-100px)] md:w-[472px]">
+      <div className="flex items-center justify-between pb-2">
+        <div className="flex items-center gap-3">
+          <Icon name="icons-20--shopping-basket" className="h-5 w-5" alt="" />
+          <h2 className="text-base font-extrabold leading-7">سبد خرید شما</h2>
+        </div>
+        <span className="text-sm font-semibold text-[#8A9398]">{toFa(lines.length)} کالا</span>
       </div>
 
       {lines.length === 0 ? (
         <div className="py-8 text-center">
-          <p className="text-3xl">🛍️</p>
-          <p className="mt-2 text-sm text-(--color-muted-fg)">سبد خرید شما خالی است</p>
-          <Link
-            href="/shop"
-            onClick={onClose}
-            className="mt-3 inline-block rounded-xl bg-(--color-mist) px-4 py-1.5 text-xs font-bold text-(--color-brand)"
-          >
-            مشاهده محصولات
-          </Link>
+          <p className="text-sm text-[#4B5563]">سبد خرید شما خالی است.</p>
+          <Link href="/shop" onClick={onClose} className="mt-4 inline-block rounded-lg bg-[#F8FAF9] px-4 py-2 text-sm font-bold text-[#01413E] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#01413E]">مشاهده محصولات</Link>
         </div>
       ) : (
-        <div className="mt-3 space-y-3">
-          {/* لیست آیتم‌ها */}
-          <div className="max-h-64 space-y-2.5 overflow-y-auto pr-1">
+        <>
+          {failed && <p role="alert" className="text-sm text-[#9F1239]">دریافت اطلاعات سبد ناموفق بود. صفحه را دوباره بارگذاری کنید.</p>}
+          {!loading && !failed && lines.some((l) => !products.has(l.id)) && <p role="alert" className="text-sm text-[#9F1239]">یکی از کالاها دیگر در دسترس نیست. آن را از سبد حذف کنید.</p>}
+          <div className="max-h-[min(386px,45vh)] overflow-y-auto md:max-h-[386px]" aria-busy={loading}>
             {lines.map((l) => {
-              const p = detail.find((d) => d.id === l.id);
+              const p = products.get(l.id);
               return (
-                <div key={l.id} className="flex items-center gap-3 rounded-xl border border-black/5 p-2 bg-[#fcfdfd]">
-                  <span className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-(--color-mist)">
-                    {p?.image ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={p.image} alt={p.title} className="h-full w-full object-cover" />
-                    ) : (
-                      <span className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-lg bg-(--color-mist)">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src="/images/product-05.webp" alt="" className="h-full w-full object-cover" />
-                    </span>
-                    )}
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <Link
-                      href={`/products/${p?.title ? l.id : ""}`}
-                      onClick={onClose}
-                      className="block truncate text-xs font-bold text-[#161b22] hover:text-(--color-brand)"
-                    >
-                      {p?.title ?? "در حال دریافت…"}
-                    </Link>
-                    <p className="mt-0.5 text-xs font-bold text-(--color-brand)">
-                      {p ? formatToman(p.price * l.qty) : "—"}
-                    </p>
+                <div key={l.id} className="flex min-h-[118px] items-center gap-3 border-b border-[#D6DBDE] pb-4 last:mb-0">
+                  <div className="flex h-[102px] w-9 shrink-0 flex-col items-center justify-between">
+                    <button type="button" onClick={() => setQty(l.id, l.qty + 1)} disabled={!p || l.qty >= p.stock || l.qty >= 99} aria-label={`افزایش تعداد ${p?.title ?? "کالا"}`} className="flex h-[30px] w-9 items-center justify-center rounded border border-[#D6DBDE] text-xl leading-none text-[#0A5A55] disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0A5A55]">+</button>
+                    <span className="text-base font-semibold" aria-label={`تعداد ${toFa(l.qty)}`}>{toFa(l.qty)}</span>
+                    <button type="button" onClick={() => setQty(l.id, l.qty - 1)} aria-label={l.qty === 1 ? `حذف ${p?.title ?? "کالا"} از سبد` : `کاهش تعداد ${p?.title ?? "کالا"}`} className="flex h-[30px] w-9 items-center justify-center rounded border border-[#D6DBDE] text-xl leading-none text-[#9F1239] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9F1239]">−</button>
                   </div>
-                  {/* دکمه‌های کم و زیاد و حذف */}
-                  <div className="flex items-center gap-1.5">
-                    <div className="flex items-center rounded-lg border bg-white px-1.5 py-0.5 text-xs font-bold">
-                      <button
-                        onClick={() => setQty(l.id, l.qty + 1)}
-                        className="text-(--color-muted-fg) hover:text-black"
-                        aria-label="افزایش"
-                      >
-                        <Icon name="icons-other--plus-2" className="h-3 w-3" />
-                      </button>
-                      <span className="w-5 text-center">{toFa(l.qty)}</span>
-                      <button
-                        onClick={() => setQty(l.id, l.qty - 1)}
-                        className="text-(--color-muted-fg) hover:text-black"
-                        aria-label="کاهش"
-                      >
-                        <Icon name="icons-20--remove" className="h-3 w-3" />
-                      </button>
+                  <div className="flex h-[102px] w-[102px] shrink-0 items-center justify-center overflow-hidden rounded-lg border border-[#D6DBDE] bg-white">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={p?.image ?? "/images/product-01.webp"} alt={p?.title ?? ""} className="h-full w-full object-contain" />
+                  </div>
+                  <div className="flex h-[102px] min-w-0 flex-1 flex-col items-start justify-between text-right">
+                    <div className="w-full">
+                      {p ? <Link href={`/products/${p.slug}`} onClick={onClose} className="block text-sm font-bold leading-[23px] hover:text-[#0A5A55] focus-visible:outline-2 focus-visible:outline-[#0A5A55]">{p.title}</Link> : <span className="text-sm text-[#8A9398]">{failed ? "اطلاعات کالا در دسترس نیست" : loading ? "در حال دریافت…" : "کالا دیگر در دسترس نیست"}</span>}
+                      {p && p.stock < l.qty && <p className="text-xs text-[#9F1239]">موجودی کافی نیست</p>}
+                      {!loading && !p && <button type="button" onClick={() => remove(l.id)} className="mt-1 text-xs text-[#9F1239] underline focus-visible:outline-2 focus-visible:outline-[#9F1239]">حذف از سبد</button>}
                     </div>
-                    <button
-                      onClick={() => remove(l.id)}
-                      className="text-black/30 hover:text-(--color-wine)"
-                      aria-label="حذف"
-                    >
-                      <Icon name="icons-20--remove-delete" className="h-3.5 w-3.5" />
-                    </button>
+                    {p && <div className="flex flex-col items-start">
+                      {p.oldPrice && p.oldPrice > p.price && <del className="text-xs leading-[19px] text-[#8A9398]">{toFa(p.oldPrice.toLocaleString("en-US"))}</del>}
+                      <p className="flex items-baseline gap-1 text-[#161B22]"><b className="text-base leading-[25px]">{toFa(p.price.toLocaleString("en-US"))}</b><span className="text-[10px] font-bold text-[#4B5563]">تومن</span></p>
+                    </div>}
                   </div>
                 </div>
               );
             })}
           </div>
-
-          {/* خلاصه مجموع سبد مطابق فیگما */}
-          <div className="border-t pt-2.5">
-            <div className="flex items-center justify-between text-sm font-bold">
-              <span className="text-[#4b5563]">مجموع سبد خرید:</span>
-              <span className="text-base text-[#161b22]">{formatToman(subtotal)}</span>
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-baseline gap-1 text-[#9F1239]">
+              <b className="text-lg leading-7">{ready ? toFa(subtotal.toLocaleString("en-US")) : "—"}</b>
+              <span className="text-xs font-bold">تومن</span>
             </div>
-            <p className="mt-1.5 text-[11px] leading-4 text-(--color-muted-fg)">
-              مبلغ سفارش هنوز پرداخت نشده و در صورت اتمام موجودی، کالاها از سبد حذف می‌شوند.
-            </p>
+            <div className="max-w-[232px] text-right">
+              <h3 className="text-sm font-extrabold leading-[23px]">مجموع سبد خرید</h3>
+              <p className="mt-1 text-xs leading-5 text-[#4B5563]">مبلغ سفارش هنوز پرداخت نشده و در صورت اتمام موجودی، کالاها از سبد حذف می‌شوند.</p>
+            </div>
           </div>
-
-          {/* دکمه‌های عملیات */}
-          <div className="flex gap-2 pt-1">
-            <Link
-              href="/cart"
-              onClick={onClose}
-              className="flex-1 rounded-xl border border-black/15 py-2.5 text-center text-xs font-bold text-[#161b22] hover:bg-black/5"
-            >
-              مشاهده سبد
-            </Link>
-            <Link
-              href="/checkout/address"
-              onClick={onClose}
-              className="flex-1 rounded-xl bg-(--color-brand) py-2.5 text-center text-xs font-bold text-white hover:bg-[#084a46]"
-            >
-              ثبت سفارش
-            </Link>
-          </div>
-        </div>
+          <Link href="/checkout/address" onClick={onClose} aria-disabled={!ready || subtotal === 0} tabIndex={ready && subtotal > 0 ? 0 : -1} className={`flex h-[52px] items-center justify-center gap-3 rounded-[10px] bg-[radial-gradient(ellipse_at_center,#00807A,#01413E)] text-base font-extrabold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#01413E] ${!ready || subtotal === 0 ? "pointer-events-none opacity-50" : ""}`}>
+            <Icon name="icons-20--check-cart" className="h-5 w-5 brightness-0 invert" alt="" />
+            ثبت سفارش
+          </Link>
+        </>
       )}
-    </div>
+    </section>
   );
 }

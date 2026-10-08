@@ -111,6 +111,7 @@ export function LoginFlow() {
     <div className="w-full">
       {step === "id" && <form noValidate onSubmit={submitId} className="space-y-8">
         <AuthField id="login-identifier" label="شماره موبایل یا ایمیل خود را وارد کنید" placeholder="شماره موبایل یا ایمیل" icon="icons-20--edit-user" value={idVal} onChange={(e) => { setIdVal(e.target.value); setError(""); }} error={error} autoComplete="username" spellCheck={false} inputMode="email" reserveHint />
+        {isMobileOrEmail(id) && <button type="button" onClick={() => { setError(""); setStep("password"); }} className="-mt-6 block text-sm font-bold text-[#168bd4] hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#01413e]">ورود با رمز عبور</button>}
         <AuthButton type="submit" pending={pending}>ورود به اکسسوری آس</AuthButton>
       </form>}
 
