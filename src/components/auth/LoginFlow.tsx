@@ -93,17 +93,22 @@ export function LoginFlow() {
         ? await authClient.signIn.phoneNumber({ phoneNumber: id, password })
         : await authClient.signIn.email({ email: id, password });
       if (response.error) {
-        const status = (response.error as { status?: number }).status;
-        if (status && status >= 500) {
-          setError("خطای ارتباط با پایگاه‌داده سرور؛ لطفاً وضعیت دیتابیس را بررسی کنید.");
+        const errObj = response.error as { status?: number; code?: string; message?: string };
+        const status = errObj.status;
+        const msg = (errObj.message ?? "").toLowerCase();
+        if ((status && status >= 500) || msg.includes("failed query") || msg.includes("connect") || msg.includes("database")) {
+          setError("خطای سرور یا قطع ارتباط با دیتابیس؛ لطفاً اتصال پایگاه‌داده را بررسی کنید.");
         } else {
           setError("رمز عبور اشتباه است!");
         }
       } else {
         window.location.href = next;
       }
-    } catch { setError("ورود ناموفق بود؛ دوباره تلاش کنید."); }
-    finally { setPending(false); }
+    } catch {
+      setError("خطای برقراری ارتباط با سرور؛ دوباره تلاش کنید.");
+    } finally {
+      setPending(false);
+    }
   }
 
   async function submitSignup(event: React.FormEvent) {
