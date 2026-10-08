@@ -47,20 +47,13 @@ export function getPool(): mysql.Pool {
 
 // اتصال خام برای تفکیک خطای connect از query
 export async function testConnection(): Promise<void> {
-  const raw = (process.env.DATABASE_URL ?? "").trim();
-  const u = new URL(raw);
-  const ca = loadCa();
-  const one = await mysql.createConnection({
-    host: u.hostname,
-    port: Number(u.port || 3306),
-    user: decodeURIComponent(u.username),
-    password: decodeURIComponent(u.password),
-    database: u.pathname.replace(/^\//, "").split("?")[0] || undefined,
-    connectTimeout: 15000,
-    ...(ca ? { ssl: { ca, rejectUnauthorized: true } } : {}),
-  });
-  await one.ping();
-  await one.end();
+  const p = getPool();
+  const c = await p.getConnection();
+  try {
+    await c.ping();
+  } finally {
+    c.release();
+  }
 }
 
 export const db = drizzle(

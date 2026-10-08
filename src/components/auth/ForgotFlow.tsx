@@ -84,7 +84,13 @@ export function ForgotFlow() {
       const response = isPhoneAccount(id)
         ? await authClient.phoneNumber.resetPassword({ phoneNumber: id, otp: normalizeDigits(code.trim()), newPassword: newPass })
         : await authClient.emailOtp.resetPassword({ email: id, otp: normalizeDigits(code.trim()), password: newPass });
-      if (response.error) return setError("تغییر رمز ناموفق بود؛ کد را دوباره بررسی کنید.");
+      if (response.error) {
+        const status = (response.error as { status?: number }).status;
+        if (status && status >= 500) {
+          return setError("خطای ارتباط با پایگاه‌داده سرور؛ لطفاً وضعیت دیتابیس را بررسی کنید.");
+        }
+        return setError("تغییر رمز ناموفق بود؛ کد را دوباره بررسی کنید.");
+      }
       setStep(4);
     } catch { setError("تغییر رمز ناموفق بود؛ دوباره تلاش کنید."); }
     finally { setPending(false); }
@@ -102,6 +108,7 @@ export function ForgotFlow() {
         <AuthButton type="submit" pending={pending}>تایید و ادامه</AuthButton>
       </form>}
       {step === 3 && <form noValidate onSubmit={submitPassword} className="space-y-6">
+        <input type="text" name="username" value={id} readOnly tabIndex={-1} aria-hidden="true" autoComplete="username" className="sr-only" />
         <AuthField id="reset-p1" label="رمز عبور جدید" type="password" placeholder="رمز عبور جدید" icon="icons-20--password-lock" value={p1} onChange={(e) => { setP1(e.target.value); setError(""); }} autoComplete="new-password" hint="رمز عبور شما باید حداقل ۸ حرف باشد." hintTone="error" error={error && (p1 || p2).length < 8 ? error : null} />
         <AuthField id="reset-p2" label="رمز عبور جدید" type="password" placeholder="رمز عبور" value={p2} onChange={(e) => { setP2(e.target.value); setError(""); }} autoComplete="new-password" hint="رمز عبور شما باید حداقل ۸ حرف باشد." hintTone="error" error={error && (p1 || p2).length < 8 ? error : null} />
         <AuthField id="reset-p3" label="تکرار رمز عبور" type="password" placeholder="تکرار رمز عبور" value={p3} onChange={(e) => { setP3(e.target.value); setError(""); }} autoComplete="new-password" error={error && (p1 || p2) !== (p3 || p2) ? error : null} />
