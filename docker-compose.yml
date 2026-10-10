@@ -1,24 +1,24 @@
 services:
   db:
-    image: mysql:8.0
+    image: mariadb:10.11
     container_name: accessory_as_db
     restart: unless-stopped
     command: --character-set-server=utf8mb4 --collation-server=utf8mb4_persian_ci
     environment:
-      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootpass_accessory_as_2026}
-      MYSQL_DATABASE: accessory_as
-      MYSQL_USER: accessory
-      MYSQL_PASSWORD: ${DB_PASSWORD:-pass_accessory_as_2026}
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootpass_accessory_as_2026}
+      MARIADB_DATABASE: accessory_as
+      MARIADB_USER: accessory
+      MARIADB_PASSWORD: ${DB_PASSWORD:-pass_accessory_as_2026}
     volumes:
       - db_data:/var/lib/mysql
       - ./init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
     networks:
       - accessory_net
     healthcheck:
-      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u accessory -p$${MYSQL_PASSWORD}"]
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
       interval: 5s
       timeout: 5s
-      retries: 15
+      retries: 20
 
   app:
     build:
