@@ -50,8 +50,8 @@ export default async function AccountPage() {
                 />
                 <div className="relative z-10 flex flex-col items-end gap-2 text-right">
                   <div className="flex items-baseline gap-2">
-                    <span className="text-[20px] font-extrabold text-[#161B22]">سفارش</span>
                     <span className="text-[40px] font-bold leading-none text-[#0A5A55]">{toFa(dash?.active ?? 0)}</span>
+                    <span className="text-[20px] font-extrabold text-[#161B22]">سفارش</span>
                   </div>
                   <p className="text-sm font-medium text-[#4B5563]">سفارش های فعال</p>
                 </div>
@@ -67,8 +67,8 @@ export default async function AccountPage() {
                 />
                 <div className="relative z-10 flex flex-col items-end gap-2 text-right">
                   <div className="flex items-baseline gap-2">
-                    <span className="text-[20px] font-extrabold text-[#161B22]">سفارش</span>
                     <span className="text-[40px] font-bold leading-none text-[#1889F2]">{toFa(dash?.delivered ?? 0)}</span>
+                    <span className="text-[20px] font-extrabold text-[#161B22]">سفارش</span>
                   </div>
                   <p className="text-sm font-medium text-[#4B5563]">سفارش های تحویل داده شده</p>
                 </div>
@@ -84,8 +84,8 @@ export default async function AccountPage() {
                 />
                 <div className="relative z-10 flex flex-col items-end gap-2 text-right">
                   <div className="flex items-baseline gap-2">
-                    <span className="text-[20px] font-extrabold text-[#161B22]">سفارش</span>
                     <span className="text-[40px] font-bold leading-none text-[#9F1239]">{toFa(dash?.refunded ?? 0)}</span>
+                    <span className="text-[20px] font-extrabold text-[#161B22]">سفارش</span>
                   </div>
                   <p className="text-sm font-medium text-[#4B5563]">سفارش های مرجوع شده</p>
                 </div>

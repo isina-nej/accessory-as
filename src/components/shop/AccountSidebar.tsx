@@ -4,11 +4,11 @@ import { toFa } from "@/lib/fa";
 import { cn } from "@/lib/cn";
 
 const NAV_ITEMS = [
-  ["/account", "نمای کلـی", "icons-solid-20--home"],
-  ["/account/orders", "سفـارش ها", "icons-20--delivery-process"],
-  ["/account/favorites", "علاقـه منـدی ها", "icons-20--favorite-icon"],
-  ["/account/addresses", "آدرس ها", "icons-20--location-user"],
-  ["/account/info", "اطلاعـات حسـاب کاربـری", "icons-20--edit-user"],
+  ["/account", "نمای کلـی", "icons-20--layer"],
+  ["/account/orders", "سفـارش ها", "icons-20--shopping-bag"],
+  ["/account/favorites", "علاقـه منـدی ها", "icons-24--heart-rate-2"],
+  ["/account/addresses", "آدرس ها", "icons-20--directions-sign"],
+  ["/account/info", "اطلاعـات حسـاب کاربـری", "icons-20--user"],
 ] as const;
 
 export function AccountSidebar({
@@ -88,10 +88,10 @@ function SignOutBtn() {
     >
       <button
         type="submit"
-        className="flex w-full items-center gap-3 text-right text-sm font-extrabold text-[#9F1239] transition-opacity hover:opacity-80"
+        className="flex w-full items-center gap-3 text-right text-sm font-extrabold text-[#161B22] transition-colors hover:text-[#9F1239]"
       >
-        <Icon name="icons-20--semicircle-logout" className="h-5 w-5" alt="" />
-        <span>خروج از حساب کاربری</span>
+        <Icon name="icons-20--semicircle-logout" className="h-5 w-5 opacity-75" alt="" />
+        <span>خروج از حسـاب کاربـری</span>
       </button>
     </form>
   );
