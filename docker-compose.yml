@@ -1,0 +1,47 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: accessory_as_db
+    restart: unless-stopped
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_persian_ci
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootpass_accessory_as_2026}
+      MYSQL_DATABASE: accessory_as
+      MYSQL_USER: accessory
+      MYSQL_PASSWORD: ${DB_PASSWORD:-pass_accessory_as_2026}
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    networks:
+      - accessory_net
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u accessory -p$${MYSQL_PASSWORD}"]
+      interval: 5s
+      timeout: 5s
+      retries: 15
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: accessory_as_app
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3002:3000"
+    environment:
+      - DATABASE_URL=mysql://accessory:${DB_PASSWORD:-pass_accessory_as_2026}@db:3306/accessory_as
+      - BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET:-accessory_as_secret_long_key_2026_prod}
+      - BETTER_AUTH_URL=${BETTER_AUTH_URL:-http://localhost:3002}
+      - PORT=3000
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - accessory_net
+
+volumes:
+  db_data:
+
+networks:
+  accessory_net:
+    driver: bridge
