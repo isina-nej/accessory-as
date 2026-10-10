@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Breadcrumb } from "@/components/shop/Breadcrumb";
 import { Footer } from "@/components/shop/Footer";
@@ -39,7 +40,7 @@ export default async function AccountPage() {
             </div>
             <div className="flex items-center justify-between">
               <h2 className="font-extrabold">لیست سفارشات</h2>
-              <a href="/account/orders" className="text-sm text-(--color-brand)">مشاهده همه</a>
+              <Link href="/account/orders" className="text-sm text-(--color-brand)">مشاهده همه</Link>
             </div>
             <div className="grid gap-3 md:grid-cols-2">
               {(dash?.orders ?? []).slice(0, 4).map((o) => (

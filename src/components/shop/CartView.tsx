@@ -49,10 +49,7 @@ export function CartView() {
   const [failed, setFailed] = useState(false);
 
   useEffect(() => {
-    if (lines.length === 0) {
-      setDetail([]);
-      return;
-    }
+    if (lines.length === 0) return;
     fetch(`/api/cart?ids=${lines.map((l) => l.id).join(",")}`)
       .then((r) => r.json())
       .then((j) => {
