@@ -1,4 +1,4 @@
-FROM node:20-alpine AS base
+FROM node:22-alpine AS base
 
 FROM base AS deps
 RUN apk add --no-cache libc6-compat
@@ -13,6 +13,7 @@ COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
 ENV BETTER_AUTH_SECRET=build_time_placeholder_secret_min_32_chars_123456
+ENV DATABASE_URL=mysql://accessory:dummy_build_pass@127.0.0.1:3306/accessory_as
 RUN npm run build
 
 FROM base AS runner
