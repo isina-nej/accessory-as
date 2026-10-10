@@ -5,6 +5,7 @@ import { Footer } from "@/components/shop/Footer";
 import { Header } from "@/components/shop/Header";
 import { AccountSidebar } from "@/components/shop/AccountSidebar";
 import { OrderCard } from "@/components/shop/OrderCard";
+import { Icon } from "@/components/ui/Icon";
 import { getOrders } from "@/lib/account-actions";
 import { toFa } from "@/lib/fa";
 import { getMegaMenu } from "@/lib/menu";
@@ -33,37 +34,79 @@ export default async function OrdersPage({
   const rows = (await getOrders(tab)) ?? [];
 
   return (
-    <div className="flex min-h-full flex-1 flex-col bg-(--color-mist)">
+    <div className="flex min-h-full flex-1 flex-col bg-[#F8FAF9]">
       <Header menu={menu} />
-      <main className="mx-auto w-full max-w-7xl flex-1 space-y-4 px-4 py-6">
-        <Breadcrumb trail={[{ href: "/", label: "اکسسوری آس" }, { href: "/account", label: "پروفایل کاربری" }, { label: "سفارش‌ها" }]} />
-        <div className="grid gap-4 lg:grid-cols-[280px_1fr]">
-          <AccountSidebar active="/account/orders" name={user.name ?? "کاربر"} phone={user.email ?? ""} />
-          <div className="space-y-4">
-            <div className="flex items-center justify-between rounded-2xl border bg-white px-4 py-2">
-              <p className="text-sm text-(--color-muted-fg)">{toFa(rows.length)} سفارش</p>
-              <div className="flex gap-1 text-sm">
-                <span className="ml-2 text-(--color-muted-fg)">مرتب‌سازی:</span>
-                {TABS.map(([v, label]) => (
-                  <Link
-                    key={v}
-                    href={`/account/orders?status=${v}`}
-                    className={cn("rounded-full px-3 py-1", tab === v ? "bg-(--color-brand) text-white" : "hover:bg-black/5")}
-                  >
-                    {label}
-                  </Link>
-                ))}
+      <main className="mx-auto w-full max-w-[1440px] flex-1 space-y-6 px-4 sm:px-8 lg:px-20 py-6">
+        <div className="h-5">
+          <Breadcrumb
+            trail={[
+              { href: "/", label: "اکسســـوری آس" },
+              { href: "/account", label: "پروفایل کاربری" },
+              { label: "سفـارش ها" },
+            ]}
+          />
+        </div>
+
+        <div className="flex flex-col-reverse lg:flex-row justify-end items-start gap-6">
+          {/* پنل سفارش‌ها سمت چپ ۹۲۷px */}
+          <section aria-label="لیست سفارش‌ها" className="w-full lg:w-[927px] rounded-[10px] border border-[#D6DBDE] bg-white p-6 space-y-6">
+            <div className="flex flex-col gap-4 border-b border-[#D6DBDE] pb-4">
+              <h1 className="text-[20px] font-extrabold text-[#161B22] text-right">لیست سفارشـات</h1>
+
+              {/* نوار فیلتر و مرتب‌سازی دقیقاً مطابق فیگما */}
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-sm">
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2 text-sm font-bold text-black">
+                    <Icon name="icons-20--sorting" className="h-5 w-5" alt="" />
+                    <span>مرتــب سازی :</span>
+                  </div>
+
+                  <div className="flex items-center gap-2 flex-wrap">
+                    {TABS.map(([v, label]) => {
+                      const isActive = tab === v;
+                      return (
+                        <Link
+                          key={v}
+                          href={`/account/orders?status=${v}`}
+                          className={cn(
+                            "rounded-md px-2.5 py-1 text-sm font-medium transition-colors",
+                            isActive
+                              ? "border border-[#9F1239] bg-white text-[#9F1239]"
+                              : "text-[#4B5563] hover:text-[#0A5A55]"
+                          )}
+                        >
+                          {label}
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <span className="text-sm font-semibold text-[#8A9398]">
+                  {toFa(rows.length)} سفارش
+                </span>
               </div>
             </div>
-            <div className="grid gap-3 md:grid-cols-2">
+
+            {/* لیست آیتم‌های سفارش */}
+            <div className="flex flex-col gap-3">
               {rows.map((o) => (
                 <OrderCard key={o.id} o={o} />
               ))}
+              {rows.length === 0 && (
+                <div className="py-16 text-center text-sm font-medium text-[#8A9398]">
+                  در این بخش سفارشی یافت نشد.
+                </div>
+              )}
             </div>
-            {rows.length === 0 && (
-              <p className="rounded-2xl border bg-white p-6 text-center text-sm text-(--color-muted-fg)">سفارشی نیست.</p>
-            )}
-          </div>
+          </section>
+
+          {/* سایدبار سمت راست ۳۲۹px */}
+          <AccountSidebar
+            active="/account/orders"
+            name={user.name ?? "علی ملکی"}
+            phone={user.email ?? "۰۹۳۵ ۱۷۹ ۰۸۵۳"}
+          />
         </div>
       </main>
       <Footer />

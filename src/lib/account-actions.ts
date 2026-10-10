@@ -8,6 +8,8 @@ import { IBAN_RE } from "@/lib/checkout";
 import { getUserId } from "@/lib/session";
 import type { ActionRes } from "./address-actions";
 
+import { shopImage } from "./shop-images";
+
 export async function getDashboard() {
   const uid = await getUserId();
   if (!uid) return null;
@@ -15,17 +17,70 @@ export async function getDashboard() {
   const active = rows.filter((o) => ["pending", "paid", "preparing", "shipped"].includes(o.status)).length;
   const delivered = rows.filter((o) => o.status === "delivered").length;
   const refunded = rows.filter((o) => o.status === "refunded").length;
-  return { orders: rows, active, delivered, refunded };
+
+  const { inArray } = await import("drizzle-orm");
+  const orderIds = rows.map((r) => r.id);
+  const items = orderIds.length > 0 ? await db.select().from(orderItems).where(inArray(orderItems.orderId, orderIds)) : [];
+  const prodIds = [...new Set(items.map((it) => it.productId))];
+  const prods = prodIds.length > 0 ? await db.select().from(products).where(inArray(products.id, prodIds)) : [];
+  const prodMap = new Map(prods.map((p) => [p.id, p]));
+
+  const enrichedOrders = rows.map((o) => {
+    const oItems = items
+      .filter((it) => it.orderId === o.id)
+      .map((it) => {
+        const p = prodMap.get(it.productId);
+        const img = p ? shopImage(p.slug) : null;
+        return {
+          id: it.id,
+          productId: it.productId,
+          title: p?.title ?? "کالا",
+          slug: p?.slug ?? "",
+          image: img ? `/images/${img}` : "/images/product-01.webp",
+          qty: it.qty,
+          unitToman: it.unitToman,
+        };
+      });
+    return { ...o, items: oItems };
+  });
+
+  return { orders: enrichedOrders, active, delivered, refunded };
 }
 
 export async function getOrders(filter: string) {
   const uid = await getUserId();
   if (!uid) return null;
   const rows = await db.select().from(orders).where(eq(orders.userId, uid)).orderBy(desc(orders.createdAt));
-  if (filter === "active") return rows.filter((o) => ["pending", "paid", "preparing", "shipped"].includes(o.status));
-  if (filter === "delivered") return rows.filter((o) => o.status === "delivered");
-  if (filter === "refunded") return rows.filter((o) => o.status === "refunded" || o.status === "cancelled");
-  return rows;
+  let filtered = rows;
+  if (filter === "active") filtered = rows.filter((o) => ["pending", "paid", "preparing", "shipped"].includes(o.status));
+  else if (filter === "delivered") filtered = rows.filter((o) => o.status === "delivered");
+  else if (filter === "refunded") filtered = rows.filter((o) => o.status === "refunded" || o.status === "cancelled");
+
+  const { inArray } = await import("drizzle-orm");
+  const orderIds = filtered.map((r) => r.id);
+  const items = orderIds.length > 0 ? await db.select().from(orderItems).where(inArray(orderItems.orderId, orderIds)) : [];
+  const prodIds = [...new Set(items.map((it) => it.productId))];
+  const prods = prodIds.length > 0 ? await db.select().from(products).where(inArray(products.id, prodIds)) : [];
+  const prodMap = new Map(prods.map((p) => [p.id, p]));
+
+  return filtered.map((o) => {
+    const oItems = items
+      .filter((it) => it.orderId === o.id)
+      .map((it) => {
+        const p = prodMap.get(it.productId);
+        const img = p ? shopImage(p.slug) : null;
+        return {
+          id: it.id,
+          productId: it.productId,
+          title: p?.title ?? "کالا",
+          slug: p?.slug ?? "",
+          image: img ? `/images/${img}` : "/images/product-01.webp",
+          qty: it.qty,
+          unitToman: it.unitToman,
+        };
+      });
+    return { ...o, items: oItems };
+  });
 }
 
 export async function getOrderDetail(id: string) {
@@ -42,7 +97,13 @@ export async function getOrderDetail(id: string) {
   const enriched = await Promise.all(
     items.map(async (it) => {
       const [p] = await db.select().from(products).where(eq(products.id, it.productId)).limit(1);
-      return { ...it, title: p?.title ?? "کالا", slug: p?.slug ?? "" };
+      const img = p ? shopImage(p.slug) : null;
+      return {
+        ...it,
+        title: p?.title ?? "کالا",
+        slug: p?.slug ?? "",
+        image: img ? `/images/${img}` : "/images/product-01.webp",
+      };
     }),
   );
   const [addr] = o.addressId
@@ -83,7 +144,14 @@ export async function getFavorites(sort: string) {
     .select()
     .from(products)
     .where(inArray(products.id, favs.map((f) => f.productId)));
-  const sorted = [...rows].sort((a, b) =>
+  const mapped = rows.map((p) => {
+    const img = shopImage(p.slug);
+    return {
+      ...p,
+      image: img ? `/images/${img}` : "/images/product-01.webp",
+    };
+  });
+  const sorted = [...mapped].sort((a, b) =>
     sort === "cheap" ? a.priceToman - b.priceToman : sort === "expensive" ? b.priceToman - a.priceToman : 0,
   );
   return sorted;

@@ -2,30 +2,26 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Icon } from "@/components/ui/Icon";
 import { authClient } from "@/lib/auth-client";
 import { saveWalletIban } from "@/lib/account-actions";
 import { toFa } from "@/lib/fa";
 
-const input = "h-10 w-full rounded-lg border bg-white px-3 text-sm";
-
-export function AccountInfo({ user }: { user: { name: string; email: string } }) {
+export function AccountInfo({ user }: { user: { name: string; email: string; phone?: string; iban?: string } }) {
   const router = useRouter();
-  const [tab, setTab] = useState<"main" | "phone" | "email" | "password" | "iban">("main");
+  const [modal, setModal] = useState<"phone" | "email" | "password" | "iban" | null>(null);
   const [msg, setMsg] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
 
-  // phone change
-  const [phone, setPhone] = useState("");
+  // فرم‌های مودال
+  const [phone, setPhone] = useState(user.phone ?? "");
   const [phoneCode, setPhoneCode] = useState("");
-  // email change
   const [email, setEmail] = useState("");
   const [emailCode, setEmailCode] = useState("");
-  // password
-  const [p1, setP1] = useState("");
-  const [p2, setP2] = useState("");
-  const [current, setCurrent] = useState("");
-  // iban
-  const [iban, setIban] = useState("");
+  const [currentPass, setCurrentPass] = useState("");
+  const [newPass, setNewPass] = useState("");
+  const [repeatPass, setRepeatPass] = useState("");
+  const [iban, setIban] = useState(user.iban ?? "");
 
   async function run(fn: () => Promise<void>) {
     setPending(true);
@@ -34,142 +30,310 @@ export function AccountInfo({ user }: { user: { name: string; email: string } })
       await fn();
       router.refresh();
     } catch (e) {
-      setMsg(e instanceof Error ? e.message : "ناموفق بود");
+      setMsg(e instanceof Error ? e.message : "عملیات ناموفق بود");
     } finally {
       setPending(false);
     }
   }
 
   return (
-    <div className="space-y-3">
-      <div className="rounded-2xl border bg-white p-4 text-sm">
-        <p className="font-bold">اطلاعات حساب کاربری</p>
-        <p className="mt-2">نام و نام خانوادگی: {user.name}</p>
-        <p className="mt-1">ایمیل: <span dir="ltr">{user.email}</span></p>
-        <div className="mt-3 flex flex-wrap gap-2">
-          {(
-            [
-              ["phone", "ویرایش موبایل"],
-              ["email", "ویرایش ایمیل"],
-              ["password", "تغییر رمز"],
-              ["iban", "حساب بازگشت وجه"],
-            ] as const
-          ).map(([v, label]) => (
-            <button key={v} onClick={() => { setTab(v); setMsg(null); }} className="rounded-lg border px-3 py-1.5 text-xs">
-              {label}
-            </button>
-          ))}
+    <div className="w-full space-y-6">
+      <div className="rounded-[10px] border border-[#D6DBDE] bg-white p-6 space-y-6 text-right">
+        <h1 className="text-[20px] font-extrabold text-[#161B22]">اطلاعـات حساب کاربـری</h1>
+
+        {/* شبکه دو ستونه فیلدهای اطلاعات حساب کاربری مطابق فیگما */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* نام و نام خانوادگی */}
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-bold text-[#4B5563]">نام و نام خانوادگی</label>
+            <div className="flex h-12 items-center justify-between rounded-lg border border-[#D6DBDE] bg-[#F8FAF9] px-3 text-sm">
+              <button
+                type="button"
+                onClick={() => setModal("phone")}
+                className="flex h-7 w-8 items-center justify-center rounded-md text-[#1889F2] hover:bg-black/5"
+              >
+                <Icon name="icons-20--edit-pen" className="h-5 w-5" alt="" />
+              </button>
+              <div className="flex items-center gap-2">
+                <span className="font-bold text-[#4B5563]">{user.name}</span>
+                <Icon name="icons-20--edit-user" className="h-5 w-5 opacity-70" alt="" />
+              </div>
+            </div>
+          </div>
+
+          {/* شماره تماس */}
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center justify-between">
+              <span className="rounded bg-[#0A5A55] px-1.5 py-0.5 text-[11px] font-bold text-white">تایید شده</span>
+              <label className="text-sm font-bold text-[#4B5563]">شماره تماس</label>
+            </div>
+            <div className="flex h-12 items-center justify-between rounded-lg border border-[#D6DBDE] bg-[#F8FAF9] px-3 text-sm">
+              <button
+                type="button"
+                onClick={() => { setModal("phone"); setMsg(null); }}
+                className="flex h-7 w-8 items-center justify-center rounded-md text-[#1889F2] hover:bg-black/5"
+              >
+                <Icon name="icons-20--edit-pen" className="h-5 w-5" alt="" />
+              </button>
+              <div className="flex items-center gap-2">
+                <span dir="ltr" className="font-bold text-[#4B5563]">{toFa(user.phone ?? "۰۹۳۵ ۱۷۹ ۰۸۵۳")}</span>
+                <Icon name="icons-20--calling" className="h-5 w-5 opacity-70" alt="" />
+              </div>
+            </div>
+          </div>
+
+          {/* رمز عبور */}
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center justify-between">
+              <span className="rounded bg-[#0A5A55] px-1.5 py-0.5 text-[11px] font-bold text-white">تغییر رمز</span>
+              <label className="text-sm font-bold text-[#4B5563]">رمز عبور</label>
+            </div>
+            <div className="flex h-12 items-center justify-between rounded-lg border border-[#D6DBDE] bg-[#F8FAF9] px-3 text-sm">
+              <button
+                type="button"
+                onClick={() => { setModal("password"); setMsg(null); }}
+                className="flex h-7 w-8 items-center justify-center rounded-md text-[#1889F2] hover:bg-black/5"
+              >
+                <Icon name="icons-20--edit-pen" className="h-5 w-5" alt="" />
+              </button>
+              <div className="flex items-center gap-2">
+                <span className="tracking-widest font-bold text-[#4B5563]">••••••••</span>
+                <Icon name="icons-20--password-lock" className="h-5 w-5 opacity-70" alt="" />
+              </div>
+            </div>
+          </div>
+
+          {/* ایمیل */}
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center justify-between">
+              <span className="rounded bg-[#0A5A55] px-1.5 py-0.5 text-[11px] font-bold text-white">ویرایش ایمیل</span>
+              <label className="text-sm font-bold text-[#4B5563]">ایمیل</label>
+            </div>
+            <div className="flex h-12 items-center justify-between rounded-lg border border-[#D6DBDE] bg-[#F8FAF9] px-3 text-sm">
+              <button
+                type="button"
+                onClick={() => { setModal("email"); setMsg(null); }}
+                className="flex h-7 w-8 items-center justify-center rounded-md text-[#1889F2] hover:bg-black/5"
+              >
+                <Icon name="icons-20--edit-pen" className="h-5 w-5" alt="" />
+              </button>
+              <div className="flex items-center gap-2">
+                <span dir="ltr" className="font-bold text-[#4B5563] truncate max-w-[200px]">{user.email}</span>
+                <Icon name="icons-20--spam-email" className="h-5 w-5 opacity-70" alt="" />
+              </div>
+            </div>
+          </div>
+
+          {/* شماره شبا جهت بازگشت وجه */}
+          <div className="flex flex-col gap-2 md:col-span-2">
+            <div className="flex items-center justify-between">
+              <span className="rounded bg-[#0A5A55] px-1.5 py-0.5 text-[11px] font-bold text-white">بازگشت وجه</span>
+              <label className="text-sm font-bold text-[#4B5563]">شماره شبا جهت بازگشت وجه</label>
+            </div>
+            <div className="flex h-12 items-center justify-between rounded-lg border border-[#D6DBDE] bg-[#F8FAF9] px-3 text-sm">
+              <button
+                type="button"
+                onClick={() => { setModal("iban"); setMsg(null); }}
+                className="flex h-7 w-8 items-center justify-center rounded-md text-[#1889F2] hover:bg-black/5"
+              >
+                <Icon name="icons-20--edit-pen" className="h-5 w-5" alt="" />
+              </button>
+              <div className="flex items-center gap-2">
+                <span dir="ltr" className="font-bold text-[#4B5563]">{user.iban ?? "IR — — —"}</span>
+                <Icon name="icons-20--credit-card-accept" className="h-5 w-5 opacity-70" alt="" />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      {tab === "phone" && (
-        <div className="space-y-2 rounded-2xl border bg-white p-4">
-          <p className="text-sm font-bold">ویرایش شماره موبایل</p>
-          <input className={input} value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="۰۹…" inputMode="tel" dir="ltr" />
-          <button
-            disabled={pending}
-            className="h-10 w-full rounded-lg border text-sm disabled:opacity-50"
-            onClick={() => run(async () => {
-              const r = await authClient.phoneNumber.sendOtp({ phoneNumber: phone.trim() });
-              if (r.error) throw new Error("ارسال کد ناموفق بود");
-              setMsg(`کد به ${toFa(phone.trim())} ارسال شد`);
-            })}
-          >
-            ارسال کد
-          </button>
-          <input className={input} value={phoneCode} onChange={(e) => setPhoneCode(e.target.value)} placeholder="کد تایید" dir="ltr" inputMode="numeric" />
-          <button
-            disabled={pending}
-            className="h-10 w-full rounded-lg bg-(--color-brand) text-sm font-bold text-white disabled:opacity-50"
-            onClick={() => run(async () => {
-              const r = await authClient.phoneNumber.verify({ phoneNumber: phone.trim(), code: phoneCode.trim(), updatePhoneNumber: true });
-              if (r.error) throw new Error("کد اشتباه است");
-              setMsg("شماره تایید شد");
-              setTab("main");
-            })}
-          >
-            تایید
-          </button>
-          {msg && <p className="text-xs">{msg}</p>}
-        </div>
-      )}
+      {/* مودال‌های تعاملی اطلاعات حساب مطابق فریم‌های مودال فیگما */}
+      {modal && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-xs"
+        >
+          <div className="relative w-full max-w-[444px] rounded-[10px] border border-[#D6DBDE] bg-white p-6 shadow-2xl text-right space-y-4">
+            <div className="flex items-center justify-between border-b border-[#D6DBDE] pb-3">
+              <button
+                type="button"
+                onClick={() => setModal(null)}
+                className="text-lg font-bold text-[#8A9398] hover:text-[#161B22]"
+              >
+                ✕
+              </button>
+              <h2 className="text-base font-extrabold text-[#161B22]">
+                {modal === "phone" && "ویرایش شماره موبایل"}
+                {modal === "email" && "ویرایش آدرس ایمیل"}
+                {modal === "password" && "تغییر رمز عبور"}
+                {modal === "iban" && "ثبت شماره شبا"}
+              </h2>
+            </div>
 
-      {tab === "email" && (
-        <div className="space-y-2 rounded-2xl border bg-white p-4">
-          <p className="text-sm font-bold">ویرایش ایمیل</p>
-          <input className={input} value={email} onChange={(e) => setEmail(e.target.value)} placeholder="ایمیل جدید" dir="ltr" />
-          <button
-            disabled={pending}
-            className="h-10 w-full rounded-lg border text-sm disabled:opacity-50"
-            onClick={() => run(async () => {
-              const r = await authClient.emailOtp.sendVerificationOtp({ email: email.trim(), type: "change-email" });
-              if (r.error) throw new Error("ارسال کد ناموفق بود");
-              setMsg("کد به ایمیل جدید ارسال شد");
-            })}
-          >
-            ارسال کد
-          </button>
-          <input className={input} value={emailCode} onChange={(e) => setEmailCode(e.target.value)} placeholder="کد تایید" dir="ltr" inputMode="numeric" />
-          <button
-            disabled={pending}
-            className="h-10 w-full rounded-lg bg-(--color-brand) text-sm font-bold text-white disabled:opacity-50"
-            onClick={() => run(async () => {
-              const r = await authClient.emailOtp.verifyEmail({ email: email.trim(), otp: emailCode.trim() });
-              if (r.error) throw new Error("کد اشتباه است");
-              setMsg("ایمیل تایید شد");
-              setTab("main");
-            })}
-          >
-            تایید
-          </button>
-          {msg && <p className="text-xs">{msg}</p>}
-        </div>
-      )}
+            {modal === "phone" && (
+              <div className="space-y-3">
+                <label className="block text-xs font-bold text-[#4B5563]">شماره موبایل جدید</label>
+                <input
+                  type="tel"
+                  dir="ltr"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="۰۹..."
+                  className="h-11 w-full rounded-lg border border-[#D6DBDE] bg-[#F8FAF9] px-3 text-sm text-right focus:outline-none focus:border-[#0A5A55]"
+                />
+                <button
+                  type="button"
+                  disabled={pending}
+                  onClick={() => run(async () => {
+                    const r = await authClient.phoneNumber.sendOtp({ phoneNumber: phone.trim() });
+                    if (r.error) throw new Error("ارسال کد پیامکی ناموفق بود");
+                    setMsg(`کد تایید به ${toFa(phone.trim())} ارسال شد.`);
+                  })}
+                  className="w-full rounded-lg border border-[#D6DBDE] py-2 text-xs font-bold text-[#4B5563] hover:bg-[#F8FAF9]"
+                >
+                  ارسال کد تایید
+                </button>
+                <input
+                  type="text"
+                  dir="ltr"
+                  value={phoneCode}
+                  onChange={(e) => setPhoneCode(e.target.value)}
+                  placeholder="کد تایید ۴ یا ۶ رقمی"
+                  className="h-11 w-full rounded-lg border border-[#D6DBDE] bg-[#F8FAF9] px-3 text-sm text-center focus:outline-none focus:border-[#0A5A55]"
+                />
+                <button
+                  type="button"
+                  disabled={pending}
+                  onClick={() => run(async () => {
+                    const r = await authClient.phoneNumber.verify({ phoneNumber: phone.trim(), code: phoneCode.trim(), updatePhoneNumber: true });
+                    if (r.error) throw new Error("کد واردشده اشتباه است");
+                    setModal(null);
+                  })}
+                  className="w-full rounded-lg bg-[#0A5A55] py-3 text-sm font-extrabold text-white transition hover:bg-[#084844]"
+                >
+                  تایید و ذخیره
+                </button>
+              </div>
+            )}
 
-      {tab === "password" && (
-        <div className="space-y-2 rounded-2xl border bg-white p-4">
-          <p className="text-sm font-bold">تغییر رمز عبور</p>
-          <input type="password" className={input} value={current} onChange={(e) => setCurrent(e.target.value)} placeholder="رمز فعلی" autoComplete="current-password" />
-          <input type="password" className={input} value={p1} onChange={(e) => setP1(e.target.value)} placeholder="رمز جدید (حداقل ۸ حرف)" autoComplete="new-password" />
-          <input type="password" className={input} value={p2} onChange={(e) => setP2(e.target.value)} placeholder="تکرار رمز جدید" autoComplete="new-password" />
-          {msg && <p className="text-xs text-(--color-wine)">{msg}</p>}
-          <button
-            disabled={pending}
-            className="h-10 w-full rounded-lg bg-(--color-brand) text-sm font-bold text-white disabled:opacity-50"
-            onClick={() => {
-              if (p1.length < 8) return setMsg("رمز عبور شما باید حداقل ۸ حرف باشد.");
-              if (p1 !== p2) return setMsg("رمز عبور خود را به درستی تکرار بکنید!");
-              run(async () => {
-                const r = await authClient.changePassword({ currentPassword: current, newPassword: p1 });
-                if (r.error) throw new Error("رمز فعلی اشتباه است");
-                setMsg("رمز با موفقیت ویرایش شد");
-                setTab("main");
-              });
-            }}
-          >
-            ثبت
-          </button>
-        </div>
-      )}
+            {modal === "email" && (
+              <div className="space-y-3">
+                <label className="block text-xs font-bold text-[#4B5563]">آدرس ایمیل جدید</label>
+                <input
+                  type="email"
+                  dir="ltr"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="name@domain.com"
+                  className="h-11 w-full rounded-lg border border-[#D6DBDE] bg-[#F8FAF9] px-3 text-sm text-right focus:outline-none focus:border-[#0A5A55]"
+                />
+                <button
+                  type="button"
+                  disabled={pending}
+                  onClick={() => run(async () => {
+                    const r = await authClient.emailOtp.sendVerificationOtp({ email: email.trim(), type: "change-email" });
+                    if (r.error) throw new Error("ارسال کد به ایمیل ناموفق بود");
+                    setMsg("کد تایید به ایمیل جدید ارسال شد.");
+                  })}
+                  className="w-full rounded-lg border border-[#D6DBDE] py-2 text-xs font-bold text-[#4B5563] hover:bg-[#F8FAF9]"
+                >
+                  ارسال کد تایید ایمیل
+                </button>
+                <input
+                  type="text"
+                  dir="ltr"
+                  value={emailCode}
+                  onChange={(e) => setEmailCode(e.target.value)}
+                  placeholder="کد تایید"
+                  className="h-11 w-full rounded-lg border border-[#D6DBDE] bg-[#F8FAF9] px-3 text-sm text-center focus:outline-none focus:border-[#0A5A55]"
+                />
+                <button
+                  type="button"
+                  disabled={pending}
+                  onClick={() => run(async () => {
+                    const r = await authClient.emailOtp.verifyEmail({ email: email.trim(), otp: emailCode.trim() });
+                    if (r.error) throw new Error("کد ایمیل اشتباه است");
+                    setModal(null);
+                  })}
+                  className="w-full rounded-lg bg-[#0A5A55] py-3 text-sm font-extrabold text-white transition hover:bg-[#084844]"
+                >
+                  تایید و جایگزینی ایمیل
+                </button>
+              </div>
+            )}
 
-      {tab === "iban" && (
-        <div className="space-y-2 rounded-2xl border bg-white p-4">
-          <p className="text-sm font-bold">حساب برای بازگشت وجه</p>
-          <p className="text-xs text-(--color-muted-fg)">شبا (IR + ۲۴ رقم) برای واریز مرجوعی.</p>
-          <input className={input} value={iban} onChange={(e) => setIban(e.target.value)} placeholder="IR…" dir="ltr" maxLength={30} />
-          {msg && <p className="text-xs">{msg}</p>}
-          <button
-            disabled={pending}
-            className="h-10 w-full rounded-lg bg-(--color-brand) text-sm font-bold text-white disabled:opacity-50"
-            onClick={() => run(async () => {
-              const r = await saveWalletIban(iban);
-              if (!r.ok) throw new Error(r.error);
-              setMsg("شبا ثبت شد");
-              setTab("main");
-            })}
-          >
-            ثبت شبا
-          </button>
+            {modal === "password" && (
+              <div className="space-y-3">
+                <label className="block text-xs font-bold text-[#4B5563]">رمز عبور فعلی</label>
+                <input
+                  type="password"
+                  value={currentPass}
+                  onChange={(e) => setCurrentPass(e.target.value)}
+                  className="h-11 w-full rounded-lg border border-[#D6DBDE] bg-[#F8FAF9] px-3 text-sm text-right focus:outline-none focus:border-[#0A5A55]"
+                />
+                <label className="block text-xs font-bold text-[#4B5563]">رمز عبور جدید (حداقل ۸ حرف)</label>
+                <input
+                  type="password"
+                  value={newPass}
+                  onChange={(e) => setNewPass(e.target.value)}
+                  className="h-11 w-full rounded-lg border border-[#D6DBDE] bg-[#F8FAF9] px-3 text-sm text-right focus:outline-none focus:border-[#0A5A55]"
+                />
+                <label className="block text-xs font-bold text-[#4B5563]">تکرار رمز عبور جدید</label>
+                <input
+                  type="password"
+                  value={repeatPass}
+                  onChange={(e) => setRepeatPass(e.target.value)}
+                  className="h-11 w-full rounded-lg border border-[#D6DBDE] bg-[#F8FAF9] px-3 text-sm text-right focus:outline-none focus:border-[#0A5A55]"
+                />
+                <button
+                  type="button"
+                  disabled={pending}
+                  onClick={() => {
+                    if (newPass.length < 8) return setMsg("رمز عبور جدید باید حداقل ۸ کاراکتر باشد.");
+                    if (newPass !== repeatPass) return setMsg("تکرار رمز عبور جدید مطابقت ندارد.");
+                    run(async () => {
+                      const r = await authClient.changePassword({ currentPassword: currentPass, newPassword: newPass });
+                      if (r.error) throw new Error("رمز عبور فعلی نامعتبر است");
+                      setModal(null);
+                    });
+                  }}
+                  className="w-full rounded-lg bg-[#0A5A55] py-3 text-sm font-extrabold text-white transition hover:bg-[#084844]"
+                >
+                  ثبت رمز عبور جدید
+                </button>
+              </div>
+            )}
+
+            {modal === "iban" && (
+              <div className="space-y-3">
+                <label className="block text-xs font-bold text-[#4B5563]">شماره شبا (IR + ۲۴ رقم)</label>
+                <input
+                  type="text"
+                  dir="ltr"
+                  value={iban}
+                  onChange={(e) => setIban(e.target.value)}
+                  placeholder="IR..."
+                  className="h-11 w-full rounded-lg border border-[#D6DBDE] bg-[#F8FAF9] px-3 text-sm font-mono focus:outline-none focus:border-[#0A5A55]"
+                />
+                <p className="text-[11px] text-[#8A9398]">در صورت مرجوعی، مبالغ بازگشتی به این شبا واریز خواهد شد.</p>
+                <button
+                  type="button"
+                  disabled={pending}
+                  onClick={() => run(async () => {
+                    const r = await saveWalletIban(iban);
+                    if (!r.ok) throw new Error(r.error);
+                    setModal(null);
+                  })}
+                  className="w-full rounded-lg bg-[#0A5A55] py-3 text-sm font-extrabold text-white transition hover:bg-[#084844]"
+                >
+                  ثبت و تأیید شبا
+                </button>
+              </div>
+            )}
+
+            {msg && <p role="alert" className="text-xs font-bold text-[#9F1239] text-center">{msg}</p>}
+          </div>
         </div>
       )}
     </div>
