@@ -1,0 +1,15 @@
+<svg width="283" height="208" viewBox="0 0 283 208" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="glow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(240 0) rotate(90) scale(160 200)">
+      <stop stop-color="#0A5A55" stop-opacity="0.12"/>
+      <stop offset="0.6" stop-color="#0A5A55" stop-opacity="0.04"/>
+      <stop offset="1" stop-color="#0A5A55" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="grid" width="22.85" height="22.85" patternUnits="userSpaceOnUse">
+      <path d="M 22.85 0 L 0 0 0 22.85" fill="none" stroke="rgba(6,11,37,0.035)" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="283" height="208" rx="10" fill="#FFFFFF"/>
+  <rect width="283" height="208" rx="10" fill="url(#grid)" opacity="0.8"/>
+  <rect width="283" height="208" rx="10" fill="url(#glow)"/>
+</svg>

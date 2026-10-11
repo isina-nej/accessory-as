@@ -5,10 +5,10 @@ import { Footer } from "@/components/shop/Footer";
 import { Header } from "@/components/shop/Header";
 import { AccountSidebar } from "@/components/shop/AccountSidebar";
 import { OrderCard } from "@/components/shop/OrderCard";
+import { OrderSummaryCards } from "@/components/shop/OrderSummaryCards";
 import { Icon } from "@/components/ui/Icon";
 import { getDashboard } from "@/lib/account-actions";
 import { getMegaMenu } from "@/lib/menu";
-import { toFa } from "@/lib/fa";
 import { getSessionUser } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
@@ -39,58 +39,11 @@ export default async function AccountPage() {
           {/* پنل جزئیات سمت چپ (در RTL) */}
           <section aria-label="خلاصه حساب کاربری" className="w-full lg:w-[927px] rounded-[10px] border border-[#D6DBDE] bg-white p-6 space-y-4">
             {/* ۳ کارت خلاصه وضعیت سفارش‌ها */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full">
-              {/* کارت ۱ (در راست RTL): سفارش‌های فعال - تم سبز تیره */}
-              <div className="relative flex h-[207px] flex-col justify-between overflow-hidden rounded-[10px] border border-[#D6DBDE] bg-white p-6 text-right">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src="/images/dashboard/card-active-bg.png"
-                  alt=""
-                  className="pointer-events-none absolute inset-0 h-full w-full object-cover"
-                />
-                <div className="relative z-10 flex flex-col items-end gap-2 text-right">
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-[40px] font-bold leading-none text-[#0A5A55]">{toFa(dash?.active ?? 0)}</span>
-                    <span className="text-[20px] font-extrabold text-[#161B22]">سفارش</span>
-                  </div>
-                  <p className="text-sm font-medium text-[#4B5563]">سفارش های فعال</p>
-                </div>
-              </div>
-
-              {/* کارت ۲ (در وسط RTL): سفارش‌های تحویل داده شده - تم آبی */}
-              <div className="relative flex h-[207px] flex-col justify-between overflow-hidden rounded-[10px] border border-[#D6DBDE] bg-white p-6 text-right">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src="/images/dashboard/card-delivered-bg.png"
-                  alt=""
-                  className="pointer-events-none absolute inset-0 h-full w-full object-cover"
-                />
-                <div className="relative z-10 flex flex-col items-end gap-2 text-right">
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-[40px] font-bold leading-none text-[#1889F2]">{toFa(dash?.delivered ?? 0)}</span>
-                    <span className="text-[20px] font-extrabold text-[#161B22]">سفارش</span>
-                  </div>
-                  <p className="text-sm font-medium text-[#4B5563]">سفارش های تحویل داده شده</p>
-                </div>
-              </div>
-
-              {/* کارت ۳ (در چپ RTL): سفارش‌های مرجوع شده - تم قرمز شرابی */}
-              <div className="relative flex h-[207px] flex-col justify-between overflow-hidden rounded-[10px] border border-[#D6DBDE] bg-white p-6 text-right">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src="/images/dashboard/card-refunded-bg.png"
-                  alt=""
-                  className="pointer-events-none absolute inset-0 h-full w-full object-cover"
-                />
-                <div className="relative z-10 flex flex-col items-end gap-2 text-right">
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-[40px] font-bold leading-none text-[#9F1239]">{toFa(dash?.refunded ?? 0)}</span>
-                    <span className="text-[20px] font-extrabold text-[#161B22]">سفارش</span>
-                  </div>
-                  <p className="text-sm font-medium text-[#4B5563]">سفارش های مرجوع شده</p>
-                </div>
-              </div>
-            </div>
+            <OrderSummaryCards
+              activeCount={dash?.active}
+              deliveredCount={dash?.delivered}
+              refundedCount={dash?.refunded}
+            />
 
             {/* بخش لیست سفارشات */}
             <div className="w-full rounded-[10px] border border-[#D6DBDE] bg-white p-6 space-y-6">
