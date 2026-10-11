@@ -35,7 +35,7 @@ export default async function AccountPage() {
         </div>
 
         {/* بدنه دو ستونه: راست سایدبار ۳۲۹px، چپ پنل جزئیات ۹۲۷px */}
-        <div className="flex flex-col-reverse lg:flex-row justify-end items-start gap-6">
+        <div className="flex flex-col-reverse items-start justify-end gap-6 lg:flex-row-reverse">
           {/* پنل جزئیات سمت چپ (در RTL) */}
           <section aria-label="خلاصه حساب کاربری" className="w-full lg:w-[927px] rounded-[10px] border border-[#D6DBDE] bg-white p-6 space-y-4">
             {/* ۳ کارت خلاصه وضعیت سفارش‌ها */}

@@ -41,7 +41,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
           />
         </div>
 
-        <div className="flex flex-col-reverse lg:flex-row justify-end items-start gap-6">
+        <div className="flex flex-col-reverse items-start justify-end gap-6 lg:flex-row-reverse">
           {/* پنل جزئیات سفارش ۹۲۷px */}
           <section aria-label="جزئیات سفارش" className="w-full lg:w-[927px] rounded-[10px] border border-[#D6DBDE] bg-white p-6 space-y-6">
             {/* سربرگ جزئیات سفارش با دکمه بازگشت و فاکتور */}

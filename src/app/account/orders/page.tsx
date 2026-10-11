@@ -47,7 +47,7 @@ export default async function OrdersPage({
           />
         </div>
 
-        <div className="flex flex-col-reverse lg:flex-row justify-end items-start gap-6">
+        <div className="flex flex-col-reverse items-start justify-end gap-6 lg:flex-row-reverse">
           {/* پنل سفارش‌ها سمت چپ ۹۲۷px */}
           <section aria-label="لیست سفارش‌ها" className="w-full lg:w-[927px] rounded-[10px] border border-[#D6DBDE] bg-white p-6 space-y-6">
             <div className="flex flex-col gap-4 border-b border-[#D6DBDE] pb-4">
