@@ -37,7 +37,7 @@ export function AccountInfo({ user }: { user: { name: string; email: string; pho
   }
 
   return (
-    <div className="w-full space-y-6">
+    <div className="min-w-0 w-full space-y-6">
       <div className="rounded-[10px] border border-[#D6DBDE] bg-white p-6 space-y-6 text-right">
         <h1 className="text-[20px] font-extrabold text-[#161B22]">اطلاعـات حساب کاربـری</h1>
 

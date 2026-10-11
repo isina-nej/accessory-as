@@ -21,7 +21,7 @@ export function AccountSidebar({
   phone: string;
 }) {
   return (
-    <aside className="h-fit w-full lg:w-[329px] shrink-0 rounded-[10px] border border-[#D6DBDE] bg-white p-6">
+    <aside className="h-fit w-full shrink-0 rounded-[10px] border border-[#D6DBDE] bg-white p-6 lg:w-[329px]">
       {/* پروفایل کاربر */}
       <div className="flex items-center justify-between border-b border-[#D6DBDE] pb-6">
         <div className="text-right">

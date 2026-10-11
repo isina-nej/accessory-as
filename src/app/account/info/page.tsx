@@ -17,9 +17,9 @@ export default async function InfoPage() {
   return (
     <div className="flex min-h-full flex-1 flex-col bg-(--color-mist)">
       <Header menu={menu} />
-      <main className="mx-auto w-full max-w-7xl flex-1 space-y-4 px-4 py-6">
+      <main className="mx-auto w-full max-w-[1440px] flex-1 space-y-4 px-4 py-6 sm:px-8 lg:px-20">
         <Breadcrumb trail={[{ href: "/", label: "اکسسوری آس" }, { href: "/account", label: "پروفایل کاربری" }, { label: "اطلاعات حساب" }]} />
-        <div className="grid gap-4 lg:grid-cols-[280px_1fr]">
+        <div className="grid min-w-0 items-start gap-6 lg:grid-cols-[329px_minmax(0,1fr)]">
           <AccountSidebar active="/account/info" name={user.name ?? "کاربر"} phone={user.email ?? ""} />
           <AccountInfo user={{ name: user.name ?? "کاربر", email: user.email ?? "" }} />
         </div>
