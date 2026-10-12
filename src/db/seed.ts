@@ -37,11 +37,31 @@ type P = {
   slug: string; title: string; cat: string; price: number;
   old?: number; off?: number; stock: number; sku: string;
   colors: string[]; sizes: string[]; img: string;
+  images?: string[];
 };
 
 // بازه فیلتر فیگما: ۲۵۰هزار تا ۲۵میلیون — عکس از public/images (فیگما)
 const PRODUCTS: P[] = [
-  { slug: "full-nagin-ring", title: "انگشتر فول نگین زنانه", cat: "ring", price: 4250000, old: 5312500, off: 20, stock: 12, sku: "WC009", colors: ["نقره‌ای", "طلایی"], sizes: ["20", "21", "22", "23", "24", "25"], img: "/images/product-01.webp" },
+  {
+    slug: "full-nagin-ring",
+    title: "انگشتر فول نگین زنانه",
+    cat: "ring",
+    price: 4250000,
+    old: 5312500,
+    off: 20,
+    stock: 12,
+    sku: "WC009",
+    colors: ["نقره‌ای", "طلایی"],
+    sizes: ["20", "21", "22", "23", "24", "25"],
+    img: "/images/product-01.webp",
+    images: [
+      "/images/product-details/product-main-ring.png",
+      "/images/product-details/product-thumb-ring-plain.png",
+      "/images/product-details/product-thumb-necklace.png",
+      "/images/product-details/product-thumb-earring.png",
+      "/images/product-details/product-thumb-bracelet.png",
+    ],
+  },
   { slug: "minimal-steel-ring", title: "انگشتر مینیمال استیل", cat: "ring", price: 1250000, stock: 30, sku: "WC011", colors: ["نقره‌ای"], sizes: ["20", "21", "22", "23", "24"], img: "/images/product-02.webp" },
   { slug: "gold-plated-ring", title: "انگشتر آبکاری طلا", cat: "ring", price: 2980000, old: 3500000, off: 15, stock: 0, sku: "WC012", colors: ["طلایی"], sizes: ["21", "22", "23"], img: "/images/product-03.webp" },
   { slug: "full-nagin-necklace", title: "گردنبند فول نگین زنانه", cat: "necklace", price: 5250000, old: 6562500, off: 20, stock: 5, sku: "WN007", colors: ["طلایی", "نقره‌ای"], sizes: [], img: "/images/product-04.webp" },
@@ -116,8 +136,11 @@ async function main() {
       });
     const [row] = await db.select().from(products).where(eq(products.slug, p.slug)).limit(1);
     if (!row) continue;
-    const [img] = await db.select().from(productImages).where(eq(productImages.productId, row.id)).limit(1);
-    if (!img) await db.insert(productImages).values({ productId: row.id, url: p.img, sort: 0 });
+    await db.delete(productImages).where(eq(productImages.productId, row.id));
+    const imgList = p.images && p.images.length > 0 ? p.images : [p.img];
+    for (let i = 0; i < imgList.length; i++) {
+      await db.insert(productImages).values({ productId: row.id, url: imgList[i], sort: i });
+    }
     await db.delete(productAttributes).where(eq(productAttributes.productId, row.id));
     const links: { productId: string; attributeId: string }[] = [];
     for (const c of p.colors) {

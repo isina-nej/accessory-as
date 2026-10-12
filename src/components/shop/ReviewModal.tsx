@@ -4,14 +4,24 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ReviewForm } from "./ReviewForm";
 
-export function ReviewModal({ slug }: { slug: string }) {
+export function ReviewModal({ slug, trigger }: { slug: string; trigger?: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   const router = useRouter();
   return (
     <>
-      <button onClick={() => setOpen(true)} className="rounded-lg border px-4 py-2 text-sm">
-        ثبت دیدگاه
-      </button>
+      {trigger ? (
+        <span onClick={() => setOpen(true)} className="inline-block cursor-pointer">
+          {trigger}
+        </span>
+      ) : (
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          className="rounded-lg border px-4 py-2 text-sm hover:bg-gray-50 transition-colors"
+        >
+          ثبت دیدگاه
+        </button>
+      )}
       {open && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
@@ -28,7 +38,11 @@ export function ReviewModal({ slug }: { slug: string }) {
                 router.refresh();
               }}
             />
-            <button onClick={() => setOpen(false)} className="mt-2 w-full text-center text-sm text-white">
+            <button
+              type="button"
+              onClick={() => setOpen(false)}
+              className="mt-2 w-full text-center text-sm text-white hover:underline py-1"
+            >
               بستن
             </button>
           </div>
