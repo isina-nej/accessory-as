@@ -139,7 +139,7 @@ export function ProductTabs({
     <div className="w-full flex flex-col gap-4 mt-6 text-right">
       {/* Tab Switcher Bar */}
       <div
-        className="box-border w-full h-[52px] bg-[#F8FAF9] border border-[#D6DBDE] rounded-[10px] p-[6px] flex flex-row items-center gap-1"
+        className="box-border flex h-[48px] w-full flex-row items-center gap-1 rounded-[10px] border border-[#D6DBDE] bg-[#F8FAF9] p-1.5 sm:h-[52px]"
         role="tablist"
         aria-label="اطلاعات محصول"
       >
@@ -148,7 +148,7 @@ export function ProductTabs({
           role="tab"
           aria-selected={activeTab === "specs"}
           onClick={() => setActiveTab("specs")}
-          className={`flex-1 h-[40px] flex items-center justify-center rounded-[8px] text-sm font-extrabold transition-all focus-visible:outline-2 focus-visible:outline-[#0A5A55] ${
+          className={`flex h-9 flex-1 items-center justify-center rounded-[8px] text-xs font-extrabold transition-all focus-visible:outline-2 focus-visible:outline-[#0A5A55] sm:h-10 sm:text-sm ${
             activeTab === "specs"
               ? "bg-white border border-[#D6DBDE] shadow-[0px_4px_12px_rgba(0,0,0,0.04)] text-[#161B22]"
               : "text-[#161B22] hover:text-[#0A5A55]"
@@ -162,7 +162,7 @@ export function ProductTabs({
           role="tab"
           aria-selected={activeTab === "reviews"}
           onClick={() => setActiveTab("reviews")}
-          className={`flex-1 h-[40px] flex items-center justify-center rounded-[8px] text-sm font-extrabold transition-all focus-visible:outline-2 focus-visible:outline-[#0A5A55] ${
+          className={`flex h-9 flex-1 items-center justify-center rounded-[8px] text-xs font-extrabold transition-all focus-visible:outline-2 focus-visible:outline-[#0A5A55] sm:h-10 sm:text-sm ${
             activeTab === "reviews"
               ? "bg-white border border-[#D6DBDE] shadow-[0px_4px_12px_rgba(0,0,0,0.04)] text-[#161B22]"
               : "text-[#161B22] hover:text-[#0A5A55]"

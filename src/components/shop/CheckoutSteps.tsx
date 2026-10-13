@@ -5,7 +5,7 @@ const STEPS = ["سبد خرید", "آدرس شما", "روش ارسال", "پر�
 
 export function CheckoutSteps({ step }: { step: number }) {
   return (
-    <ol className="flex items-center gap-1 text-xs md:gap-2 md:text-sm">
+    <ol className="flex items-center gap-1 overflow-x-auto text-[11px] md:gap-2 md:text-sm scrollbar-none"> OUT
       {STEPS.map((s, i) => {
         const n = i + 1;
         const active = n === step;

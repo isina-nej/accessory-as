@@ -1,6 +1,6 @@
 import { writeFile, mkdir } from "node:fs/promises";
 import { join } from "node:path";
-import { requireStaff } from "./staff";
+import { requirePermission } from "./staff";
 
 const ALLOWED = new Map([
   ["image/jpeg", "jpg"],
@@ -10,7 +10,7 @@ const ALLOWED = new Map([
 
 // ponytail: لوکال public/uploads — روی ورسل موقت است؛ CDN بعداً
 export async function uploadProductImage(form: FormData): Promise<{ ok: true; url: string } | { ok: false; error: string }> {
-  const gate = await requireStaff();
+  const gate = await requirePermission("products.write");
   if (!gate.ok) return gate;
   const f = form.get("file");
   if (!(f instanceof File)) return { ok: false, error: "فایل نفرستادی" };

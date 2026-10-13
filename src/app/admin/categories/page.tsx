@@ -1,37 +1,35 @@
 import { redirect } from "next/navigation";
-import { Footer } from "@/components/shop/Footer";
-import { Header } from "@/components/shop/Header";
-import { AdminShell } from "@/components/admin/Shell";
-import { AdminCard, AdminTable } from "@/components/admin/ui";
+import { AdminCard, AdminEmpty, AdminTable } from "@/components/admin/ui";
+import { AdminPage } from "@/components/admin/Shell";
 import { CatNew, CatRow } from "@/components/admin/CatForms";
 import { listAdminCats } from "@/server/admin-products";
-import { getMegaMenu } from "@/lib/menu";
-import { getMyRoles, isStaff } from "@/lib/staff";
+import { requirePermission } from "@/lib/staff";
+import { toFa } from "@/lib/fa";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "دسته‌ها | پنل" };
 
 export default async function AdminCats() {
-  const menu = await getMegaMenu().catch(() => ({ cats: [], byCat: {} }));
-  if (!(await isStaff())) redirect("/login?next=/admin/categories");
-  const roles = await getMyRoles();
+  const gate = await requirePermission("categories.read");
+  if (!gate.ok) redirect("/login?next=/admin/categories");
   const cats = await listAdminCats();
+  const titleById = new Map(cats.map((c) => [c.id, c.title]));
   return (
-    <div className="flex min-h-full flex-1 flex-col bg-(--color-mist)">
-      <Header menu={menu} />
-      <main className="flex-1">
-        <AdminShell active="/admin/categories" roles={roles}>
-          <AdminCard title="دسته جدید"><CatNew /></AdminCard>
-          <AdminCard title={`دسته‌ها (${cats.length})`}>
-            <AdminTable head={["دسته", "ویرایش", ""]}>
-              {cats.map((c) => (
-                <CatRow key={c.id} id={c.id} title={c.title} slug={c.slug} count={c.count} />
-              ))}
-            </AdminTable>
-          </AdminCard>
-        </AdminShell>
-      </main>
-      <Footer />
-    </div>
+    <AdminPage active="/admin/categories" roles={gate.roles}>
+      <AdminCard title="دسته جدید">
+        <CatNew cats={cats} />
+      </AdminCard>
+      <AdminCard title={`دسته‌ها (${toFa(cats.length)})`}>
+        {cats.length === 0 ? (
+          <AdminEmpty text="هنوز دسته‌ای ثبت نشده است." />
+        ) : (
+          <AdminTable head={["دسته", "ویرایش", ""]}>
+            {cats.map((c) => (
+              <CatRow key={c.id} cat={c} parentTitle={c.parentId ? titleById.get(c.parentId) ?? null : null} cats={cats} />
+            ))}
+          </AdminTable>
+        )}
+      </AdminCard>
+    </AdminPage>
   );
 }

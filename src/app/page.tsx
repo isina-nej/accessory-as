@@ -323,7 +323,7 @@ export default async function LandingPage() {
           />
         </div>
 
-        <div className="relative mx-auto w-full max-w-[1280px] px-4 md:px-0 pt-6 pb-12">
+        <div className="relative mx-auto w-full max-w-[1280px] px-3 pt-5 pb-10 sm:px-4 sm:pt-6 sm:pb-12 md:px-0">
           {/* تیتر هیرو: خوشنویسی اختصاصی، گیومه تکی سمت چپ، تگ اکسسوری آس سمت راست */}
           <div className="relative z-10 flex items-center justify-center pt-6 md:pt-10 pb-2 md:pb-4">
             <div className="relative inline-flex items-center justify-center">
@@ -358,9 +358,9 @@ export default async function LandingPage() {
           </div>
 
           {/* دو کارت هیرو در RTL: راست کارت معرفی و فیچرها (520px)، چپ بنر فروش ویژه (736px) */}
-          <div className="mt-6 md:mt-8 grid gap-6 grid-cols-1 lg:grid-cols-[minmax(0,500px)_1fr] xl:grid-cols-[520px_1fr] items-stretch lg:items-end">
+          <div className="mt-5 grid gap-4 sm:mt-6 sm:gap-6 md:mt-8 lg:grid-cols-[minmax(0,500px)_1fr] xl:grid-cols-[520px_1fr] lg:items-end">
             {/* ۱. کارت معرفی و فیچرها (در RTL دسکتاپ ستون راست — 520px، در موبایل زیر بنر مطابق فیگما موبایل) */}
-            <div className="order-2 lg:order-1 flex flex-col justify-between rounded-3xl border border-black/10 bg-white p-5 sm:p-6 md:p-8 text-right shadow-sm lg:min-h-[389px]">
+            <div className="order-2 flex flex-col justify-between rounded-3xl border border-black/10 bg-white p-4 text-right shadow-sm sm:p-6 md:order-1 md:p-8 lg:min-h-[389px]">
               <div>
                 <p className="text-sm font-medium leading-7 text-[#161B22] md:text-base md:leading-8">
                   {bOfferSide?.subtitle ??
@@ -420,7 +420,7 @@ export default async function LandingPage() {
             </div>
 
             {/* ۲. بنر فروش ویژه متحرک و پویا با برش اختصاصی گوشه‌ها (Carved Notches) مطابق فیگما */}
-            <div className="order-1 lg:order-2 w-full flex justify-center">
+            <div className="order-1 flex w-full justify-center md:order-2">
               <HeroBannerSlider
                 slides={[
                   {
@@ -464,7 +464,7 @@ export default async function LandingPage() {
       </section>
 
       {/* ۲. دسته‌بندی محصولات (CATEGORIES) */}
-      <div className="mx-auto w-full max-w-[1280px] px-4 mt-12 sm:mt-16 md:mt-24">
+      <div className="mx-auto w-full max-w-[1280px] px-3 mt-10 sm:px-4 sm:mt-16 md:mt-24">
         <section className="relative text-center overflow-hidden">
           <p
             aria-hidden
@@ -518,7 +518,7 @@ export default async function LandingPage() {
       </div>
 
       {/* ۳. پیشنهاد شگفت‌انگیز */}
-      <div className="mx-auto w-full max-w-[1280px] px-4 my-10 sm:my-12 md:my-16">
+      <div className="mx-auto w-full max-w-[1280px] px-3 my-8 sm:px-4 sm:my-12 md:my-16">
         <section className="relative overflow-hidden rounded-3xl bg-[#02312E] bg-[url('/images/figma-landing/offers-bg.webp')] bg-cover bg-center p-4 sm:p-5 md:p-8 shadow-xl">
           <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(1,65,62,0.65)_0%,rgba(15,93,90,0.5)_51%,rgba(1,65,62,0.65)_100%)]" />
 
@@ -594,7 +594,7 @@ export default async function LandingPage() {
       </div>
 
       {/* ۴. دو بنر میانی */}
-      <div className="mx-auto w-full max-w-[1280px] px-4 my-8">
+      <div className="mx-auto w-full max-w-[1280px] px-3 my-8 sm:px-4">
         <section className="grid gap-6 grid-cols-1 md:grid-cols-2">
           {/* بنر سمت راست (تیره: بهترین گوشواره و دستبندها) */}
           <div className="relative min-h-[280px] sm:min-h-[320px] md:min-h-[362px] overflow-hidden rounded-[14px] bg-[#062e2b] shadow-sm flex flex-col justify-between p-6 md:p-8 text-right">
@@ -679,7 +679,7 @@ export default async function LandingPage() {
       </div>
 
       {/* ۵. محصولات جدید (New Products) */}
-      <div className="mx-auto w-full max-w-[1280px] px-4 my-10 md:my-14">
+      <div className="mx-auto w-full max-w-[1280px] px-3 my-8 sm:px-4 sm:my-10 md:my-14">
         <section>
           {/* هدر بخش: عنوان راست + مشاهده همه چپ */}
           <div className="flex items-center justify-between gap-4">
@@ -738,7 +738,7 @@ export default async function LandingPage() {
       </div>
 
       {/* ۶. بنر درخشش در هر نگاه */}
-      <div className="mx-auto w-full max-w-[1280px] px-4 my-10 md:my-14">
+      <div className="mx-auto w-full max-w-[1280px] px-3 my-8 sm:px-4 sm:my-10 md:my-14">
         <section className="relative overflow-hidden rounded-3xl bg-[#062e2b] bg-[url('/images/figma-landing/shine-bg.webp')] bg-cover bg-center min-h-[300px] md:min-h-[362px] p-6 md:p-12 shadow-xl">
           <div className="relative z-10 grid items-center gap-6 grid-cols-1 md:grid-cols-2">
             {/* ستون متن در سمت راست */}

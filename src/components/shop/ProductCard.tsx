@@ -19,7 +19,8 @@ export function ProductCard({ p, offer = false }: { p: ShopProduct; offer?: bool
   const [busy, setBusy] = useState(false);
   const href = `/products/${p.slug}`;
   return (
-    <article className={`flex h-[286px] min-w-0 flex-col gap-3 border-b border-l border-[#D6DBDE] p-3 text-right ${offer ? "bg-[#F8FAF9]" : "bg-white"}`}>
+    <article className={`group flex h-[270px] min-w-0 flex-col gap-2 border-b border-l border-[#D6DBDE] p-2.5 text-right transition-colors duration-200 hover:bg-[#FAFBFB] sm:h-[286px] sm:gap-3 sm:p-3 ${offer ? "bg-[#F8FAF9]" : "bg-white"}`}>
+
       <div className="flex h-[142px] shrink-0 flex-col gap-2">
         <div className="flex h-6 items-center justify-between">
           {p.discountPct ? (

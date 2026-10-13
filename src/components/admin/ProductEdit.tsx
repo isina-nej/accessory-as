@@ -3,10 +3,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { AdminForm } from "@/components/admin/Forms";
-import { Field, TextInput } from "@/components/admin/ui";
-import { inputCls } from "@/components/admin/ui";
-import { uploadAction as uploadProductImage } from "@/server/upload-actions";
-import { deleteProductImage, saveProduct, type ProductInput } from "@/server/admin-products";
+import { Field, TextInput, inputCls } from "@/components/admin/ui";
+import { uploadAction } from "@/server/upload-actions";
+import { addProductImage, deleteProductImage, moveProductImage, saveProduct, type ProductInput } from "@/server/admin-products";
 
 export function ProductEdit({
   id, initial, attrNames, colors, sizes, images,
@@ -19,7 +18,23 @@ export function ProductEdit({
   images: { id: string; url: string }[];
 }) {
   const router = useRouter();
-  const [imgMsg, setImgMsg] = useState<string | null>(null);
+  const [imgMsg, setImgMsg] = useState<{ ok: boolean; text: string } | null>(null);
+  const [imgBusy, setImgBusy] = useState(false);
+
+  const upload = async (productId: string, form: FormData) => {
+    setImgBusy(true);
+    setImgMsg(null);
+    const r = await uploadAction(form);
+    setImgBusy(false);
+    if (!r.ok) {
+      setImgMsg({ ok: false, text: r.error });
+      return;
+    }
+    const created = await addProductImage(productId, r.url);
+    setImgMsg(created.ok ? { ok: true, text: "تصویر اضافه شد." } : { ok: false, text: created.error });
+    if (created.ok) router.refresh();
+  };
+
   return (
     <div className="space-y-4">
       <AdminForm
@@ -56,16 +71,16 @@ export function ProductEdit({
             </Field>
             <Field label="SKU"><TextInput value={v.sku ?? ""} onChange={(x) => set({ sku: x || null })} maxLength={50} dir="ltr" /></Field>
             <Field label="رنگ‌ها (چندتایی)">
-              <select multiple value={v.colors} onChange={(e) => set({ colors: [...e.target.selectedOptions].map((o) => o.value) })} className={`${inputCls} h-24`}>
+              <select multiple value={v.colors} onChange={(e) => set({ colors: [...e.target.selectedOptions].map((o) => o.value) })} className={`${inputCls} h-24`} aria-label="رنگ‌ها">
                 {colors.map((c) => (<option key={c} value={c}>{c}</option>))}
               </select>
             </Field>
             <Field label="سایزها (چندتایی)">
-              <select multiple value={v.sizes} onChange={(e) => set({ sizes: [...e.target.selectedOptions].map((o) => o.value) })} className={`${inputCls} h-24`}>
+              <select multiple value={v.sizes} onChange={(e) => set({ sizes: [...e.target.selectedOptions].map((o) => o.value) })} className={`${inputCls} h-24`} aria-label="سایزها">
                 {sizes.map((s) => (<option key={s} value={s}>{s}</option>))}
               </select>
             </Field>
-            <Field label="لینک عکس (اختیاری — یا از آپلود زیر)">
+            <Field label="تصویر اصلی (لینک — یا از آپلود پایین)">
               <TextInput value={v.imageUrl ?? ""} onChange={(x) => set({ imageUrl: x || null })} maxLength={500} dir="ltr" placeholder="/uploads/… یا https://…" />
             </Field>
             <div className="md:col-span-2">
@@ -78,41 +93,79 @@ export function ProductEdit({
       </AdminForm>
       {id && (
         <div className="rounded-2xl border bg-white p-4">
-          <p className="mb-2 text-sm font-bold">عکس‌ها</p>
-          <div className="flex flex-wrap gap-2">
-            {images.map((im) => (
-              <span key={im.id} className="relative">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={im.url} alt="" className="h-20 w-20 rounded-lg border object-cover" />
-                <button
-                  className="absolute top-0 left-0 rounded bg-white/90 px-1 text-xs text-(--color-wine)"
-                  onClick={async () => {
-                    if (!confirm("حذف عکس؟")) return;
-                    await deleteProductImage(im.id, id);
-                    router.refresh();
-                  }}
-                >×</button>
-              </span>
-            ))}
-          </div>
+          <p className="mb-2 text-sm font-bold">عکس‌ها (به ترتیب نمایش)</p>
+          {images.length === 0 ? (
+            <p className="text-xs text-(--color-muted-fg)">هنوز عکسی برای این محصول ثبت نشده است.</p>
+          ) : (
+            <ul className="flex flex-wrap gap-2">
+              {images.map((im, index) => (
+                <li key={im.id} className="relative">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={im.url} alt="" className="h-20 w-20 rounded-lg border object-cover" />
+                  {index === 0 && <span className="absolute bottom-0 inset-x-0 rounded-b-lg bg-(--color-brand)/90 py-0.5 text-center text-[10px] text-white">اصلی</span>}
+                  <div className="absolute top-0 left-0 flex gap-0.5">
+                    <button
+                      type="button"
+                      className="rounded bg-white/90 px-1 text-xs disabled:opacity-40"
+                      disabled={index === 0}
+                      aria-label="انتقال به قبل"
+                      onClick={async () => {
+                        const r = await moveProductImage(im.id, id, -1);
+                        if (r.ok) router.refresh();
+                        else setImgMsg({ ok: false, text: r.error });
+                      }}
+                    >
+                      ›
+                    </button>
+                    <button
+                      type="button"
+                      className="rounded bg-white/90 px-1 text-xs disabled:opacity-40"
+                      disabled={index === images.length - 1}
+                      aria-label="انتقال به بعد"
+                      onClick={async () => {
+                        const r = await moveProductImage(im.id, id, 1);
+                        if (r.ok) router.refresh();
+                        else setImgMsg({ ok: false, text: r.error });
+                      }}
+                    >
+                      ‹
+                    </button>
+                    <button
+                      type="button"
+                      className="rounded bg-white/90 px-1 text-xs text-(--color-wine)"
+                      aria-label="حذف عکس"
+                      onClick={async () => {
+                        if (!confirm("این عکس حذف شود؟")) return;
+                        const r = await deleteProductImage(im.id, id);
+                        if (r.ok) router.refresh();
+                        else setImgMsg({ ok: false, text: r.error });
+                      }}
+                    >
+                      ×
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
           <form
-            className="mt-3 flex items-center gap-2"
-            onSubmit={async (e) => {
+            className="mt-3 flex flex-wrap items-center gap-2"
+            onSubmit={(e) => {
               e.preventDefault();
-              const f = new FormData(e.target as HTMLFormElement);
-              setImgMsg("…");
-              const r = await uploadProductImage(f);
-              setImgMsg(r.ok ? r.url : r.error);
-              if (r.ok) router.refresh();
+              const form = new FormData(e.target as HTMLFormElement);
+              form.set("productId", id);
+              void upload(id, form);
+              (e.target as HTMLFormElement).reset();
             }}
           >
             <input type="file" name="file" accept="image/jpeg,image/png,image/webp" className="text-sm" required />
-            <button className="rounded-lg bg-(--color-brand) px-3 py-1.5 text-sm text-white">آپلود</button>
-            {imgMsg && <span className="text-xs text-(--color-muted-fg)" dir="ltr">{imgMsg}</span>}
+            <button disabled={imgBusy} className="rounded-lg bg-(--color-brand) px-3 py-1.5 text-sm text-white disabled:opacity-50">
+              {imgBusy ? "در حال آپلود…" : "آپلود"}
+            </button>
+            {imgMsg && <span className={`text-xs ${imgMsg.ok ? "text-(--color-brand)" : "text-(--color-wine)"}`}>{imgMsg.text}</span>}
           </form>
         </div>
       )}
     </div>
   );
 }
-

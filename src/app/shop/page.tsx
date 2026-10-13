@@ -58,8 +58,8 @@ export default async function ShopPage({
         <Suspense fallback={<CardSkeleton />}>
           <OffersCarousel items={offers} endsAt={campaign?.active ? campaign.endsAt?.toISOString() : null} />
         </Suspense>
-        <div className="mt-8 grid items-start gap-6 lg:grid-cols-[330px_minmax(0,1fr)]">
-          <div className="order-2 min-w-0 space-y-6">
+        <div className="mt-6 grid items-start gap-4 pb-24 sm:mt-8 sm:gap-6 lg:grid-cols-[330px_minmax(0,1fr)] lg:pb-0">
+          <div className="order-2 min-w-0 space-y-4 sm:space-y-6">
             <SortBar q={q} total={total} base="/shop" />
             {dbError ? (
               <div className="rounded-[10px] border border-[#D6DBDE] bg-white p-10 text-center">

@@ -1,32 +1,30 @@
 import { redirect } from "next/navigation";
-import { Footer } from "@/components/shop/Footer";
-import { Header } from "@/components/shop/Header";
-import { AdminShell } from "@/components/admin/Shell";
 import { AdminCard } from "@/components/admin/ui";
-import { ProductNew } from "@/components/admin/ProductNew";
+import { AdminPage } from "@/components/admin/Shell";
+import { ProductEdit } from "@/components/admin/ProductEdit";
 import { listAdminCats, listAttrOptions } from "@/server/admin-products";
-import { getMegaMenu } from "@/lib/menu";
-import { getMyRoles, isStaff } from "@/lib/staff";
+import { requirePermission } from "@/lib/staff";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "محصول جدید | پنل" };
 
 export default async function ProductNewPage() {
-  const menu = await getMegaMenu().catch(() => ({ cats: [], byCat: {} }));
-  if (!(await isStaff())) redirect("/login?next=/admin/products/new");
-  const roles = await getMyRoles();
+  const gate = await requirePermission("products.write");
+  if (!gate.ok) redirect("/login?next=/admin/products/new");
   const [cats, opts] = await Promise.all([listAdminCats(), listAttrOptions()]);
+  const initial = {
+    title: "", slug: "", categoryId: null, priceToman: 0, oldPriceToman: null,
+    discountPct: null, stock: 0, status: "active" as const, sku: null, description: null,
+    colors: [] as string[], sizes: [] as string[], imageUrl: null,
+  };
   return (
-    <div className="flex min-h-full flex-1 flex-col bg-(--color-mist)">
-      <Header menu={menu} />
-      <main className="flex-1">
-        <AdminShell active="/admin/products" roles={roles}>
-          <AdminCard title="محصول جدید">
-            <ProductNew cats={cats} colors={opts.colors} sizes={opts.sizes} />
-          </AdminCard>
-        </AdminShell>
-      </main>
-      <Footer />
-    </div>
+    <AdminPage active="/admin/products" roles={gate.roles}>
+      <AdminCard title="محصول جدید">
+        <p className="mb-3 text-xs text-(--color-muted-fg)">
+          دسته‌ها: {cats.map((c) => c.title).join("، ") || "—"}
+        </p>
+        <ProductEdit id={null} initial={initial} attrNames={{ colors: [], sizes: [] }} colors={opts.colors} sizes={opts.sizes} images={[]} />
+      </AdminCard>
+    </AdminPage>
   );
 }

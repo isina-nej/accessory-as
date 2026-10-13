@@ -36,7 +36,7 @@ export function FiltersSidebar({ q, meta, base = "/shop" }: { q: ShopQuery; meta
   const price = (n: number) => toFa(n.toLocaleString("en-US"));
 
   return (
-    <aside aria-label="فیلترهای فروشگاه" className="rounded-[10px] border border-[#D6DBDE] bg-white p-5 lg:p-6">
+    <aside aria-label="فیلترهای فروشگاه" className="rounded-[10px] border border-[#D6DBDE] bg-white p-4 sm:p-5 lg:p-6">
       <button type="button" onClick={() => setOpen(!open)} aria-expanded={open} className="mb-4 flex w-full items-center justify-between font-bold text-[#01413E] lg:hidden">فیلترها <Icon name="icons-20--setting-filter" className="h-5 w-5" alt="" /></button>
       <div className={cn("lg:block", open ? "block" : "hidden")}>
       <div className="mb-8 flex items-center justify-between">

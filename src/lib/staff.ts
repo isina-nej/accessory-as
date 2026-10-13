@@ -3,10 +3,16 @@ import { db } from "@/db";
 import { staffRoles } from "@/db/schema";
 import { getSessionUser, getUserId } from "@/lib/session";
 
-import { ROLE_FA, STAFF_ROLES } from "./roles";
-import type { StaffRole } from "./roles";
-export { ROLE_FA, STAFF_ROLES };
-export type { StaffRole };
+import { hasStaffPermission, ROLE_FA, STAFF_ROLES } from "./roles";
+import type { AdminPermission, StaffRole } from "./roles";
+export { hasStaffPermission, ROLE_FA, STAFF_ROLES };
+export type { AdminPermission, StaffRole };
+
+export type StaffGate = { ok: true; userId: string; roles: StaffRole[] } | { ok: false; error: string };
+
+export function canAccess(roles: readonly StaffRole[], permission: AdminPermission): boolean {
+  return hasStaffPermission(roles, permission);
+}
 
 export async function getMyRoles(): Promise<StaffRole[]> {
   const uid = await getUserId();
@@ -14,25 +20,25 @@ export async function getMyRoles(): Promise<StaffRole[]> {
   try {
     const rows = await db.select().from(staffRoles).where(eq(staffRoles.userId, uid));
     return rows.map((r) => r.role as StaffRole).filter((r) => (STAFF_ROLES as string[]).includes(r));
-  } catch {
+  } catch (e) {
+    console.error("getMyRoles failed", e);
     return [];
   }
 }
 
-export async function isStaff(role?: StaffRole): Promise<boolean> {
-  const roles = await getMyRoles();
-  if (roles.length === 0) return false;
-  if (!role) return true;
-  if (roles.includes("admin")) return true;
-  return roles.includes(role);
-}
-
-export async function requireStaff(role?: StaffRole): Promise<{ ok: true; userId: string; roles: StaffRole[] } | { ok: false; error: string }> {
+export async function requirePermission(permission: AdminPermission): Promise<StaffGate> {
   const user = await getSessionUser();
   if (!user) return { ok: false, error: "وارد شو" };
   const roles = await getMyRoles();
-  if (roles.length === 0) return { ok: false, error: "دسترسی نداری" };
-  if (role && !roles.includes("admin") && !roles.includes(role)) return { ok: false, error: "دسترسی نداری" };
+  if (!canAccess(roles, permission)) return { ok: false, error: "دسترسی نداری" };
+  return { ok: true, userId: user.id, roles };
+}
+
+export async function requireAnyPermission(...permissions: AdminPermission[]): Promise<StaffGate> {
+  const user = await getSessionUser();
+  if (!user) return { ok: false, error: "وارد شو" };
+  const roles = await getMyRoles();
+  if (!permissions.some((permission) => canAccess(roles, permission))) return { ok: false, error: "دسترسی نداری" };
   return { ok: true, userId: user.id, roles };
 }
 

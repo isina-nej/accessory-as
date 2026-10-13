@@ -50,10 +50,10 @@ export function Footer({ settings }: { settings?: Record<string, string> }) {
     "فروشگاه اکسســوری آس با هدف ارائه مجموعه‌ ای از اکسسوری ‌های خاص، مدرن و با کیفیت فعالیت خود را آغاز کرده است. ما باور داریم که جزئیات، نقش مهمی در شکل‌گیری استایل و بیان شخصیت هر فرد دارند. به همین دلیل تلاش می‌کنیم با انتخاب محصولاتی متمایز و طراحی‌ هایی چشم‌ نواز، تجربه ‌ای متفاوت از خرید اکسسوری را برای مشتریان خود فراهم کنیم. در AS مجموعه ‌ای متنوع از دستبند، گردنبند، انگشتر، گوشواره و سایر اکسسوری ‌های منتخب گرد آوری شده است تا پاسخگوی سلیقه‌ های مختلف باشد. تمرکز ما بر کیفیت، ظرافت در طراحی و ارائه محصولاتی است که بتوانند در کنار زیبایی، ماندگاری و ارزش واقعی را نیز به همراه داشته باشند. ما همواره در تلاشیم تا با ارائه جدید ترین کالکشن‌ ها، خدمات مطمئن و تجربه خریدی آسان، به انتخابی قابل اعتماد برای علاقه ‌مندان به اکسسوری و استایل مدرن تبدیل شویم.";
 
   return (
-    <footer className="mt-16 border-t border-[#D6DBDE] bg-white">
-      <div className="mx-auto max-w-[1280px] px-4">
+    <footer className="mt-12 border-t border-[#D6DBDE] bg-white md:mt-16">
+      <div className="mx-auto max-w-[1280px] px-3 sm:px-4 pb-20 md:pb-0">
         {/* ردیف بالا: لوگو + آدرس + تلفن + سوشال عین فیگما */}
-        <div className="flex flex-col items-start justify-between gap-4 border-b border-black/5 py-6 md:flex-row md:items-center">
+        <div className="flex flex-col items-start justify-between gap-5 border-b border-black/5 py-6 md:flex-row md:items-center">
           <Link href="/" className="flex items-center gap-3">
             <span className="text-left font-serif font-black leading-none text-[#0A5A55]">
               <span className="block text-2xl tracking-tighter">AS</span>
@@ -88,7 +88,7 @@ export function Footer({ settings }: { settings?: Record<string, string> }) {
         </div>
 
         {/* ردیف میانی: ۳ ستون لینک در راست + نماد اعتماد در چپ */}
-        <div className="grid gap-8 py-10 md:grid-cols-4">
+        <div className="grid grid-cols-2 gap-6 py-8 sm:gap-8 sm:py-10 md:grid-cols-4">
           {LINK_GROUPS.map((g) => (
             <div key={g.title} className="text-right">
               <p className="font-extrabold text-[#161B22] text-base">{g.title}</p>

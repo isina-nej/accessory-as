@@ -112,7 +112,7 @@ export function HeroBannerSlider({
 
   return (
     <div
-      className="relative w-full max-w-[736px] h-[260px] sm:h-[310px] md:h-[391px] select-none"
+      className="relative h-[230px] w-full max-w-[736px] select-none sm:h-[280px] md:h-[391px]"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
       onTouchStart={handleTouchStart}

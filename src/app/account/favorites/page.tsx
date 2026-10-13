@@ -29,7 +29,7 @@ export default async function FavoritesPage({
   return (
     <div className="flex min-h-full flex-1 flex-col bg-[#F8FAF9]">
       <Header menu={menu} />
-      <main className="mx-auto w-full max-w-[1440px] flex-1 space-y-6 px-4 sm:px-8 lg:px-20 py-6">
+      <main className="mx-auto w-full max-w-[1440px] flex-1 space-y-5 px-3 py-4 pb-24 sm:space-y-6 sm:px-8 sm:py-6 lg:px-20 lg:pb-6">
         <div className="h-5">
           <Breadcrumb
             trail={[

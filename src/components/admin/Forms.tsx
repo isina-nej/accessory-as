@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { inputCls } from "@/components/admin/ui";
 import { Button } from "@/components/ui/button";
 
 export function AdminForm<T extends Record<string, unknown>>({
