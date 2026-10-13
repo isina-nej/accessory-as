@@ -28,7 +28,7 @@ export function OffersCarousel({ items, endsAt }: { items: ShopProduct[]; endsAt
 
   const max = Math.max(0, items.length - 5);
   return (
-    <section aria-label="پیشنهادهای شگفت‌انگیز" className="relative flex min-h-[350px] flex-col gap-6 overflow-hidden rounded-[10px] border border-[#D6DBDE] bg-white p-5 lg:flex-row lg:items-center lg:gap-8 lg:p-8">
+    <section aria-label="پیشنهادهای شگفت‌انگیز" className="relative flex min-h-[350px] flex-col gap-5 overflow-hidden rounded-[10px] border border-[#D6DBDE] bg-white p-3.5 sm:gap-6 sm:p-5 lg:flex-row lg:items-center lg:gap-8 lg:p-8">
       <div className="relative z-10 flex shrink-0 flex-col items-center gap-4 self-center lg:w-[152px]">
         <h2 className="text-center text-[30px] font-extrabold leading-[1.28] text-[#01413E] lg:text-[40px] lg:leading-[56px]">
           پیشنــهاد<br />شــگــفت<br />انگـــــــیز
@@ -46,7 +46,7 @@ export function OffersCarousel({ items, endsAt }: { items: ShopProduct[]; endsAt
         </Link>
       </div>
       <div className="relative z-10 min-w-0 flex-1 overflow-hidden rounded-[10px] border border-[#D6DBDE] bg-[#F8FAF9]">
-        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5" key={index}>
+        <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5" key={index}>
           {items.slice(index, index + 5).map((p) => (
             <ProductCard key={p.id} p={p} offer />
           ))}

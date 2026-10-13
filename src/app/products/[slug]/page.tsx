@@ -60,7 +60,7 @@ export default async function ProductPage({
           (): Awaited<ReturnType<typeof getMegaMenu>> => ({ cats: [], byCat: {} }),
         )}
       />
-      <main className="mx-auto w-full max-w-[1440px] flex-1 px-4 py-6 md:px-20">
+      <main className="mx-auto w-full max-w-[1440px] flex-1 px-3 py-4 sm:px-4 sm:py-6 md:px-20 pb-24 md:pb-6">
         {/* بریدکرامب عین فیگما: اکسسوری آس / دسته / صفحه محصول */}
         <div className="flex w-full justify-end">
           <Breadcrumb

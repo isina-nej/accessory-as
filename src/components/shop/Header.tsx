@@ -74,17 +74,17 @@ export function Header({ menu }: { menu: MegaMenuData }) {
 
   return (
     <header ref={rootRef} className="relative z-40 w-full max-w-full border-b border-[#D6DBDE] bg-white">
-      <div className="mx-auto flex min-h-22 max-w-7xl items-center justify-between gap-8 px-4 py-5">
+      <div className="mx-auto flex min-h-16 max-w-7xl items-center justify-between gap-3 px-4 py-3 md:min-h-22 md:gap-8 md:px-4 md:py-5">
         {/* راست: لوگو عین فیگما */}
-        <Link href="/" className="flex items-center gap-3">
-          <span className="text-left font-serif font-black leading-none text-[#0A5A55]">
-            <span className="block text-2xl tracking-tighter">AS</span>
-            <span className="block text-[10px] tracking-widest font-sans font-medium">accessory</span>
+        <Link href="/" className="flex min-w-0 items-center gap-2 md:gap-3">
+          <span className="text-left font-black leading-none text-[#0A5A55]">
+            <span className="block text-xl tracking-tighter md:text-2xl">AS</span>
+            <span className="block text-[8px] tracking-widest font-medium md:text-[10px]">accessory</span>
           </span>
-          <span aria-hidden className="h-8 w-px bg-black/10" />
-          <span className="leading-tight text-right">
-            <span className="block text-base font-extrabold text-[#161B22]">اکسسوری آس</span>
-            <span className="block text-xs font-medium text-[#8A9398]">روایتی از سلیقه تو</span>
+          <span aria-hidden className="hidden h-8 w-px bg-black/10 md:block" />
+          <span className="hidden min-w-0 leading-tight text-right sm:block">
+            <span className="block truncate text-sm font-extrabold text-[#161B22] md:text-base">اکسسوری آس</span>
+            <span className="block text-[10px] font-medium text-[#8A9398] md:text-xs">روایتی از سلیقه تو</span>
           </span>
         </Link>
 
@@ -133,15 +133,15 @@ export function Header({ menu }: { menu: MegaMenuData }) {
         </nav>
 
         {/* چپ: جستجو + خط + پروفایل + سبد (در RTL از راست به چپ: جستجو، خط، حساب کاربری، سبد خرید) */}
-        <div className="flex items-center gap-4">
-          <Link href="/shop" aria-label="جستجو" className="rounded-lg p-1 text-[#161B22] hover:bg-black/5">
+        <div className="flex shrink-0 items-center gap-1.5 md:gap-4">
+          <Link href="/shop" aria-label="جستجو" className="rounded-lg p-2 text-[#161B22] hover:bg-black/5">
             <Icon name="icons-20--search" className="h-5 w-5" alt="" />
           </Link>
 
-          <span aria-hidden className="h-8 w-px bg-black/10" />
+          <span aria-hidden className="hidden h-8 w-px bg-black/10 md:block" />
 
           {session?.user ? (
-            <Link href="/account" className="flex items-center gap-2">
+            <Link href="/account" className="hidden items-center gap-2 sm:flex">
               <span className="flex h-6 w-6 items-center justify-center">
                 <Icon name="icons-20--user" className="h-5 w-5" alt="" />
               </span>
@@ -151,7 +151,7 @@ export function Header({ menu }: { menu: MegaMenuData }) {
               </span>
             </Link>
           ) : (
-            <Link href="/login" className="flex items-center gap-2">
+            <Link href="/login" className="hidden items-center gap-2 sm:flex">
               <span className="flex h-6 w-6 items-center justify-center">
                 <Icon name="icons-20--user" className="h-5 w-5" alt="" />
               </span>
@@ -159,6 +159,16 @@ export function Header({ menu }: { menu: MegaMenuData }) {
                 <span className="block text-[13px] font-bold text-[#161B22]">حساب کاربری</span>
                 <span className="block text-[11px] text-[#8A9398]">ورود یا ثبت نام</span>
               </span>
+            </Link>
+          )}
+
+          {session?.user ? (
+            <Link href="/account" className="flex items-center gap-2 sm:hidden" aria-label="حساب کاربری">
+              <Icon name="icons-20--user" className="h-5 w-5" alt="" />
+            </Link>
+          ) : (
+            <Link href="/login" className="flex items-center gap-2 sm:hidden" aria-label="ورود یا ثبت نام">
+              <Icon name="icons-20--user" className="h-5 w-5" alt="" />
             </Link>
           )}
 
@@ -173,7 +183,7 @@ export function Header({ menu }: { menu: MegaMenuData }) {
               aria-haspopup="dialog"
               aria-controls="cart-popover"
               aria-label="سبد خرید"
-              className="relative flex h-11 w-11 items-center justify-center rounded-[10px] border border-[#D6DBDE] bg-[#F8FAF9] transition-colors hover:bg-[#E7EFEE] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0A5A55]"
+              className="relative flex h-10 w-10 items-center justify-center rounded-[10px] border border-[#D6DBDE] bg-[#F8FAF9] transition-colors hover:bg-[#E7EFEE] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0A5A55] md:h-11 md:w-11"
             >
               <Icon name="icons-20--shopping-basket" className="h-5 w-5" alt="" />
               {count > 0 && (
@@ -190,7 +200,7 @@ export function Header({ menu }: { menu: MegaMenuData }) {
       </div>
 
       {/* نو بار افقی موبایل */}
-      <nav className="flex gap-3 overflow-x-auto border-t border-black/5 bg-white px-4 py-2 text-xs sm:text-[13px] font-medium text-[#161B22] md:hidden w-full max-w-full" aria-label="ناوبری موبایل">
+      <nav className="flex gap-2 overflow-x-auto border-t border-black/5 bg-white px-4 py-2 text-xs font-medium text-[#161B22] md:hidden w-full max-w-full scrollbar-none" aria-label="ناوبری موبایل">
         <Link href="/shop" className="whitespace-nowrap rounded-full bg-[#E7EFEE] px-3 py-1.5 font-bold text-[#01413E]">
           دسته‌بندی محصولات
         </Link>
@@ -201,17 +211,17 @@ export function Header({ menu }: { menu: MegaMenuData }) {
         ))}
       </nav>
       {/* نوبار پایین موبایل عین فیگما 4302:2078: خانه / دسته‌بندی / سبد / جستجو / اکانت */}
-      <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-black/10 bg-white/95 backdrop-blur md:hidden" aria-label="نوبار پایین">
+      <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-black/10 bg-white/95 shadow-[0_-8px_24px_rgba(0,0,0,0.04)] backdrop-blur md:hidden" aria-label="نوبار پایین">
         <div className="mx-auto grid max-w-md grid-cols-5 px-2 pb-[env(safe-area-inset-bottom)] pt-1.5">
-          <Link href="/" className="flex flex-col items-center gap-0.5 rounded-lg py-1 text-[#0A5A55]">
+          <Link href="/" className="flex flex-col items-center gap-0.5 rounded-lg py-1 text-[#0A5A55] transition-transform active:scale-95">
             <Icon name="icons-solid-20--home" className="h-6 w-6" alt="" />
             <span className="text-[11px] font-bold">خانه</span>
           </Link>
-          <Link href="/shop" className="flex flex-col items-center gap-0.5 rounded-lg py-1 text-[#4B5563]">
+          <Link href="/shop" className="flex flex-col items-center gap-0.5 rounded-lg py-1 text-[#4B5563] transition-transform active:scale-95">
             <Icon name="icons-20--menu-line-horizontal" className="h-6 w-6" alt="" />
             <span className="text-[11px] font-medium">دسته‌بندی</span>
           </Link>
-          <Link href="/cart" className="relative flex flex-col items-center gap-0.5 rounded-lg py-1 text-[#4B5563]">
+          <Link href="/cart" className="relative flex flex-col items-center gap-0.5 rounded-lg py-1 text-[#4B5563] transition-transform active:scale-95">
             <Icon name="icons-20--shopping-basket" className="h-6 w-6" alt="" />
             <span className="text-[11px] font-medium">سبد خرید</span>
             {count > 0 && (
@@ -220,11 +230,11 @@ export function Header({ menu }: { menu: MegaMenuData }) {
               </span>
             )}
           </Link>
-          <Link href="/shop" className="flex flex-col items-center gap-0.5 rounded-lg py-1 text-[#4B5563]">
+          <Link href="/shop" className="flex flex-col items-center gap-0.5 rounded-lg py-1 text-[#4B5563] transition-transform active:scale-95">
             <Icon name="icons-20--search" className="h-6 w-6" alt="" />
             <span className="text-[11px] font-medium">جستجو</span>
           </Link>
-          <Link href={session?.user ? "/account" : "/login"} className="flex flex-col items-center gap-0.5 rounded-lg py-1 text-[#4B5563]">
+          <Link href={session?.user ? "/account" : "/login"} className="flex flex-col items-center gap-0.5 rounded-lg py-1 text-[#4B5563] transition-transform active:scale-95">
             <Icon name="icons-20--user" className="h-6 w-6" alt="" />
             <span className="text-[11px] font-medium">اکانت من</span>
           </Link>

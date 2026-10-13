@@ -80,7 +80,7 @@ export function CartView() {
   const profit = items.reduce((n, x) => n + ((x.p!.oldPrice ?? x.p!.price) - x.p!.price) * x.qty, 0);
 
   return (
-    <div className="grid gap-4 lg:grid-cols-[1fr_360px]">
+    <div className="grid gap-4 pb-4 lg:grid-cols-[1fr_360px]">
       <div className="space-y-3">
         {failed && (
           <p className="rounded-xl border bg-white p-3 text-sm text-(--color-wine)">
@@ -88,7 +88,7 @@ export function CartView() {
           </p>
         )}
         {items.map(({ p, qty }) => (
-          <div key={p!.id} className="flex gap-3 rounded-2xl border bg-white p-3">
+          <div key={p!.id} className="flex gap-2 rounded-2xl border bg-white p-2.5 sm:gap-3 sm:p-3">
             <Link
               href={`/products/${p!.slug}`}
               className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-(--color-mist)"

@@ -50,11 +50,11 @@ export function ProductDetailGallery({
   };
 
   return (
-    <div className="flex flex-col gap-3 w-full">
+    <div className="flex w-full flex-col gap-3">
       {/* Main Image Box */}
-      <div className="box-border flex flex-col items-center justify-between p-6 bg-white border border-[#D6DBDE] rounded-[10px] w-full min-h-[460px] md:min-h-[513px]">
+      <div className="box-border flex min-h-[330px] w-full flex-col items-center justify-between rounded-[10px] border border-[#D6DBDE] bg-white p-3 sm:min-h-[390px] sm:p-4 md:min-h-[513px] md:p-6">
         {/* Top Controls: Arrows on Right in LTR (Left in RTL), Heart on Right in RTL */}
-        <div className="flex flex-row items-center justify-between w-full h-[44px]">
+        <div className="flex h-9 w-full flex-row items-center justify-between sm:h-[44px]">
           {/* Heart rate / Favorite button */}
           <button
             type="button"
@@ -80,7 +80,7 @@ export function ProductDetailGallery({
               type="button"
               onClick={handlePrev}
               aria-label="تصویر قبلی"
-              className="box-border flex items-center justify-center w-[44px] h-[44px] bg-[#F8FAF9] border border-[#D6DBDE] rounded-full shadow-[0px_4px_35px_rgba(0,0,0,0.04)] text-[#161B22] hover:bg-white hover:border-[#0A5A55] transition-all focus-visible:outline-2 focus-visible:outline-[#0A5A55]"
+              className="box-border flex h-9 w-9 items-center justify-center rounded-full border border-[#D6DBDE] bg-[#F8FAF9] text-[#161B22] shadow-[0px_4px_35px_rgba(0,0,0,0.04)] transition-all hover:border-[#0A5A55] hover:bg-white focus-visible:outline-2 focus-visible:outline-[#0A5A55] sm:h-[44px] sm:w-[44px]"
             >
               <Icon name="icons-20--direction-down" className="w-5 h-5 -rotate-90 text-[#161B22]" alt="" />
             </button>
@@ -88,7 +88,7 @@ export function ProductDetailGallery({
               type="button"
               onClick={handleNext}
               aria-label="تصویر بعدی"
-              className="box-border flex items-center justify-center w-[44px] h-[44px] bg-[#F8FAF9] border border-[#D6DBDE] rounded-full shadow-[0px_4px_35px_rgba(0,0,0,0.04)] text-[#161B22] hover:bg-white hover:border-[#0A5A55] transition-all focus-visible:outline-2 focus-visible:outline-[#0A5A55]"
+              className="box-border flex h-9 w-9 items-center justify-center rounded-full border border-[#D6DBDE] bg-[#F8FAF9] text-[#161B22] shadow-[0px_4px_35px_rgba(0,0,0,0.04)] transition-all hover:border-[#0A5A55] hover:bg-white focus-visible:outline-2 focus-visible:outline-[#0A5A55] sm:h-[44px] sm:w-[44px]"
             >
               <Icon name="icons-20--direction-down" className="w-5 h-5 rotate-90 text-[#161B22]" alt="" />
             </button>
@@ -96,12 +96,12 @@ export function ProductDetailGallery({
         </div>
 
         {/* Big Preview Image */}
-        <div className="flex-1 flex items-center justify-center w-full my-auto overflow-hidden py-2">
+        <div className="my-auto flex min-h-[240px] w-full flex-1 items-center justify-center overflow-hidden py-2 sm:min-h-[290px] md:min-h-0">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={currentImage}
             alt={title}
-            className="w-full max-w-[580px] h-[340px] md:h-[421px] object-contain transition-transform duration-300 hover:scale-105"
+            className="h-[220px] w-full max-w-[580px] object-contain transition-transform duration-300 hover:scale-105 sm:h-[280px] md:h-[421px]"
           />
         </div>
       </div>
@@ -118,7 +118,7 @@ export function ProductDetailGallery({
               aria-selected={isActive}
               aria-label={`تصویر ${idx + 1}`}
               onClick={() => setActiveIndex(idx)}
-              className={`box-border flex items-center justify-center h-[100px] md:h-[138px] bg-white border rounded-[10px] p-2 transition-all overflow-hidden focus-visible:outline-2 focus-visible:outline-[#0A5A55] ${
+              className={`box-border flex h-[68px] items-center justify-center overflow-hidden rounded-[10px] border bg-white p-1.5 transition-all focus-visible:outline-2 focus-visible:outline-[#0A5A55] sm:h-[92px] md:h-[138px] md:p-2 ${
                 isActive
                   ? "border-[#0A5A55] ring-2 ring-[#0A5A55]/20"
                   : "border-[#D6DBDE] hover:border-[#8A9398]"
@@ -128,7 +128,7 @@ export function ProductDetailGallery({
               <img
                 src={img}
                 alt={`${title} - بندانگشتی ${idx + 1}`}
-                className="w-full h-full max-h-[85px] md:max-h-[110px] object-contain"
+                className="h-full w-full max-h-[58px] object-contain sm:max-h-[76px] md:max-h-[110px]"
                 loading="lazy"
               />
             </button>

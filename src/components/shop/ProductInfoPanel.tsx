@@ -65,7 +65,7 @@ export function ProductInfoPanel({
   };
 
   return (
-    <div className="box-border flex w-full min-w-0 flex-col gap-6 rounded-[10px] border border-[#D6DBDE] bg-white p-6">
+    <div className="box-border flex w-full min-w-0 flex-col gap-5 rounded-[10px] border border-[#D6DBDE] bg-white p-4 sm:gap-6 sm:p-6">
       {/* نشان دسته + تیتر */}
       <div className="flex flex-col items-end gap-4">
         <span className="box-border flex h-8 flex-row items-center gap-1.5 rounded-lg border border-[#E8EBED] bg-[#F8FAF9] px-3 py-1.5 text-xs font-bold text-[#4B5563]">
@@ -206,10 +206,10 @@ export function ProductInfoPanel({
           ناموجود
         </button>
       ) : (
-        <div className="flex w-full flex-row items-stretch gap-4">
+        <div className="flex w-full flex-col-reverse items-stretch gap-3 sm:flex-row sm:gap-4">
           <div
             dir="ltr"
-            className="box-border flex h-[52px] w-[179px] shrink-0 flex-row items-center justify-between gap-4 rounded-[10px] border border-[#D6DBDE] bg-[#F8FAF9] px-3 py-1.5"
+            className="box-border flex h-[52px] w-full shrink-0 flex-row items-center justify-between gap-4 rounded-[10px] border border-[#D6DBDE] bg-[#F8FAF9] px-3 py-1.5 sm:w-[179px]"
           >
             <button
               type="button"

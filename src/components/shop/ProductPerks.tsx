@@ -41,27 +41,27 @@ const PERKS: PerkItem[] = [
 
 export function ProductPerks() {
   return (
-    <div className="box-border w-full bg-white border border-[#D6DBDE] rounded-[10px] p-6 flex flex-col justify-between gap-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
+    <div className="box-border flex w-full flex-col justify-between gap-5 rounded-[10px] border border-[#D6DBDE] bg-white p-4 sm:gap-6 sm:p-6">
+      <div className="grid w-full grid-cols-2 gap-4 sm:gap-6">
         {PERKS.map((perk) => (
-          <div key={perk.id} className="flex flex-row items-center justify-end gap-3 text-right">
-            <div className="flex flex-col justify-center items-end">
-              <span className="text-[13px] font-bold text-[#161B22] leading-[22px]">
+          <div key={perk.id} className="flex min-w-0 flex-row items-center justify-end gap-2 text-right sm:gap-3">
+            <div className="flex min-w-0 flex-col items-end justify-center">
+              <span className="block max-w-full truncate text-[11px] font-bold leading-[18px] text-[#161B22] sm:text-[13px] sm:leading-[22px]">
                 {perk.title}
               </span>
-              <span className={`text-[12px] font-medium leading-[20px] ${perk.descColor ?? "text-[#4B5563]"}`}>
+              <span className={`block max-w-full truncate text-[9px] font-medium leading-[16px] sm:text-[12px] sm:leading-[20px] ${perk.descColor ?? "text-[#4B5563]"}`}>
                 {perk.desc}
               </span>
             </div>
-            <div className="relative w-11 h-11 shrink-0 flex items-center justify-center">
+            <div className="relative flex h-9 w-9 shrink-0 items-center justify-center sm:h-11 sm:w-11">
               <span
-                className="absolute inset-1 rounded-full pointer-events-none"
+                className="pointer-events-none absolute inset-1 rounded-full"
                 style={{
                   background:
                     "linear-gradient(149.32deg, rgba(215, 232, 231, 0) 14.89%, #D7E8E7 84.43%)",
                 }}
               />
-              <Icon name={perk.icon} className="relative z-10 w-6 h-6 text-[#01413E]" alt="" />
+              <Icon name={perk.icon} className="relative z-10 h-5 w-5 text-[#01413E] sm:h-6 sm:w-6" alt="" />
             </div>
           </div>
         ))}

@@ -23,7 +23,7 @@ export default async function PayPage({
   return (
     <div className="flex min-h-full flex-1 flex-col bg-(--color-mist)">
       <Header menu={menu} />
-      <main className="mx-auto w-full max-w-7xl flex-1 space-y-4 px-4 py-6">
+      <main className="mx-auto w-full max-w-7xl flex-1 space-y-4 px-3 py-4 pb-24 sm:px-4 sm:py-6 md:pb-6">
         <Breadcrumb
           trail={[
             { href: "/", label: "اکسسوری آس" },
