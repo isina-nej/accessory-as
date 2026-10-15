@@ -1,1 +1,0 @@
-DROP INDEX `verification_id_idx` ON `verification`;

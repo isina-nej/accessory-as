@@ -29,3 +29,12 @@ EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 CMD ["node", "server.js"]
+
+# Opt-in tooling image for one-shot seeding/migrations against the compose database:
+#   SEED_ALLOW_REMOTE_HOSTS=db docker compose --profile tools run --rm seed
+# Keeps dev dependencies (tsx) so the TypeScript seed scripts run over the service network
+# instead of requiring a published database port.
+FROM deps AS seeder
+WORKDIR /app
+COPY . .
+CMD ["npx", "tsx", "src/db/seed.ts"]

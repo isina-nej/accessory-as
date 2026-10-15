@@ -3,7 +3,10 @@ node_modules
 .git
 .env
 .env*.local
+# The local Aiven CA must never enter an image: `*.pem` does not match nested paths, and a
+# shipped CA forces mysql2 into TLS against plain (non-TLS) development/compose databases.
 *.pem
+certs/
 *.fig
 PLAN.md
 README.md

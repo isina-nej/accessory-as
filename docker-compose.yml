@@ -39,6 +39,29 @@ services:
     networks:
       - accessory_net
 
+  # One-shot seeding container, excluded from a normal `docker compose up` (tools profile).
+  # It writes catalog/CMS seed rows into the compose database, so the target host must be
+  # authorised explicitly:
+  #   SEED_ALLOW_REMOTE_HOSTS=db docker compose --profile tools run --rm seed
+  # Do NOT run the fixture variant (src/db/seed-fixtures.ts) against the live store.
+  seed:
+    profiles: ["tools"]
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: seeder
+    container_name: accessory_as_seed
+    environment:
+      - DATABASE_URL=mysql://accessory:${DB_PASSWORD:-pass_accessory_as_2026}@db:3306/accessory_as
+      - NODE_ENV=development
+      - SEED_ALLOW_REMOTE_HOSTS=${SEED_ALLOW_REMOTE_HOSTS:-}
+      - SEED_FIXTURES=${SEED_FIXTURES:-0}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - accessory_net
+
 volumes:
   db_data:
 
